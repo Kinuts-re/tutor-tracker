@@ -5,45 +5,145 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Репетитор · облачный учёт</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <!-- Supabase JS -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', 'Roboto', system-ui, sans-serif; }
         body { background: #f8f3fa; min-height: 100vh; padding: 2rem 1.5rem; display: flex; justify-content: center; align-items: flex-start; }
+        
         .app-container { max-width: 1400px; width: 100%; background: rgba(255, 250, 252, 0.7); backdrop-filter: blur(2px); border-radius: 48px 48px 32px 32px; padding: 2rem 2rem 3rem; box-shadow: 0 20px 40px -12px rgba(120, 80, 130, 0.25), 0 8px 24px -6px rgba(180, 130, 190, 0.15); border: 1px solid #e5d5e9; }
+        
+        /* ===== ЭКРАН ВХОДА ===== */
+        .login-overlay { 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: rgba(60, 40, 70, 0.7); 
+            backdrop-filter: blur(8px); 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            z-index: 2000; 
+            padding: 20px;
+        }
+        .login-card { 
+            background: #fcf8fe; 
+            border-radius: 60px; 
+            padding: 3rem 2.5rem; 
+            max-width: 440px; 
+            width: 100%; 
+            border: 1px solid #dcc7e2; 
+            box-shadow: 0 30px 60px rgba(0,0,0,0.3); 
+            text-align: center; 
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .login-card h2 { color: #4a2e4f; margin-bottom: 0.5rem; font-size: 1.8rem; }
+        .login-card h2 i { color: #7d5f86; }
+        .login-card .subtitle { color: #7f5f89; margin-bottom: 1.5rem; font-size: 0.95rem; }
+        .login-card .field-group { margin-bottom: 1rem; text-align: left; }
+        .login-card label { display: block; font-weight: 500; color: #5e4166; margin-bottom: 0.3rem; font-size: 0.9rem; }
+        .login-card input { 
+            width: 100%; 
+            padding: 0.8rem 1.2rem; 
+            border-radius: 60px; 
+            border: 1px solid #dcc7e2; 
+            font-size: 1rem; 
+            outline: none; 
+            transition: 0.2s;
+        }
+        .login-card input:focus { border-color: #b48dbd; box-shadow: 0 0 0 3px rgba(180, 130, 190, 0.2); }
+        .login-card .btn-primary { 
+            width: 100%; 
+            justify-content: center; 
+            padding: 0.8rem; 
+            font-size: 1rem; 
+            background: #b48dbd;
+            border: none;
+            border-radius: 60px;
+            font-weight: 500;
+            color: white;
+            cursor: pointer;
+            transition: 0.2s;
+            border: 1px solid #c9a8d3;
+            box-shadow: 0 4px 8px rgba(150, 110, 165, 0.2);
+        }
+        .login-card .btn-primary:hover { background: #a47bae; transform: scale(0.98); }
+        .login-card .btn-secondary { 
+            background: transparent; 
+            border: none; 
+            color: #7f5f89; 
+            cursor: pointer; 
+            font-size: 0.9rem; 
+            padding: 0.5rem;
+            transition: 0.2s;
+        }
+        .login-card .btn-secondary:hover { color: #4a2e4f; text-decoration: underline; }
+        .login-card .error { 
+            color: #8a4040; 
+            background: #f7e6e6; 
+            padding: 0.5rem 1rem; 
+            border-radius: 30px; 
+            font-size: 0.9rem; 
+            margin-bottom: 1rem; 
+        }
+        .login-card .hint { 
+            font-size: 0.8rem; 
+            color: #9a82a2; 
+            margin-top: 1.5rem; 
+            border-top: 1px dashed #dcc7e2; 
+            padding-top: 1rem;
+        }
+        .login-card .register-section { 
+            margin-top: 1.5rem; 
+            border-top: 1px dashed #dcc7e2; 
+            padding-top: 1.5rem;
+        }
+        .login-card .register-section .field-group { margin-bottom: 0.8rem; }
+
         .header-botanical { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 2rem; flex-wrap: wrap; border-bottom: 2px dashed #cdb5d4; padding-bottom: 1.2rem; }
         .header-botanical h1 { font-weight: 400; font-size: 2.1rem; letter-spacing: 2px; color: #4a2e4f; display: flex; align-items: center; gap: 0.6rem; }
-        .header-botanical h1 i { color: #7d5f86; font-size: 2rem; filter: drop-shadow(0 2px 4px rgba(130, 80, 140, 0.2)); }
-        .botanical-icon { background: #ebdfef; padding: 0.4rem 0.9rem; border-radius: 60px; font-size: 0.9rem; color: #553a5c; border: 1px solid #d5bedb; box-shadow: inset 0 1px 4px #f3eaf6; margin-left: auto; display: flex; align-items: center; gap: 8px; }
+        .header-botanical h1 i { color: #7d5f86; font-size: 2rem; }
+        .botanical-icon { background: #ebdfef; padding: 0.4rem 0.9rem; border-radius: 60px; font-size: 0.9rem; color: #553a5c; border: 1px solid #d5bedb; display: flex; align-items: center; gap: 8px; margin-left: auto; }
         .save-status { font-size: 0.8rem; color: #6a4e72; background: #efe6f2; padding: 0.3rem 1rem; border-radius: 60px; border: 1px solid #d5bedb; }
+        .save-status.synced { background: #d9ebd9; border-color: #b8d5b8; color: #1f5420; }
+        
         .btn-circle { background: #efe6f2; border: 1px solid #d5bedb; border-radius: 60px; width: 38px; height: 38px; display: inline-flex; align-items: center; justify-content: center; color: #553a5c; font-size: 1rem; cursor: pointer; transition: 0.15s; }
         .btn-circle:hover { background: #dcc7e2; border-color: #b48dbd; }
+        .btn-circle.today-btn { background: #b48dbd; color: white; border-color: #b48dbd; width: auto; padding: 0 1.2rem; font-weight: 500; font-size: 0.85rem; }
+        .btn-circle.today-btn:hover { background: #a47bae; }
+        .btn-circle.copy-btn { background: #d9ebd9; border-color: #b8d5b8; color: #1f5420; width: auto; padding: 0 1.2rem; font-weight: 500; font-size: 0.85rem; }
+        .btn-circle.copy-btn:hover { background: #c5e0c5; }
         .btn-circle.cloud-btn { background: #c9d4e8; border-color: #a8b8d0; color: #2e3f5a; width: auto; padding: 0 1.2rem; font-weight: 500; font-size: 0.85rem; }
         .btn-circle.cloud-btn:hover { background: #b5c4dc; }
         .btn-circle.cloud-btn.synced { background: #d9ebd9; border-color: #b8d5b8; color: #1f5420; }
         .btn-circle.cloud-btn.synced:hover { background: #c5e0c5; }
+
+        .tabs { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+        .tab-btn { background: #efe6f2; border: 1px solid #d5bedb; border-radius: 60px; padding: 0.5rem 1.5rem; font-weight: 500; color: #553a5c; cursor: pointer; transition: 0.15s; font-size: 0.95rem; }
+        .tab-btn:hover { background: #dcc7e2; }
+        .tab-btn.active { background: #b48dbd; color: white; border-color: #b48dbd; box-shadow: 0 4px 10px rgba(150, 110, 165, 0.25); }
+
+        .calendar-nav { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; background: #fcf8fe; border-radius: 60px; padding: 0.6rem 1.5rem; margin-bottom: 1.5rem; border: 1px solid #dcc7e2; }
+        .calendar-nav .nav-group { display: flex; align-items: center; gap: 0.8rem; flex-wrap: wrap; }
+        .calendar-nav .date-display { font-size: 1.1rem; font-weight: 450; color: #3b2740; min-width: 160px; text-align: center; }
+
+        .add-student-section { background: #fcf8fe; border-radius: 40px; padding: 1.5rem 2rem; margin: 1.5rem 0; border: 1px solid #dcc7e2; display: flex; flex-wrap: wrap; align-items: flex-end; gap: 1rem 1.5rem; }
+        .add-student-section .field-group { display: flex; flex-direction: column; gap: 0.3rem; flex: 1 0 100px; }
+        .add-student-section label { font-size: 0.8rem; font-weight: 500; color: #5e4166; display: flex; align-items: center; gap: 6px; }
+        .add-student-section input, .add-student-section select { background: white; border: 1px solid #dcc7e2; border-radius: 40px; padding: 0.6rem 1rem; font-size: 0.9rem; color: #2e1f32; outline: none; width: 100%; }
+        .add-student-section input:focus, .add-student-section select:focus { border-color: #b48dbd; box-shadow: 0 0 0 3px rgba(180, 130, 190, 0.2); }
         .btn-primary { background: #b48dbd; border: none; border-radius: 60px; padding: 0.6rem 1.5rem; font-weight: 500; color: white; font-size: 0.95rem; display: inline-flex; align-items: center; gap: 8px; cursor: pointer; transition: 0.2s; border: 1px solid #c9a8d3; box-shadow: 0 4px 8px rgba(150, 110, 165, 0.2); white-space: nowrap; }
         .btn-primary:hover { background: #a47bae; transform: scale(0.98); }
         .btn-danger { background: #e9d4ed; border: 1px solid #d5b8dc; color: #55335e; padding: 0.3rem 0.8rem; border-radius: 40px; font-size: 0.75rem; font-weight: 500; cursor: pointer; transition: 0.15s; display: inline-flex; align-items: center; gap: 4px; }
         .btn-danger:hover { background: #dcbfe2; }
         .btn-icon { background: transparent; border: none; color: #7f5f89; font-size: 0.9rem; cursor: pointer; padding: 0 4px; }
         .btn-icon:hover { color: #4a2e4f; }
-        /* ===== ОСТАЛЬНЫЕ СТИЛИ (сокращены для экономии места) ===== */
-        .tabs { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
-        .tab-btn { background: #efe6f2; border: 1px solid #d5bedb; border-radius: 60px; padding: 0.5rem 1.5rem; font-weight: 500; color: #553a5c; cursor: pointer; transition: 0.15s; font-size: 0.95rem; }
-        .tab-btn:hover { background: #dcc7e2; }
-        .tab-btn.active { background: #b48dbd; color: white; border-color: #b48dbd; box-shadow: 0 4px 10px rgba(150, 110, 165, 0.25); }
-        .calendar-nav { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; background: #fcf8fe; border-radius: 60px; padding: 0.6rem 1.5rem; margin-bottom: 1.5rem; border: 1px solid #dcc7e2; box-shadow: 0 4px 12px -6px rgba(140, 100, 155, 0.1); }
-        .calendar-nav .nav-group { display: flex; align-items: center; gap: 0.8rem; }
-        .calendar-nav .date-display { font-size: 1.1rem; font-weight: 450; color: #3b2740; min-width: 160px; text-align: center; }
-        .add-student-section { background: #fcf8fe; border-radius: 40px; padding: 1.5rem 2rem; margin: 1.5rem 0; border: 1px solid #dcc7e2; box-shadow: 0 8px 18px -10px rgba(140, 100, 155, 0.15); display: flex; flex-wrap: wrap; align-items: flex-end; gap: 1rem 1.5rem; }
-        .add-student-section .field-group { display: flex; flex-direction: column; gap: 0.3rem; flex: 1 0 100px; }
-        .add-student-section label { font-size: 0.8rem; font-weight: 500; color: #5e4166; display: flex; align-items: center; gap: 6px; }
-        .add-student-section input, .add-student-section select { background: white; border: 1px solid #dcc7e2; border-radius: 40px; padding: 0.6rem 1rem; font-size: 0.9rem; color: #2e1f32; outline: none; width: 100%; }
-        .add-student-section input:focus, .add-student-section select:focus { border-color: #b48dbd; box-shadow: 0 0 0 3px rgba(180, 130, 190, 0.2); }
+
         .day-students-grid { display: flex; flex-direction: column; gap: 1.5rem; }
         .day-student-card { background: #fcf8fe; border-radius: 30px; padding: 1.5rem 2rem; border: 1px solid #decbe3; box-shadow: 0 6px 14px -6px rgba(130, 90, 145, 0.12); transition: 0.15s; }
-        .day-student-card:hover { border-color: #cbafd3; box-shadow: 0 10px 20px -10px rgba(140, 100, 160, 0.18); }
+        .day-student-card:hover { border-color: #cbafd3; }
         .day-student-header { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 1rem 0.5rem; margin-bottom: 0.8rem; }
         .day-student-name { font-size: 1.5rem; font-weight: 450; color: #3b2740; display: flex; align-items: center; gap: 8px; }
         .day-student-name i { color: #8f6f9a; font-size: 1.3rem; }
@@ -51,16 +151,18 @@
         .day-lessons-table { width: 100%; border-collapse: collapse; font-size: 0.95rem; min-width: 500px; }
         .day-lessons-table th { text-align: left; padding: 0.7rem 0.6rem 0.7rem 0; font-weight: 500; color: #5b4363; border-bottom: 1px solid #dcc7e2; }
         .day-lessons-table td { padding: 0.8rem 0.6rem 0.8rem 0; border-bottom: 1px dashed #e8d9ed; vertical-align: middle; }
+        .day-lessons-table tr:last-child td { border-bottom: none; }
         .status-paid { background: #d9ebd9; color: #1f5420; padding: 0.3rem 1.2rem; border-radius: 60px; font-size: 0.85rem; font-weight: 500; display: inline-block; border: 1px solid #b8d5b8; }
         .status-unpaid { background: #f7e6e6; color: #8a4040; padding: 0.3rem 1.2rem; border-radius: 60px; font-size: 0.85rem; font-weight: 500; display: inline-block; border: 1px solid #eac8c8; }
         .note-badge { background: #efe6f2; padding: 0.3rem 1rem; border-radius: 30px; font-size: 0.85rem; color: #3f2a44; max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: inline-block; border: 1px solid #dcc7e2; }
         .no-lessons-msg { text-align: center; padding: 3rem 1rem; color: #9a82a2; background: #fcf8fe; border-radius: 40px; border: 1px dashed #dcc7e2; font-style: italic; }
         .no-lessons-msg i { font-size: 2.4rem; opacity: 0.5; display: block; margin-bottom: 0.5rem; }
+
         .week-grid, .month-grid { display: grid; gap: 0.8rem; margin-top: 1rem; }
         .week-grid { grid-template-columns: repeat(7, 1fr); }
         .month-grid { grid-template-columns: repeat(7, 1fr); }
         .day-cell { background: #fcf8fe; border-radius: 20px; padding: 0.8rem; border: 1px solid #decbe3; min-height: 120px; transition: 0.15s; }
-        .day-cell:hover { border-color: #cbafd3; box-shadow: 0 4px 12px -6px rgba(140, 100, 160, 0.12); }
+        .day-cell:hover { border-color: #cbafd3; }
         .day-cell.today { border-color: #b48dbd; background: #faf5fc; box-shadow: 0 0 0 2px rgba(180, 130, 190, 0.2); }
         .day-cell.other-month { opacity: 0.5; }
         .day-header { display: flex; justify-content: space-between; align-items: center; font-weight: 500; color: #4a2e4f; margin-bottom: 0.5rem; font-size: 0.9rem; }
@@ -75,30 +177,26 @@
         .day-lesson .unpaid-badge { background: #f7e6e6; color: #8a4040; }
         .add-mini { background: transparent; border: 1px dashed #d5bedb; border-radius: 12px; padding: 0.2rem; text-align: center; color: #9a82a2; font-size: 0.7rem; cursor: pointer; margin-top: 0.3rem; transition: 0.1s; }
         .add-mini:hover { background: #efe6f2; border-color: #b48dbd; }
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(60, 40, 70, 0.5); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 1000; }
-        .modal-content { background: #fcf8fe; border-radius: 40px; padding: 2rem 2.5rem; max-width: 500px; width: 90%; border: 1px solid #dcc7e2; box-shadow: 0 20px 40px rgba(0,0,0,0.2); }
+
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(60, 40, 70, 0.5); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
+        .modal-content { background: #fcf8fe; border-radius: 40px; padding: 2rem 2.5rem; max-width: 500px; width: 100%; border: 1px solid #dcc7e2; box-shadow: 0 20px 40px rgba(0,0,0,0.2); max-height: 90vh; overflow-y: auto; }
         .modal-content h3 { color: #4a2e4f; margin-bottom: 1rem; }
         .modal-content .field-group { margin-bottom: 1rem; }
         .modal-content label { display: block; font-weight: 500; color: #5e4166; margin-bottom: 0.3rem; font-size: 0.9rem; }
         .modal-content input, .modal-content select { width: 100%; padding: 0.6rem 1rem; border-radius: 40px; border: 1px solid #dcc7e2; outline: none; }
-        .modal-actions { display: flex; gap: 0.8rem; margin-top: 1.5rem; justify-content: flex-end; }
+        .modal-actions { display: flex; gap: 0.8rem; margin-top: 1.5rem; justify-content: flex-end; flex-wrap: wrap; }
         .modal-actions .btn-secondary { background: #efe6f2; border: 1px solid #d5bedb; border-radius: 40px; padding: 0.5rem 1.5rem; cursor: pointer; }
         .modal-actions .btn-secondary:hover { background: #dcc7e2; }
-        .login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(60, 40, 70, 0.7); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 2000; }
-        .login-card { background: #fcf8fe; border-radius: 60px; padding: 3rem; max-width: 420px; width: 90%; border: 1px solid #dcc7e2; box-shadow: 0 30px 60px rgba(0,0,0,0.3); text-align: center; }
-        .login-card h2 { color: #4a2e4f; margin-bottom: 0.5rem; }
-        .login-card p { color: #7f5f89; margin-bottom: 2rem; font-size: 0.95rem; }
-        .login-card input { width: 100%; padding: 0.8rem 1.2rem; border-radius: 60px; border: 1px solid #dcc7e2; margin-bottom: 1rem; font-size: 1rem; outline: none; }
-        .login-card input:focus { border-color: #b48dbd; box-shadow: 0 0 0 3px rgba(180, 130, 190, 0.2); }
-        .login-card .btn-primary { width: 100%; justify-content: center; padding: 0.8rem; font-size: 1rem; }
-        .login-card .error { color: #8a4040; background: #f7e6e6; padding: 0.5rem; border-radius: 30px; font-size: 0.9rem; margin-bottom: 1rem; }
-        .login-card .hint { font-size: 0.8rem; color: #9a82a2; margin-top: 1rem; }
+
         @media (max-width: 768px) {
             .week-grid, .month-grid { grid-template-columns: repeat(4, 1fr); }
             .app-container { padding: 1rem; }
             .add-student-section { flex-direction: column; align-items: stretch; }
             .calendar-nav { flex-direction: column; align-items: stretch; }
-            .calendar-nav .nav-group { justify-content: center; flex-wrap: wrap; }
+            .calendar-nav .nav-group { justify-content: center; }
+            .login-card { padding: 2rem 1.5rem; }
+            .header-botanical { flex-direction: column; align-items: stretch; text-align: center; }
+            .botanical-icon { margin-left: 0; justify-content: center; flex-wrap: wrap; }
         }
         @media (max-width: 500px) {
             .week-grid, .month-grid { grid-template-columns: repeat(2, 1fr); }
@@ -107,34 +205,64 @@
 </head>
 <body>
 <div class="app-container" id="app">
-    <!-- Экран входа -->
+    <!-- ЭКРАН ВХОДА -->
     <div v-if="!isLoggedIn" class="login-overlay">
         <div class="login-card">
-            <h2><i class="fas fa-leaf" style="color:#7d5f86;"></i> Ученический сад</h2>
-            <p>Войдите, чтобы синхронизировать данные</p>
+            <h2><i class="fas fa-leaf"></i> Ученический сад</h2>
+            <p class="subtitle">Войдите, чтобы синхронизировать данные</p>
+            
             <div v-if="loginError" class="error">{{ loginError }}</div>
-            <input type="email" v-model="loginEmail" placeholder="Email" @keydown.enter="login">
-            <input type="password" v-model="loginPassword" placeholder="Пароль" @keydown.enter="login">
-            <button class="btn-primary" @click="login"><i class="fas fa-sign-in-alt"></i> Войти</button>
-            <div style="margin-top: 0.8rem;">
-                <button class="btn-secondary" @click="showRegister = !showRegister" style="background:transparent;border:none;color:#7f5f89;cursor:pointer;font-size:0.9rem;">
-                    {{ showRegister ? 'Уже есть аккаунт? Войти' : 'Нет аккаунта? Зарегистрироваться' }}
-                </button>
+            
+            <!-- Форма входа -->
+            <div v-if="!showRegister">
+                <div class="field-group">
+                    <label><i class="fas fa-envelope"></i> Email</label>
+                    <input type="email" v-model="loginEmail" placeholder="your@email.com" @keydown.enter="login">
+                </div>
+                <div class="field-group">
+                    <label><i class="fas fa-lock"></i> Пароль</label>
+                    <input type="password" v-model="loginPassword" placeholder="••••••••" @keydown.enter="login">
+                </div>
+                <button class="btn-primary" @click="login"><i class="fas fa-sign-in-alt"></i> Войти</button>
+                <div style="margin-top: 1rem;">
+                    <button class="btn-secondary" @click="showRegister = !showRegister">
+                        <i class="fas fa-user-plus"></i> Нет аккаунта? Зарегистрироваться
+                    </button>
+                </div>
             </div>
-            <div v-if="showRegister" style="margin-top: 1rem; border-top: 1px dashed #dcc7e2; padding-top: 1rem;">
-                <input type="text" v-model="registerName" placeholder="Ваше имя" @keydown.enter="register">
-                <input type="email" v-model="registerEmail" placeholder="Email" @keydown.enter="register">
-                <input type="password" v-model="registerPassword" placeholder="Пароль (мин. 6 символов)" @keydown.enter="register">
+            
+            <!-- Форма регистрации -->
+            <div v-else class="register-section">
+                <div class="field-group">
+                    <label><i class="fas fa-user"></i> Ваше имя</label>
+                    <input type="text" v-model="registerName" placeholder="Анна" @keydown.enter="register">
+                </div>
+                <div class="field-group">
+                    <label><i class="fas fa-envelope"></i> Email</label>
+                    <input type="email" v-model="registerEmail" placeholder="your@email.com" @keydown.enter="register">
+                </div>
+                <div class="field-group">
+                    <label><i class="fas fa-lock"></i> Пароль (мин. 6 символов)</label>
+                    <input type="password" v-model="registerPassword" placeholder="••••••••" @keydown.enter="register">
+                </div>
                 <button class="btn-primary" @click="register" style="background:#a47bae;"><i class="fas fa-user-plus"></i> Зарегистрироваться</button>
+                <div style="margin-top: 0.8rem;">
+                    <button class="btn-secondary" @click="showRegister = !showRegister">
+                        <i class="fas fa-arrow-left"></i> Назад к входу
+                    </button>
+                </div>
             </div>
-            <div class="hint">Данные сохраняются в облаке и доступны на всех устройствах</div>
+            
+            <div class="hint">
+                <i class="fas fa-cloud-upload-alt"></i> Данные сохраняются в облаке и доступны на всех устройствах
+            </div>
         </div>
     </div>
 
-    <!-- Основной интерфейс -->
+    <!-- ОСНОВНОЙ ИНТЕРФЕЙС -->
     <template v-if="isLoggedIn">
         <div class="header-botanical">
-            <h1><i class="fas fa-leaf"></i><span>ученический сад</span><i class="fas fa-seedling" style="font-size: 1.4rem;"></i></h1>
+            <h1><i class="fas fa-leaf"></i><span>ученический сад</span></h1>
             <span class="botanical-icon">
                 <i class="fas fa-user-circle"></i> {{ userEmail }}
                 <span class="save-status" :class="{ synced: syncStatus === 'synced' }">
@@ -144,7 +272,7 @@
                     {{ syncLabel }}
                 </span>
                 <button class="btn-circle" @click="logout" style="width:auto;padding:0 0.8rem;font-size:0.8rem;background:#e9d4ed;border-color:#d5b8dc;">
-                    <i class="fas fa-sign-out-alt"></i>
+                    <i class="fas fa-sign-out-alt"></i> Выйти
                 </button>
             </span>
         </div>
@@ -163,10 +291,8 @@
             </div>
             <div class="date-display"><i class="far fa-calendar-alt"></i> {{ periodLabel }}</div>
             <div class="nav-group">
-                <button class="btn-circle copy-btn" @click="openCopyModal" style="background:#d9ebd9;border-color:#b8d5b8;color:#1f5420;width:auto;padding:0 1.2rem;font-weight:500;font-size:0.85rem;">
-                    <i class="fas fa-copy"></i> Копировать
-                </button>
-                <button class="btn-circle cloud-btn" :class="{ synced: syncStatus === 'synced' }" @click="syncWithCloud" style="width:auto;padding:0 1.2rem;font-weight:500;font-size:0.85rem;">
+                <button class="btn-circle copy-btn" @click="openCopyModal"><i class="fas fa-copy"></i> Копировать</button>
+                <button class="btn-circle cloud-btn" :class="{ synced: syncStatus === 'synced' }" @click="syncWithCloud">
                     <i class="fas fa-cloud-upload-alt"></i> {{ syncStatus === 'synced' ? 'Синхронизировано' : 'Синхронизировать' }}
                 </button>
             </div>
@@ -266,11 +392,14 @@
     </template>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
 <script>
-    // ===== КОНФИГУРАЦИЯ SUPABASE =====
-    // ЗАМЕНИТЕ ЭТИ ЗНАЧЕНИЯ НА СВОИ ИЗ ПАНЕЛИ УПРАВЛЕНИЯ SUPABASE
+    // ==========================================
+    // ⭐ ВСТАВЬТЕ ВАШИ ДАННЫЕ СЮДА ⭐
+    // ==========================================
     const SUPABASE_URL = 'https://nmvsdljxxwghwpmjnoxh.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_TexxaSVrxSpUXBh0tIR7Tw_6-Sdlsm_';
+    // ==========================================
 
     const { createClient } = supabase;
     const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -278,7 +407,6 @@
     new Vue({
         el: '#app',
         data: {
-            // Авторизация
             isLoggedIn: false,
             userEmail: '',
             loginEmail: '',
@@ -288,8 +416,6 @@
             registerName: '',
             registerEmail: '',
             registerPassword: '',
-            
-            // Основные данные
             students: [],
             viewMode: 'day',
             selectedDate: new Date(),
@@ -303,7 +429,7 @@
             copySourceDate: '', 
             copyTargetDate: '', 
             copyAction: 'copy',
-            syncStatus: 'idle', // idle | syncing | synced | error
+            syncStatus: 'idle',
             syncLabel: 'Ожидание'
         },
         computed: {
@@ -525,6 +651,10 @@
             // ===== АВТОРИЗАЦИЯ =====
             async login() {
                 this.loginError = '';
+                if (!this.loginEmail || !this.loginPassword) {
+                    this.loginError = 'Введите email и пароль';
+                    return;
+                }
                 try {
                     const { data, error } = await supabaseClient.auth.signInWithPassword({
                         email: this.loginEmail,
@@ -535,13 +665,18 @@
                     this.isLoggedIn = true;
                     this.loginEmail = '';
                     this.loginPassword = '';
+                    this.loginError = '';
                     await this.loadFromCloud();
                 } catch (e) {
-                    this.loginError = e.message || 'Ошибка входа';
+                    this.loginError = e.message || 'Ошибка входа. Проверьте email и пароль.';
                 }
             },
             async register() {
                 this.loginError = '';
+                if (!this.registerEmail || !this.registerPassword || !this.registerName) {
+                    this.loginError = 'Заполните все поля';
+                    return;
+                }
                 if (this.registerPassword.length < 6) {
                     this.loginError = 'Пароль должен быть минимум 6 символов';
                     return;
@@ -555,13 +690,15 @@
                         }
                     });
                     if (error) throw error;
-                    alert('Регистрация успешна! Проверьте почту для подтверждения.');
+                    alert('Регистрация успешна! Проверьте почту для подтверждения (если не пришло - проверьте спам).');
                     this.showRegister = false;
                     this.registerName = '';
                     this.registerEmail = '';
                     this.registerPassword = '';
+                    this.loginEmail = this.registerEmail;
+                    this.loginError = 'Теперь войдите с вашим email и паролем';
                 } catch (e) {
-                    this.loginError = e.message || 'Ошибка регистрации';
+                    this.loginError = e.message || 'Ошибка регистрации. Возможно, email уже используется.';
                 }
             },
             async logout() {
@@ -569,6 +706,8 @@
                 this.isLoggedIn = false;
                 this.userEmail = '';
                 this.students = [];
+                this.syncStatus = 'idle';
+                this.syncLabel = 'Ожидание';
             },
 
             // ===== ОБЛАЧНОЕ ХРАНИЛИЩЕ =====
@@ -577,10 +716,12 @@
                 this.syncStatus = 'syncing';
                 this.syncLabel = 'Сохранение...';
                 try {
+                    const user = await supabaseClient.auth.getUser();
+                    if (user.error) throw user.error;
                     const { error } = await supabaseClient
                         .from('tutor_data')
                         .upsert({
-                            user_id: (await supabaseClient.auth.getUser()).data.user.id,
+                            user_id: user.data.user.id,
                             data: JSON.stringify(this.students),
                             updated_at: new Date().toISOString()
                         }, { onConflict: 'user_id' });
@@ -602,10 +743,12 @@
                 this.syncStatus = 'syncing';
                 this.syncLabel = 'Загрузка...';
                 try {
+                    const user = await supabaseClient.auth.getUser();
+                    if (user.error) throw user.error;
                     const { data, error } = await supabaseClient
                         .from('tutor_data')
                         .select('data')
-                        .eq('user_id', (await supabaseClient.auth.getUser()).data.user.id)
+                        .eq('user_id', user.data.user.id)
                         .maybeSingle();
                     if (error) throw error;
                     if (data) {
@@ -618,7 +761,6 @@
                             }
                         }, 3000);
                     } else {
-                        // Первый вход — создаем пустой массив
                         this.students = [];
                         this.syncStatus = 'synced';
                         this.syncLabel = 'Новые данные';
@@ -641,12 +783,10 @@
             },
             async syncWithCloud() {
                 await this.saveToCloud();
-                // После сохранения загружаем актуальные данные
                 await this.loadFromCloud();
             }
         },
         mounted() {
-            // Проверяем, есть ли активная сессия
             supabaseClient.auth.getSession().then(({ data }) => {
                 if (data.session) {
                     this.userEmail = data.session.user.email;
@@ -655,7 +795,6 @@
                 }
             });
 
-            // Подписка на изменения сессии
             supabaseClient.auth.onAuthStateChange((event, session) => {
                 if (event === 'SIGNED_IN' && session) {
                     this.userEmail = session.user.email;
