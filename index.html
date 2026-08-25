@@ -8,19 +8,117 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', 'Roboto', system-ui, sans-serif; }
-        body { background: #f8f3fa; min-height: 100vh; display: flex; justify-content: center; align-items: center; margin: 0; padding: 20px; }
+        
+        /* ===== ФОН С БОТАНИЧЕСКИМ ПАТТЕРНОМ ===== */
+        body { 
+            background: #f8f3fa; 
+            min-height: 100vh; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            margin: 0; 
+            padding: 20px;
+            /* Создаем паттерн с листочками через CSS */
+            background-image: 
+                /* Листочки */
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cpath d='M30 10 C25 15, 20 25, 20 30 C20 38, 25 45, 30 50 C35 45, 40 38, 40 30 C40 25, 35 15, 30 10Z' fill='rgba(180, 141, 189, 0.08)'/%3E%3Cpath d='M30 12 C26 16, 22 24, 22 30 C22 36, 26 43, 30 47 C34 43, 38 36, 38 30 C38 24, 34 16, 30 12Z' fill='rgba(200, 170, 210, 0.06)'/%3E%3C/svg%3E"),
+                /* Маленькие листочки */
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='30' height='30' viewBox='0 0 30 30'%3E%3Cpath d='M15 5 C12 8, 10 13, 10 16 C10 20, 12 24, 15 26 C18 24, 20 20, 20 16 C20 13, 18 8, 15 5Z' fill='rgba(200, 170, 210, 0.05)'/%3E%3C/svg%3E"),
+                /* Цветочки */
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Ccircle cx='40' cy='40' r='6' fill='rgba(200, 170, 210, 0.06)'/%3E%3Ccircle cx='34' cy='34' r='4' fill='rgba(200, 170, 210, 0.04)'/%3E%3Ccircle cx='46' cy='34' r='4' fill='rgba(200, 170, 210, 0.04)'/%3E%3Ccircle cx='34' cy='46' r='4' fill='rgba(200, 170, 210, 0.04)'/%3E%3Ccircle cx='46' cy='46' r='4' fill='rgba(200, 170, 210, 0.04)'/%3E%3C/svg%3E");
+            background-repeat: repeat, repeat, repeat;
+            background-size: 120px 120px, 80px 80px, 160px 160px;
+            background-position: 0 0, 30px 40px, 0 20px;
+        }
         
         .app-container { 
             max-width: 1400px; 
             width: 100%; 
-            background: rgba(255, 250, 252, 0.7); 
-            backdrop-filter: blur(2px); 
+            background: rgba(255, 250, 252, 0.85); 
+            backdrop-filter: blur(4px); 
             border-radius: 48px; 
             padding: 2rem; 
             box-shadow: 0 20px 40px -12px rgba(120, 80, 130, 0.25); 
             border: 1px solid #e5d5e9; 
+            position: relative;
+            overflow: hidden;
         }
         
+        /* Декоративные уголки с листочками */
+        .app-container::before {
+            content: '🌿';
+            position: absolute;
+            top: -5px;
+            right: 20px;
+            font-size: 3rem;
+            opacity: 0.15;
+            transform: rotate(20deg);
+        }
+        .app-container::after {
+            content: '🍃';
+            position: absolute;
+            bottom: -5px;
+            left: 20px;
+            font-size: 2.5rem;
+            opacity: 0.12;
+            transform: rotate(-15deg);
+        }
+        
+        /* ===== ШАПКА С ПОДЗАГОЛОВКОМ ===== */
+        .header-botanical { 
+            display: flex; 
+            align-items: center; 
+            gap: 0.75rem; 
+            margin-bottom: 2rem; 
+            flex-wrap: wrap; 
+            border-bottom: 2px dashed #cdb5d4; 
+            padding-bottom: 1.2rem; 
+            position: relative;
+        }
+        .header-botanical .title-group {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+        .header-botanical h1 { 
+            font-weight: 400; 
+            font-size: 2.1rem; 
+            letter-spacing: 2px; 
+            color: #4a2e4f; 
+            display: flex; 
+            align-items: center; 
+            gap: 0.6rem; 
+            margin-bottom: 0.1rem;
+        }
+        .header-botanical h1 i { 
+            color: #7d5f86; 
+            font-size: 2rem; 
+        }
+        .header-botanical .subtitle {
+            font-size: 0.85rem;
+            color: #7f5f89;
+            font-weight: 300;
+            letter-spacing: 0.5px;
+            margin-left: 2.8rem;
+        }
+        .header-botanical .subtitle i {
+            color: #b48dbd;
+            margin-right: 4px;
+        }
+        .botanical-icon { 
+            background: #ebdfef; 
+            padding: 0.4rem 0.9rem; 
+            border-radius: 60px; 
+            font-size: 0.9rem; 
+            color: #553a5c; 
+            border: 1px solid #d5bedb; 
+            display: flex; 
+            align-items: center; 
+            gap: 8px; 
+            flex-wrap: wrap; 
+        }
+        
+        /* Остальные стили остаются без изменений */
         .login-overlay { 
             position: fixed; 
             top: 0; left: 0; right: 0; bottom: 0;
@@ -119,11 +217,6 @@
             border-top: 1px dashed #dcc7e2; 
             padding-top: 1rem;
         }
-
-        .header-botanical { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 2rem; flex-wrap: wrap; border-bottom: 2px dashed #cdb5d4; padding-bottom: 1.2rem; }
-        .header-botanical h1 { font-weight: 400; font-size: 2.1rem; letter-spacing: 2px; color: #4a2e4f; display: flex; align-items: center; gap: 0.6rem; }
-        .header-botanical h1 i { color: #7d5f86; font-size: 2rem; }
-        .botanical-icon { background: #ebdfef; padding: 0.4rem 0.9rem; border-radius: 60px; font-size: 0.9rem; color: #553a5c; border: 1px solid #d5bedb; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
         .role-badge { 
             background: #b48dbd; 
             color: white; 
@@ -292,7 +385,6 @@
         .day-lesson .price { color: #5e4166; font-size: 0.7rem; }
         .day-lesson .paid-badge { font-size: 0.6rem; padding: 0.1rem 0.4rem; border-radius: 20px; background: #d9ebd9; color: #1f5420; margin-left: 4px; }
         .day-lesson .unpaid-badge { background: #f7e6e6; color: #8a4040; }
-        .day-lesson .note-text { font-size: 0.6rem; color: #6a4e72; }
         .day-lesson .source-badge-small { 
             font-size: 0.5rem; 
             padding: 0.05rem 0.4rem; 
@@ -528,13 +620,30 @@
             .month-grid { grid-template-columns: repeat(4, 1fr); }
             .day-lessons-table { min-width: 400px; }
             .autocomplete-list { max-height: 150px; }
+            .header-botanical .subtitle {
+                margin-left: 0;
+                font-size: 0.75rem;
+            }
+            .app-container::before,
+            .app-container::after {
+                display: none;
+            }
         }
         @media (max-width: 500px) {
             .week-grid, .month-grid { grid-template-columns: repeat(2, 1fr); }
+            .header-botanical h1 { font-size: 1.5rem; }
         }
     </style>
 </head>
 <body>
+
+    
+
+        <!-- ОСТАЛЬНОЙ КОД БЕЗ ИЗМЕНЕНИЙ -->
+        <!-- ... -->
+
+    </template>
+</div>
 <div class="app-container" id="app">
     <!-- ЭКРАН ВХОДА -->
     <div v-if="!isLoggedIn" class="login-overlay">
@@ -551,7 +660,7 @@
                 <button :class="{ active: selectedRole === 'parent' }" @click="selectedRole = 'parent'">
                     <i class="fas fa-user-friends"></i> Родитель
                 </button>
-            </div>
+            </div> 
             
             <div v-if="!showRegister">
                 <div class="field-group">
@@ -604,10 +713,22 @@
         </div>
     </div>
 
-    <!-- ОСНОВНОЙ ИНТЕРФЕЙС -->
+   <!-- ОСНОВНОЙ ИНТЕРФЕЙС -->
     <template v-if="isLoggedIn">
+        <!-- ===== НОВАЯ ШАПКА С ПОДЗАГОЛОВКОМ ===== -->
         <div class="header-botanical">
-            <h1><i class="fas fa-leaf"></i> ученический сад</h1>
+            <div class="title-group">
+                <h1>
+                    <i class="fas fa-leaf"></i>
+                    <span>ученический сад</span>
+                    <i class="fas fa-seedling" style="font-size: 1.4rem;"></i>
+                </h1>
+                <div class="subtitle">
+                    <i class="fas fa-heart" style="color: #e8a0b0;"></i>
+                    Наталья Леонидовна - математика по любви
+                    <i class="fas fa-heart" style="color: #e8a0b0; margin-left: 4px;"></i>
+                </div>
+            </div>
             <span class="botanical-icon">
                 <i class="fas fa-user-circle"></i> {{ userEmail }}
                 <span class="role-badge" :class="{ parent: userRole === 'parent' }">
