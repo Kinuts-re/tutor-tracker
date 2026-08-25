@@ -247,7 +247,6 @@
             text-overflow: ellipsis; 
             display: inline-block; 
             border: 1px solid #dcc7e2; 
-            cursor: pointer;
         }
         .source-badge { 
             font-size: 0.65rem; 
@@ -700,7 +699,7 @@
                 </div>
             </div>
 
-            <!-- 2. ДНЕВНИК (ЕДИНОЕ РАСПИСАНИЕ) -->
+            <!-- 2. ДНЕВНИК -->
             <div v-if="viewMode === 'diary'">
                 <div class="add-student-section">
                     <div class="field-group">
@@ -1363,6 +1362,7 @@
                 const result = [];
                 const studentsMap = new Map();
                 
+                // Берем все занятия из diaryLessons для выбранной даты
                 this.diaryLessons.filter(l => l.date === dateStr).forEach(l => {
                     if (!studentsMap.has(l.student_name)) {
                         studentsMap.set(l.student_name, {
@@ -1370,7 +1370,10 @@
                             lessons: []
                         });
                     }
-                    studentsMap.get(l.student_name).lessons.push(l);
+                    studentsMap.get(l.student_name).lessons.push({
+                        ...l,
+                        source: l.source || 'tutor'
+                    });
                 });
                 
                 return Array.from(studentsMap.values());
@@ -1903,7 +1906,7 @@
                 }
             },
             
-            // ===== ЗАПИСЬ РОДИТЕЛЯ (ОСНОВНАЯ ЛОГИКА) =====
+            // ===== ЗАПИСЬ РОДИТЕЛЯ (ГЛАВНАЯ ЛОГИКА) =====
             async bookSlot(slot) {
                 const form = slot.bookForm;
                 if (!form.parent_name || !form.parent_phone || !form.student_name) {
@@ -1974,7 +1977,7 @@
                     note: form.note || ''
                 });
                 
-                // 5. Добавляем в дневник репетитора (единое расписание)
+                // 5. ДОБАВЛЯЕМ В ДНЕВНИК (единое расписание)
                 const { error: diaryError } = await supabaseClient
                     .from('diary_lessons')
                     .insert({
