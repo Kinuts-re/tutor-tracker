@@ -361,6 +361,50 @@
         .student-card-actions .btn-delete-student { background: #f7e6e6; color: #8a4040; }
         .student-card-actions .btn-delete-student:hover { background: #eac8c8; }
 
+        /* Стили для автокомплита */
+        .autocomplete-container {
+            position: relative;
+            width: 100%;
+        }
+        .autocomplete-list {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #dcc7e2;
+            border-radius: 20px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 100;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            margin-top: 4px;
+        }
+        .autocomplete-item {
+            padding: 0.6rem 1rem;
+            cursor: pointer;
+            border-bottom: 1px solid #f0ebf2;
+            transition: 0.1s;
+            font-size: 0.9rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .autocomplete-item:hover {
+            background: #efe6f2;
+        }
+        .autocomplete-item:last-child {
+            border-bottom: none;
+        }
+        .autocomplete-item .student-info {
+            font-size: 0.75rem;
+            color: #7f5f89;
+        }
+        .autocomplete-item .student-name {
+            font-weight: 500;
+            color: #3b2740;
+        }
+
         @media (max-width: 768px) {
             .app-container { padding: 1rem; }
             .add-slot-form, .add-student-section { flex-direction: column; align-items: stretch; }
@@ -370,6 +414,7 @@
             .week-grid { grid-template-columns: repeat(4, 1fr); }
             .month-grid { grid-template-columns: repeat(4, 1fr); }
             .day-lessons-table { min-width: 400px; }
+            .autocomplete-list { max-height: 150px; }
         }
         @media (max-width: 500px) {
             .week-grid, .month-grid { grid-template-columns: repeat(2, 1fr); }
@@ -543,10 +588,24 @@
                 </div>
             </div>
 
-            <!-- 2. ДНЕВНИК -->
+            <!-- 2. ДНЕВНИК (С АВТОКОМПЛИТОМ) -->
             <div v-if="viewMode === 'diary'">
                 <div class="add-student-section">
-                    <div class="field-group"><label><i class="fas fa-user-graduate"></i> Ученик</label><input v-model="newStudentName" placeholder="Имя"></div>
+                    <div class="field-group">
+                        <label><i class="fas fa-user-graduate"></i> Ученик</label>
+                        <div class="autocomplete-container">
+                            <input type="text" v-model="newStudentName" @input="filterStudents" @blur="closeAutocomplete" @focus="filterStudents" placeholder="Введите имя ученика...">
+                            <div v-if="showAutocomplete && filteredStudentList.length > 0" class="autocomplete-list">
+                                <div v-for="student in filteredStudentList" :key="student.name + student.phone" class="autocomplete-item" @mousedown.prevent="selectStudent(student)">
+                                    <span class="student-name">{{ student.name }}</span>
+                                    <span class="student-info">
+                                        {{ student.class || '—' }} · {{ student.parent_phone || '—' }}
+                                        <span style="font-size:0.7rem;color:#9a82a2;">({{ student.totalLessons || 0 }} занятий)</span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <div class="field-group"><label><i class="fas fa-calendar-day"></i> Дата</label><input type="date" v-model="newLessonDate"></div>
                     <div class="field-group"><label><i class="far fa-clock"></i> Время</label><input v-model="newLessonTime" placeholder="15:00–16:30"></div>
                     <div class="field-group"><label><i class="fas fa-coins"></i> Стоимость</label><input v-model="newLessonPrice" placeholder="1500 ₽"></div>
@@ -608,9 +667,8 @@
                 </div>
             </div>
 
-            <!-- 3. УЧЕНИКИ (ЕДИНАЯ БАЗА) -->
+            <!-- 3. УЧЕНИКИ -->
             <div v-if="viewMode === 'students'">
-                <!-- Форма добавления ученика -->
                 <div class="add-student-section" style="background:#fcf8fe;border-radius:40px;padding:1.5rem 2rem;margin:1.5rem 0;border:1px solid #dcc7e2;">
                     <div class="field-group"><label><i class="fas fa-user-graduate"></i> Имя ученика *</label><input v-model="newStudentForm.name" placeholder="Имя"></div>
                     <div class="field-group"><label><i class="fas fa-user-tag"></i> Класс</label><input v-model="newStudentForm.class" placeholder="7А"></div>
@@ -619,9 +677,8 @@
                     <button class="btn-primary" @click="addStudent"><i class="fas fa-plus-circle"></i> Добавить ученика</button>
                 </div>
 
-                <!-- Список учеников -->
                 <div class="slots-grid" v-if="allStudents.length > 0">
-                    <div v-for="student in allStudents" :key="student.id || student.name + student.phone" class="slot-card">
+                    <div v-for="student in allStudents" :key="student.name + student.phone" class="slot-card">
                         <div style="font-size:1.2rem;font-weight:500;">
                             <i class="fas fa-user-circle"></i> {{ student.name }}
                         </div>
@@ -632,7 +689,7 @@
                             Всего занятий: {{ student.totalLessons || 0 }}
                         </div>
                         <div class="student-card-actions" style="margin-top:0.5rem;padding-top:0.5rem;border-top:1px dashed #e8d9ed;">
-                            <button class="btn-delete-student" @click="deleteStudent(student.id || student.name)" title="Удалить ученика">
+                            <button class="btn-delete-student" @click="deleteStudent(student.name)" title="Удалить ученика">
                                 <i class="fas fa-trash"></i> Удалить
                             </button>
                         </div>
@@ -644,7 +701,7 @@
                 </div>
             </div>
 
-            <!-- 4. РАСПИСАНИЕ (С УПРАВЛЕНИЕМ) -->
+            <!-- 4. РАСПИСАНИЕ -->
             <div v-if="viewMode === 'schedule'">
                 <div class="tabs" style="margin-bottom:1rem;">
                     <button class="tab-btn" :class="{ active: scheduleView === 'day' }" @click="scheduleView = 'day'">
@@ -1023,6 +1080,10 @@
             newLessonPaid: 'paid',
             newLessonNote: '',
             
+            // Автокомплит
+            showAutocomplete: false,
+            filteredStudentList: [],
+            
             // Форма добавления ученика
             newStudentForm: {
                 name: '',
@@ -1261,10 +1322,33 @@
                 this.freeSlots = [];
                 this.myBookings = [];
                 this.allBookings = [];
-                this.myStudents = [];
                 this.allStudents = [];
                 this.diaryStudents = [];
                 this.diaryLessons = [];
+            },
+            
+            // ===== АВТОКОМПЛИТ =====
+            filterStudents() {
+                const query = this.newStudentName.toLowerCase().trim();
+                if (!query) {
+                    this.filteredStudentList = [];
+                    this.showAutocomplete = false;
+                    return;
+                }
+                this.filteredStudentList = this.allStudents
+                    .filter(s => s.name.toLowerCase().includes(query))
+                    .slice(0, 10);
+                this.showAutocomplete = this.filteredStudentList.length > 0;
+            },
+            closeAutocomplete() {
+                setTimeout(() => {
+                    this.showAutocomplete = false;
+                }, 200);
+            },
+            selectStudent(student) {
+                this.newStudentName = student.name;
+                this.showAutocomplete = false;
+                this.filteredStudentList = [];
             },
             
             // ===== ЗАГРУЗКА ДАННЫХ =====
@@ -1303,7 +1387,6 @@
                 try {
                     const user = await supabaseClient.auth.getUser();
                     
-                    // Загружаем учеников из bookings (родители)
                     const { data: bookingsData, error: bookingsError } = await supabaseClient
                         .from('bookings')
                         .select('student_name, student_class, parent_phone, parent_name, created_at')
@@ -1312,7 +1395,6 @@
                     
                     if (bookingsError) throw bookingsError;
                     
-                    // Загружаем учеников из diary_lessons
                     const { data: diaryData, error: diaryError } = await supabaseClient
                         .from('diary_lessons')
                         .select('student_name, note, created_at')
@@ -1321,10 +1403,8 @@
                     
                     if (diaryError) throw diaryError;
                     
-                    // Объединяем в единую базу
                     const studentsMap = new Map();
                     
-                    // Добавляем из bookings
                     (bookingsData || []).forEach(b => {
                         const key = b.student_name + (b.parent_phone || '');
                         if (!studentsMap.has(key)) {
@@ -1340,7 +1420,6 @@
                         studentsMap.get(key).totalLessons++;
                     });
                     
-                    // Добавляем из diary_lessons
                     (diaryData || []).forEach(d => {
                         const key = d.student_name + 'diary';
                         if (!studentsMap.has(key)) {
@@ -1640,8 +1719,6 @@
                     return;
                 }
                 
-                // Сохраняем в diary_lessons как информацию об ученике
-                // Добавляем запись-заглушку, чтобы ученик появился в списке
                 const user = await supabaseClient.auth.getUser();
                 const { error } = await supabaseClient
                     .from('diary_lessons')
@@ -1666,11 +1743,10 @@
                 alert('✅ Ученик добавлен!');
             },
             
-            async deleteStudent(studentKey) {
-                if (!confirm('Удалить этого ученика и все его занятия?')) return;
+            async deleteStudent(studentName) {
+                if (!confirm(`Удалить ученика "${studentName}" и все его занятия?`)) return;
                 
-                // Находим все занятия ученика
-                const lessons = this.diaryLessons.filter(l => l.student_name === studentKey);
+                const lessons = this.diaryLessons.filter(l => l.student_name === studentName);
                 for (const lesson of lessons) {
                     await supabaseClient
                         .from('diary_lessons')
