@@ -217,9 +217,42 @@
         .no-data { text-align: center; padding: 3rem; color: #9a82a2; background: #fcf8fe; border-radius: 40px; border: 1px dashed #dcc7e2; }
         .no-data i { font-size: 2.4rem; opacity: 0.5; display: block; margin-bottom: 0.5rem; }
 
+        /* Стили для дневника учеников (старые функции) */
+        .day-students-grid { display: flex; flex-direction: column; gap: 1.5rem; }
+        .day-student-card { background: #fcf8fe; border-radius: 30px; padding: 1.5rem 2rem; border: 1px solid #decbe3; box-shadow: 0 6px 14px -6px rgba(130, 90, 145, 0.12); transition: 0.15s; }
+        .day-student-card:hover { border-color: #cbafd3; }
+        .day-student-header { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 1rem 0.5rem; margin-bottom: 0.8rem; }
+        .day-student-name { font-size: 1.5rem; font-weight: 450; color: #3b2740; display: flex; align-items: center; gap: 8px; }
+        .day-student-name i { color: #8f6f9a; font-size: 1.3rem; }
+        .day-lessons-table-wrap { overflow-x: auto; margin: 0.5rem 0 0.8rem; }
+        .day-lessons-table { width: 100%; border-collapse: collapse; font-size: 0.95rem; min-width: 500px; }
+        .day-lessons-table th { text-align: left; padding: 0.7rem 0.6rem 0.7rem 0; font-weight: 500; color: #5b4363; border-bottom: 1px solid #dcc7e2; }
+        .day-lessons-table td { padding: 0.8rem 0.6rem 0.8rem 0; border-bottom: 1px dashed #e8d9ed; vertical-align: middle; }
+        .day-lessons-table tr:last-child td { border-bottom: none; }
+        .status-paid { background: #d9ebd9; color: #1f5420; padding: 0.3rem 1.2rem; border-radius: 60px; font-size: 0.85rem; font-weight: 500; display: inline-block; border: 1px solid #b8d5b8; }
+        .status-unpaid { background: #f7e6e6; color: #8a4040; padding: 0.3rem 1.2rem; border-radius: 60px; font-size: 0.85rem; font-weight: 500; display: inline-block; border: 1px solid #eac8c8; }
+        .note-badge { background: #efe6f2; padding: 0.3rem 1rem; border-radius: 30px; font-size: 0.85rem; color: #3f2a44; max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: inline-block; border: 1px solid #dcc7e2; }
+
+        /* Форма добавления ученика (старая) */
+        .add-student-section { 
+            background: #fcf8fe; 
+            border-radius: 40px; 
+            padding: 1.5rem 2rem; 
+            margin: 1.5rem 0; 
+            border: 1px solid #dcc7e2; 
+            display: flex; 
+            flex-wrap: wrap; 
+            align-items: flex-end; 
+            gap: 1rem 1.5rem; 
+        }
+        .add-student-section .field-group { display: flex; flex-direction: column; gap: 0.3rem; flex: 1 0 100px; }
+        .add-student-section label { font-size: 0.8rem; font-weight: 500; color: #5e4166; display: flex; align-items: center; gap: 6px; }
+        .add-student-section input, .add-student-section select { background: white; border: 1px solid #dcc7e2; border-radius: 40px; padding: 0.6rem 1rem; font-size: 0.9rem; color: #2e1f32; outline: none; width: 100%; }
+        .add-student-section input:focus, .add-student-section select:focus { border-color: #b48dbd; box-shadow: 0 0 0 3px rgba(180, 130, 190, 0.2); }
+
         @media (max-width: 768px) {
             .app-container { padding: 1rem; }
-            .add-slot-form { flex-direction: column; align-items: stretch; }
+            .add-slot-form, .add-student-section { flex-direction: column; align-items: stretch; }
             .calendar-nav { flex-direction: column; align-items: stretch; }
             .slots-grid { grid-template-columns: 1fr; }
             .login-card { padding: 2rem 1.5rem; }
@@ -311,20 +344,23 @@
             </span>
         </div>
 
-        <!-- Вкладки для репетитора -->
+        <!-- ===== ВКЛАДКИ ДЛЯ РЕПЕТИТОРА ===== -->
         <div v-if="userRole === 'tutor'" class="tabs">
             <button class="tab-btn" :class="{ active: viewMode === 'slots' }" @click="viewMode = 'slots'">
-                <i class="fas fa-clock"></i> Мои слоты
+                <i class="fas fa-clock"></i> Слоты для родителей
             </button>
             <button class="tab-btn" :class="{ active: viewMode === 'students' }" @click="viewMode = 'students'">
-                <i class="fas fa-users"></i> Ученики
+                <i class="fas fa-users"></i> Мои ученики
+            </button>
+            <button class="tab-btn" :class="{ active: viewMode === 'diary' }" @click="viewMode = 'diary'">
+                <i class="fas fa-book"></i> Дневник занятий
             </button>
             <button class="tab-btn" :class="{ active: viewMode === 'calendar' }" @click="viewMode = 'calendar'">
                 <i class="fas fa-calendar-alt"></i> Календарь
             </button>
         </div>
 
-        <!-- Вкладки для родителя -->
+        <!-- ===== ВКЛАДКИ ДЛЯ РОДИТЕЛЯ ===== -->
         <div v-else class="tabs">
             <button class="tab-btn" :class="{ active: viewMode === 'slots' }" @click="viewMode = 'slots'">
                 <i class="fas fa-clock"></i> Свободные слоты
@@ -334,27 +370,29 @@
             </button>
         </div>
 
+        <!-- ============================================ -->
         <!-- ===== РЕЖИМ РЕПЕТИТОРА ===== -->
+        <!-- ============================================ -->
         <template v-if="userRole === 'tutor'">
-            <!-- Форма добавления слота -->
-            <div v-if="viewMode === 'slots'" class="add-slot-form">
-                <div class="field-group">
-                    <label><i class="fas fa-calendar-day"></i> Дата</label>
-                    <input type="date" v-model="newSlotDate">
-                </div>
-                <div class="field-group">
-                    <label><i class="far fa-clock"></i> Время</label>
-                    <input type="text" v-model="newSlotTime" placeholder="15:00–16:30">
-                </div>
-                <div class="field-group">
-                    <label><i class="fas fa-coins"></i> Стоимость</label>
-                    <input type="text" v-model="newSlotPrice" placeholder="1500 ₽">
-                </div>
-                <button class="btn-primary" @click="addSlot"><i class="fas fa-plus-circle"></i> Добавить слот</button>
-            </div>
-
-            <!-- Слоты репетитора -->
+            
+            <!-- 1. СЛОТЫ ДЛЯ РОДИТЕЛЕЙ -->
             <div v-if="viewMode === 'slots'">
+                <div class="add-slot-form">
+                    <div class="field-group">
+                        <label><i class="fas fa-calendar-day"></i> Дата</label>
+                        <input type="date" v-model="newSlotDate">
+                    </div>
+                    <div class="field-group">
+                        <label><i class="far fa-clock"></i> Время</label>
+                        <input type="text" v-model="newSlotTime" placeholder="15:00–16:30">
+                    </div>
+                    <div class="field-group">
+                        <label><i class="fas fa-coins"></i> Стоимость</label>
+                        <input type="text" v-model="newSlotPrice" placeholder="1500 ₽">
+                    </div>
+                    <button class="btn-primary" @click="addSlot"><i class="fas fa-plus-circle"></i> Добавить слот</button>
+                </div>
+
                 <div class="slots-grid" v-if="tutorSlots.length > 0">
                     <div v-for="slot in tutorSlots" :key="slot.id" class="slot-card" :class="{ booked: slot.booked }">
                         <div class="time">{{ slot.time }}</div>
@@ -384,7 +422,7 @@
                 </div>
             </div>
 
-            <!-- Ученики репетитора -->
+            <!-- 2. МОИ УЧЕНИКИ (из записей) -->
             <div v-if="viewMode === 'students'">
                 <div class="slots-grid" v-if="myStudents.length > 0">
                     <div v-for="student in myStudents" :key="student.name + student.phone" class="slot-card">
@@ -404,7 +442,56 @@
                 </div>
             </div>
 
-            <!-- Календарь репетитора -->
+            <!-- 3. ДНЕВНИК ЗАНЯТИЙ (старые функции) -->
+            <div v-if="viewMode === 'diary'">
+                <!-- Форма добавления занятия -->
+                <div class="add-student-section">
+                    <div class="field-group"><label><i class="fas fa-user-graduate"></i> Ученик</label><input v-model="newStudentName" placeholder="Имя"></div>
+                    <div class="field-group"><label><i class="fas fa-calendar-day"></i> Дата</label><input type="date" v-model="newLessonDate"></div>
+                    <div class="field-group"><label><i class="far fa-clock"></i> Время</label><input v-model="newLessonTime" placeholder="15:00–16:30"></div>
+                    <div class="field-group"><label><i class="fas fa-coins"></i> Стоимость</label><input v-model="newLessonPrice" placeholder="1500 ₽"></div>
+                    <div class="field-group" style="flex:0.6;"><label><i class="fas fa-check-circle"></i> Оплата</label>
+                        <select v-model="newLessonPaid"><option value="paid">✅ Оплачено</option><option value="unpaid">❌ Не оплачено</option></select>
+                    </div>
+                    <div class="field-group" style="flex:1;"><label><i class="fas fa-pen-fancy"></i> Заметка</label><input v-model="newLessonNote" placeholder="Тема, долг..."></div>
+                    <button class="btn-primary" @click="addDiaryLesson"><i class="fas fa-plus-circle"></i> Добавить</button>
+                </div>
+
+                <!-- Список занятий на сегодня -->
+                <div class="day-students-grid">
+                    <div v-if="diaryLessons.length === 0" class="no-data">
+                        <i class="fas fa-book"></i>
+                        <p>Нет занятий на {{ formattedSelectedDate }}</p>
+                    </div>
+                    <div v-for="(student, idx) in diaryStudents" :key="idx" class="day-student-card">
+                        <div class="day-student-header">
+                            <span class="day-student-name">
+                                <i class="fas fa-user-circle"></i> {{ student.name }}
+                                <span style="background:#ebdfef;padding:0.2rem 1rem;border-radius:60px;font-size:0.8rem;color:#46304b;">{{ student.lessons.length }} занятий</span>
+                            </span>
+                            <button class="btn-danger" @click="removeStudent(student.originalIndex)"><i class="fas fa-trash-alt"></i> удалить</button>
+                        </div>
+                        <div class="day-lessons-table-wrap">
+                            <table class="day-lessons-table">
+                                <thead><tr><th>Время</th><th>Стоимость</th><th>Статус</th><th>Заметка</th><th style="width:70px;"></th></tr></thead>
+                                <tbody>
+                                    <tr v-for="(lesson, lIdx) in student.lessons" :key="lIdx">
+                                        <td>{{ lesson.time }}</td><td>{{ lesson.price }}</td>
+                                        <td><span v-if="lesson.paid === 'paid'" class="status-paid"><i class="fas fa-check-circle"></i> оплачено</span><span v-else class="status-unpaid"><i class="fas fa-exclamation-circle"></i> не оплачено</span></td>
+                                        <td><span class="note-badge" :title="lesson.note || '—'">{{ lesson.note || '—' }}</span></td>
+                                        <td>
+                                            <button class="btn-icon" @click="togglePaid(student.originalIndex, lesson.originalIndex)"><i class="fas fa-sync-alt"></i></button>
+                                            <button class="btn-icon" @click="removeDiaryLesson(student.originalIndex, lesson.originalIndex)"><i class="fas fa-times-circle" style="color:#a079aa;"></i></button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. КАЛЕНДАРЬ -->
             <div v-if="viewMode === 'calendar'">
                 <div class="calendar-nav">
                     <div>
@@ -426,8 +513,11 @@
             </div>
         </template>
 
+        <!-- ============================================ -->
         <!-- ===== РЕЖИМ РОДИТЕЛЯ ===== -->
+        <!-- ============================================ -->
         <template v-else>
+            
             <!-- Свободные слоты -->
             <div v-if="viewMode === 'slots'">
                 <div style="margin-bottom:1rem;color:#6a4e72;">
@@ -528,21 +618,34 @@
             registerEmail: '',
             registerPassword: '',
             
+            // Данные для слотов
             slots: [],
+            tutorSlots: [],
+            freeSlots: [],
+            myBookings: [],
+            myStudents: [],
+            
+            // Данные для дневника (старые функции)
+            diaryStudents: [],
+            diaryLessons: [],
             students: [],
-            bookings: [],
             
             viewMode: 'slots',
             currentDate: new Date(),
             
+            // Форма добавления слота
             newSlotDate: '',
             newSlotTime: '',
             newSlotPrice: '',
             
-            myStudents: [],
-            freeSlots: [],
-            myBookings: [],
-            tutorSlots: [],
+            // Форма добавления занятия в дневник
+            newStudentName: '',
+            newLessonDate: '',
+            newLessonTime: '',
+            newLessonPrice: '',
+            newLessonPaid: 'paid',
+            newLessonNote: '',
+            
             monthDays: []
         },
         computed: {
@@ -551,6 +654,14 @@
             },
             currentYear() {
                 return this.currentDate.getFullYear();
+            },
+            formattedSelectedDate() {
+                const d = this.currentDate; 
+                return `${String(d.getDate()).padStart(2,'0')}.${String(d.getMonth()+1).padStart(2,'0')}.${d.getFullYear()}`;
+            },
+            selectedDateStr() {
+                const d = this.currentDate; 
+                return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
             }
         },
         methods: {
@@ -572,19 +683,15 @@
                     });
                     if (error) throw error;
                     
-                    // 🔥 ПРИНУДИТЕЛЬНО ОБНОВЛЯЕМ РОЛЬ
-                    // Сначала проверяем, есть ли пользователь в таблице users
                     const { data: userData, error: userError } = await supabaseClient
                         .from('users')
                         .select('role')
                         .eq('id', data.user.id)
                         .maybeSingle();
                     
-                    // Если пользователь не найден в таблице users - создаем
                     if (userError || !userData) {
-                        console.log('Пользователь не найден в таблице users, создаем...');
                         const defaultRole = this.selectedRole === 'tutor' ? 'tutor' : 'parent';
-                        const { error: insertError } = await supabaseClient
+                        await supabaseClient
                             .from('users')
                             .insert({
                                 id: data.user.id,
@@ -592,31 +699,17 @@
                                 name: data.user.user_metadata?.name || 'Пользователь',
                                 role: defaultRole
                             });
-                        if (insertError) {
-                            console.error('Ошибка создания пользователя:', insertError);
-                            this.userRole = 'parent'; // fallback
-                        } else {
-                            this.userRole = defaultRole;
-                        }
+                        this.userRole = defaultRole;
                     } else {
-                        // Пользователь найден - используем его роль
                         this.userRole = userData.role || 'parent';
-                        console.log('Роль пользователя из БД:', this.userRole);
                     }
                     
-                    // Если роль не совпадает с выбранной - обновляем
                     if (this.userRole !== this.selectedRole) {
-                        console.log(`Обновляем роль с ${this.userRole} на ${this.selectedRole}`);
-                        const { error: updateError } = await supabaseClient
+                        await supabaseClient
                             .from('users')
                             .update({ role: this.selectedRole })
                             .eq('id', data.user.id);
-                        if (updateError) {
-                            console.error('Ошибка обновления роли:', updateError);
-                        } else {
-                            this.userRole = this.selectedRole;
-                            console.log('Роль обновлена на:', this.userRole);
-                        }
+                        this.userRole = this.selectedRole;
                     }
                     
                     this.userEmail = data.user.email;
@@ -625,7 +718,6 @@
                     this.loginPassword = '';
                     this.loginError = '';
                     
-                    console.log('✅ Вход выполнен. Роль:', this.userRole);
                     await this.loadData();
                 } catch (e) {
                     console.error('Ошибка входа:', e);
@@ -657,8 +749,7 @@
                     if (error) throw error;
                     
                     if (data.user) {
-                        // Создаем запись в таблице users с выбранной ролью
-                        const { error: insertError } = await supabaseClient
+                        await supabaseClient
                             .from('users')
                             .insert({
                                 id: data.user.id,
@@ -666,20 +757,6 @@
                                 name: this.registerName,
                                 role: this.selectedRole
                             });
-                        
-                        if (insertError) {
-                            console.error('Ошибка сохранения роли:', insertError);
-                            if (insertError.code === '23505') {
-                                // Обновляем существующую запись
-                                await supabaseClient
-                                    .from('users')
-                                    .update({
-                                        name: this.registerName,
-                                        role: this.selectedRole
-                                    })
-                                    .eq('id', data.user.id);
-                            }
-                        }
                     }
                     
                     alert(`✅ Регистрация успешна! Вы зарегистрированы как ${this.selectedRole === 'tutor' ? 'репетитор' : 'родитель'}. Проверьте почту для подтверждения.`);
@@ -700,13 +777,12 @@
                 this.isLoggedIn = false;
                 this.userEmail = '';
                 this.userRole = '';
-                this.slots = [];
-                this.students = [];
-                this.bookings = [];
                 this.tutorSlots = [];
                 this.freeSlots = [];
                 this.myBookings = [];
                 this.myStudents = [];
+                this.diaryStudents = [];
+                this.diaryLessons = [];
             },
             
             // ===== ЗАГРУЗКА ДАННЫХ =====
@@ -715,6 +791,7 @@
                 if (this.userRole === 'tutor') {
                     await this.loadTutorSlots();
                     await this.loadStudents();
+                    await this.loadDiary();
                     this.viewMode = 'slots';
                 } else {
                     await this.loadFreeSlots();
@@ -734,7 +811,6 @@
                     
                     if (error) throw error;
                     this.tutorSlots = data || [];
-                    console.log('Загружено слотов репетитора:', this.tutorSlots.length);
                 } catch (e) {
                     console.error('Ошибка загрузки слотов:', e);
                 }
@@ -765,9 +841,50 @@
                         studentsMap.get(key).totalLessons++;
                     });
                     this.myStudents = Array.from(studentsMap.values());
-                    console.log('Загружено учеников:', this.myStudents.length);
                 } catch (e) {
                     console.error('Ошибка загрузки учеников:', e);
+                }
+            },
+            
+            // ===== ЗАГРУЗКА ДНЕВНИКА (старые функции) =====
+            async loadDiary() {
+                try {
+                    const user = await supabaseClient.auth.getUser();
+                    // Загружаем все занятия из дневника
+                    const { data, error } = await supabaseClient
+                        .from('diary_lessons')
+                        .select('*')
+                        .eq('tutor_id', user.data.user.id)
+                        .order('date', { ascending: false });
+                    
+                    if (error) throw error;
+                    
+                    // Группируем по ученикам и датам для отображения
+                    const lessons = data || [];
+                    this.diaryLessons = lessons;
+                    
+                    // Фильтруем для отображения на выбранную дату
+                    const filtered = lessons.filter(l => l.date === this.selectedDateStr);
+                    const result = [];
+                    const studentsMap = new Map();
+                    
+                    filtered.forEach(l => {
+                        if (!studentsMap.has(l.student_name)) {
+                            studentsMap.set(l.student_name, {
+                                name: l.student_name,
+                                lessons: []
+                            });
+                        }
+                        studentsMap.get(l.student_name).lessons.push(l);
+                    });
+                    
+                    this.diaryStudents = Array.from(studentsMap.values()).map(s => ({
+                        ...s,
+                        originalIndex: this.diaryStudents.findIndex(d => d.name === s.name) || 0
+                    }));
+                    
+                } catch (e) {
+                    console.error('Ошибка загрузки дневника:', e);
                 }
             },
             
@@ -788,7 +905,6 @@
                         showBookingForm: false,
                         bookForm: { name: '', class: '', phone: '' }
                     }));
-                    console.log('Загружено свободных слотов:', this.freeSlots.length);
                 } catch (e) {
                     console.error('Ошибка загрузки свободных слотов:', e);
                 }
@@ -805,13 +921,12 @@
                     
                     if (error) throw error;
                     this.myBookings = data || [];
-                    console.log('Загружено записей:', this.myBookings.length);
                 } catch (e) {
                     console.error('Ошибка загрузки записей:', e);
                 }
             },
             
-            // ===== УПРАВЛЕНИЕ СЛОТАМИ (РЕПЕТИТОР) =====
+            // ===== УПРАВЛЕНИЕ СЛОТАМИ =====
             async addSlot() {
                 if (!this.newSlotDate || !this.newSlotTime || !this.newSlotPrice) {
                     alert('Заполните все поля');
@@ -925,6 +1040,93 @@
                 }
             },
             
+            // ===== ДНЕВНИК (старые функции) =====
+            async addDiaryLesson() {
+                const name = this.newStudentName.trim(), 
+                      date = this.newLessonDate.trim(), 
+                      time = this.newLessonTime.trim(), 
+                      price = this.newLessonPrice.trim(), 
+                      note = this.newLessonNote.trim();
+                if (!name || !date || !time || !price) { 
+                    alert('Заполните имя, дату, время и стоимость.'); 
+                    return; 
+                }
+                
+                const user = await supabaseClient.auth.getUser();
+                const { error } = await supabaseClient
+                    .from('diary_lessons')
+                    .insert({
+                        tutor_id: user.data.user.id,
+                        student_name: name,
+                        date: date,
+                        time: time,
+                        price: price,
+                        paid: this.newLessonPaid,
+                        note: note || ''
+                    });
+                
+                if (error) {
+                    alert('Ошибка: ' + error.message);
+                    return;
+                }
+                
+                this.newStudentName = '';
+                this.newLessonDate = '';
+                this.newLessonTime = '';
+                this.newLessonPrice = '';
+                this.newLessonPaid = 'paid';
+                this.newLessonNote = '';
+                
+                await this.loadDiary();
+            },
+            
+            async removeDiaryLesson(studentIdx, lessonIdx) {
+                const student = this.diaryStudents[studentIdx];
+                if (!student) return;
+                const lesson = student.lessons[lessonIdx];
+                if (!lesson) return;
+                
+                if (confirm('Удалить это занятие?')) {
+                    await supabaseClient
+                        .from('diary_lessons')
+                        .delete()
+                        .eq('id', lesson.id);
+                    
+                    await this.loadDiary();
+                }
+            },
+            
+            async togglePaid(studentIdx, lessonIdx) {
+                const student = this.diaryStudents[studentIdx];
+                if (!student) return;
+                const lesson = student.lessons[lessonIdx];
+                if (!lesson) return;
+                
+                const newStatus = lesson.paid === 'paid' ? 'unpaid' : 'paid';
+                await supabaseClient
+                    .from('diary_lessons')
+                    .update({ paid: newStatus })
+                    .eq('id', lesson.id);
+                
+                await this.loadDiary();
+            },
+            
+            async removeStudent(studentIdx) {
+                const student = this.diaryStudents[studentIdx];
+                if (!student) return;
+                if (confirm(`Удалить все занятия ученика "${student.name}"?`)) {
+                    // Удаляем все занятия этого ученика
+                    const lessons = this.diaryLessons.filter(l => l.student_name === student.name);
+                    for (const lesson of lessons) {
+                        await supabaseClient
+                            .from('diary_lessons')
+                            .delete()
+                            .eq('id', lesson.id);
+                    }
+                    await this.loadDiary();
+                }
+            },
+            
             // ===== КАЛЕНДАРЬ =====
             changeMonth(delta) {
                 const newDate = new Date(this.currentDate);
@@ -974,7 +1176,6 @@
                     console.error('Ошибка получения роли:', error);
                 }
                 
-                // Если роль не найдена - устанавливаем parent по умолчанию
                 this.userRole = userData?.role || 'parent';
                 this.userEmail = data.session.user.email;
                 this.isLoggedIn = true;
@@ -987,12 +1188,10 @@
             
             // Слушаем изменения сессии
             supabaseClient.auth.onAuthStateChange(async (event, session) => {
-                console.log('🔔 Событие аутентификации:', event);
                 if (event === 'SIGNED_IN' && session) {
                     this.userEmail = session.user.email;
                     this.isLoggedIn = true;
                     
-                    // Получаем роль после входа
                     const { data: userData } = await supabaseClient
                         .from('users')
                         .select('role')
@@ -1000,7 +1199,6 @@
                         .maybeSingle();
                     
                     this.userRole = userData?.role || 'parent';
-                    console.log('🔄 Роль после входа:', this.userRole);
                     await this.loadData();
                 }
                 if (event === 'SIGNED_OUT') {
@@ -1010,12 +1208,15 @@
                     this.tutorSlots = [];
                     this.freeSlots = [];
                     this.myBookings = [];
+                    this.diaryStudents = [];
+                    this.diaryLessons = [];
                 }
             });
             
-            // Устанавливаем сегодняшнюю дату для формы
+            // Устанавливаем сегодняшнюю дату для форм
             const today = new Date();
             this.newSlotDate = this.formatDate(today);
+            this.newLessonDate = this.formatDate(today);
         }
     });
 </script>
