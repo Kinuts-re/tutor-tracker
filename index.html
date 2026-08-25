@@ -138,6 +138,8 @@
         .btn-circle:hover { background: #dcc7e2; border-color: #b48dbd; }
         .btn-circle.today-btn { background: #b48dbd; color: white; border-color: #b48dbd; width: auto; padding: 0 1.2rem; font-weight: 500; font-size: 0.85rem; }
         .btn-circle.today-btn:hover { background: #a47bae; }
+        .btn-circle.copy-btn { background: #d9ebd9; border-color: #b8d5b8; color: #1f5420; width: auto; padding: 0 1.2rem; font-weight: 500; font-size: 0.85rem; }
+        .btn-circle.copy-btn:hover { background: #c5e0c5; }
 
         .tabs { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
         .tab-btn { background: #efe6f2; border: 1px solid #d5bedb; border-radius: 60px; padding: 0.5rem 1.5rem; font-weight: 500; color: #553a5c; cursor: pointer; transition: 0.15s; font-size: 0.95rem; }
@@ -145,6 +147,7 @@
         .tab-btn.active { background: #b48dbd; color: white; border-color: #b48dbd; }
 
         .calendar-nav { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; background: #fcf8fe; border-radius: 60px; padding: 0.6rem 1.5rem; margin-bottom: 1.5rem; border: 1px solid #dcc7e2; }
+        .calendar-nav .nav-group { display: flex; align-items: center; gap: 0.8rem; flex-wrap: wrap; }
         .calendar-nav .date-display { font-size: 1.1rem; font-weight: 450; color: #3b2740; min-width: 160px; text-align: center; }
 
         .slots-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; margin: 1rem 0; }
@@ -217,7 +220,7 @@
         .no-data { text-align: center; padding: 3rem; color: #9a82a2; background: #fcf8fe; border-radius: 40px; border: 1px dashed #dcc7e2; }
         .no-data i { font-size: 2.4rem; opacity: 0.5; display: block; margin-bottom: 0.5rem; }
 
-        /* Стили для дневника учеников (старые функции) */
+        /* Стили для дневника учеников */
         .day-students-grid { display: flex; flex-direction: column; gap: 1.5rem; }
         .day-student-card { background: #fcf8fe; border-radius: 30px; padding: 1.5rem 2rem; border: 1px solid #decbe3; box-shadow: 0 6px 14px -6px rgba(130, 90, 145, 0.12); transition: 0.15s; }
         .day-student-card:hover { border-color: #cbafd3; }
@@ -233,7 +236,6 @@
         .status-unpaid { background: #f7e6e6; color: #8a4040; padding: 0.3rem 1.2rem; border-radius: 60px; font-size: 0.85rem; font-weight: 500; display: inline-block; border: 1px solid #eac8c8; }
         .note-badge { background: #efe6f2; padding: 0.3rem 1rem; border-radius: 30px; font-size: 0.85rem; color: #3f2a44; max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: inline-block; border: 1px solid #dcc7e2; }
 
-        /* Форма добавления ученика (старая) */
         .add-student-section { 
             background: #fcf8fe; 
             border-radius: 40px; 
@@ -250,12 +252,48 @@
         .add-student-section input, .add-student-section select { background: white; border: 1px solid #dcc7e2; border-radius: 40px; padding: 0.6rem 1rem; font-size: 0.9rem; color: #2e1f32; outline: none; width: 100%; }
         .add-student-section input:focus, .add-student-section select:focus { border-color: #b48dbd; box-shadow: 0 0 0 3px rgba(180, 130, 190, 0.2); }
 
+        /* Стили для недели и месяца */
+        .week-grid, .month-grid { display: grid; gap: 0.8rem; margin-top: 1rem; }
+        .week-grid { grid-template-columns: repeat(7, 1fr); }
+        .month-grid { grid-template-columns: repeat(7, 1fr); }
+        .day-cell { background: #fcf8fe; border-radius: 20px; padding: 0.8rem; border: 1px solid #decbe3; min-height: 120px; transition: 0.15s; }
+        .day-cell:hover { border-color: #cbafd3; box-shadow: 0 4px 12px -6px rgba(140, 100, 160, 0.12); }
+        .day-cell.today { border-color: #b48dbd; background: #faf5fc; box-shadow: 0 0 0 2px rgba(180, 130, 190, 0.2); }
+        .day-cell.other-month { opacity: 0.5; }
+        .day-header { display: flex; justify-content: space-between; align-items: center; font-weight: 500; color: #4a2e4f; margin-bottom: 0.5rem; font-size: 0.9rem; }
+        .day-header .day-num { font-size: 1.1rem; }
+        .day-header .day-name { font-size: 0.75rem; color: #7f5f89; }
+        .day-lesson { background: #efe6f2; border-radius: 12px; padding: 0.3rem 0.6rem; margin-bottom: 0.3rem; font-size: 0.75rem; border-left: 3px solid #b48dbd; cursor: pointer; transition: 0.1s; }
+        .day-lesson:hover { background: #dcc7e2; }
+        .day-lesson .student-name { font-weight: 500; color: #3b2740; }
+        .day-lesson .time { color: #6a4e72; font-size: 0.7rem; }
+        .day-lesson .price { color: #5e4166; font-size: 0.7rem; }
+        .day-lesson .paid-badge { font-size: 0.6rem; padding: 0.1rem 0.4rem; border-radius: 20px; background: #d9ebd9; color: #1f5420; margin-left: 4px; }
+        .day-lesson .unpaid-badge { background: #f7e6e6; color: #8a4040; }
+        .add-mini { background: transparent; border: 1px dashed #d5bedb; border-radius: 12px; padding: 0.2rem; text-align: center; color: #9a82a2; font-size: 0.7rem; cursor: pointer; margin-top: 0.3rem; transition: 0.1s; }
+        .add-mini:hover { background: #efe6f2; border-color: #b48dbd; }
+
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(60, 40, 70, 0.5); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
+        .modal-content { background: #fcf8fe; border-radius: 40px; padding: 2rem 2.5rem; max-width: 500px; width: 100%; border: 1px solid #dcc7e2; box-shadow: 0 20px 40px rgba(0,0,0,0.2); max-height: 90vh; overflow-y: auto; }
+        .modal-content h3 { color: #4a2e4f; margin-bottom: 1rem; }
+        .modal-content .field-group { margin-bottom: 1rem; }
+        .modal-content label { display: block; font-weight: 500; color: #5e4166; margin-bottom: 0.3rem; font-size: 0.9rem; }
+        .modal-content input, .modal-content select { width: 100%; padding: 0.6rem 1rem; border-radius: 40px; border: 1px solid #dcc7e2; outline: none; }
+        .modal-actions { display: flex; gap: 0.8rem; margin-top: 1.5rem; justify-content: flex-end; flex-wrap: wrap; }
+        .modal-actions .btn-secondary { background: #efe6f2; border: 1px solid #d5bedb; border-radius: 40px; padding: 0.5rem 1.5rem; cursor: pointer; }
+        .modal-actions .btn-secondary:hover { background: #dcc7e2; }
+
         @media (max-width: 768px) {
             .app-container { padding: 1rem; }
             .add-slot-form, .add-student-section { flex-direction: column; align-items: stretch; }
             .calendar-nav { flex-direction: column; align-items: stretch; }
             .slots-grid { grid-template-columns: 1fr; }
             .login-card { padding: 2rem 1.5rem; }
+            .week-grid { grid-template-columns: repeat(4, 1fr); }
+            .month-grid { grid-template-columns: repeat(4, 1fr); }
+        }
+        @media (max-width: 500px) {
+            .week-grid, .month-grid { grid-template-columns: repeat(2, 1fr); }
         }
     </style>
 </head>
@@ -347,16 +385,16 @@
         <!-- ===== ВКЛАДКИ ДЛЯ РЕПЕТИТОРА ===== -->
         <div v-if="userRole === 'tutor'" class="tabs">
             <button class="tab-btn" :class="{ active: viewMode === 'slots' }" @click="viewMode = 'slots'">
-                <i class="fas fa-clock"></i> Слоты для родителей
-            </button>
-            <button class="tab-btn" :class="{ active: viewMode === 'students' }" @click="viewMode = 'students'">
-                <i class="fas fa-users"></i> Мои ученики
+                <i class="fas fa-clock"></i> Слоты
             </button>
             <button class="tab-btn" :class="{ active: viewMode === 'diary' }" @click="viewMode = 'diary'">
-                <i class="fas fa-book"></i> Дневник занятий
+                <i class="fas fa-book"></i> Дневник
             </button>
-            <button class="tab-btn" :class="{ active: viewMode === 'calendar' }" @click="viewMode = 'calendar'">
-                <i class="fas fa-calendar-alt"></i> Календарь
+            <button class="tab-btn" :class="{ active: viewMode === 'students' }" @click="viewMode = 'students'">
+                <i class="fas fa-users"></i> Ученики
+            </button>
+            <button class="tab-btn" :class="{ active: viewMode === 'schedule' }" @click="viewMode = 'schedule'">
+                <i class="fas fa-calendar-alt"></i> Расписание
             </button>
         </div>
 
@@ -422,29 +460,8 @@
                 </div>
             </div>
 
-            <!-- 2. МОИ УЧЕНИКИ (из записей) -->
-            <div v-if="viewMode === 'students'">
-                <div class="slots-grid" v-if="myStudents.length > 0">
-                    <div v-for="student in myStudents" :key="student.name + student.phone" class="slot-card">
-                        <div style="font-size:1.2rem;font-weight:500;">
-                            <i class="fas fa-user-circle"></i> {{ student.name }}
-                        </div>
-                        <div>📞 {{ student.phone || '—' }}</div>
-                        <div>🏫 {{ student.class || '—' }}</div>
-                        <div style="margin-top:0.5rem;font-size:0.9rem;color:#6a4e72;">
-                            Всего занятий: {{ student.totalLessons || 0 }}
-                        </div>
-                    </div>
-                </div>
-                <div v-else class="no-data">
-                    <i class="fas fa-users"></i>
-                    <p>Пока нет учеников</p>
-                </div>
-            </div>
-
-            <!-- 3. ДНЕВНИК ЗАНЯТИЙ (старые функции) -->
+            <!-- 2. ДНЕВНИК ЗАНЯТИЙ -->
             <div v-if="viewMode === 'diary'">
-                <!-- Форма добавления занятия -->
                 <div class="add-student-section">
                     <div class="field-group"><label><i class="fas fa-user-graduate"></i> Ученик</label><input v-model="newStudentName" placeholder="Имя"></div>
                     <div class="field-group"><label><i class="fas fa-calendar-day"></i> Дата</label><input type="date" v-model="newLessonDate"></div>
@@ -457,9 +474,8 @@
                     <button class="btn-primary" @click="addDiaryLesson"><i class="fas fa-plus-circle"></i> Добавить</button>
                 </div>
 
-                <!-- Список занятий на сегодня -->
                 <div class="day-students-grid">
-                    <div v-if="diaryLessons.length === 0" class="no-data">
+                    <div v-if="diaryStudents.length === 0" class="no-data">
                         <i class="fas fa-book"></i>
                         <p>Нет занятий на {{ formattedSelectedDate }}</p>
                     </div>
@@ -491,22 +507,115 @@
                 </div>
             </div>
 
-            <!-- 4. КАЛЕНДАРЬ -->
-            <div v-if="viewMode === 'calendar'">
-                <div class="calendar-nav">
-                    <div>
-                        <button class="btn-circle" @click="changeMonth(-1)"><i class="fas fa-chevron-left"></i></button>
-                        <span style="font-weight:500;margin:0 1rem;">{{ currentMonth }} {{ currentYear }}</span>
-                        <button class="btn-circle" @click="changeMonth(1)"><i class="fas fa-chevron-right"></i></button>
+            <!-- 3. УЧЕНИКИ -->
+            <div v-if="viewMode === 'students'">
+                <div class="slots-grid" v-if="myStudents.length > 0">
+                    <div v-for="student in myStudents" :key="student.name + student.phone" class="slot-card">
+                        <div style="font-size:1.2rem;font-weight:500;">
+                            <i class="fas fa-user-circle"></i> {{ student.name }}
+                        </div>
+                        <div>📞 {{ student.phone || '—' }}</div>
+                        <div>🏫 {{ student.class || '—' }}</div>
+                        <div style="margin-top:0.5rem;font-size:0.9rem;color:#6a4e72;">
+                            Всего занятий: {{ student.totalLessons || 0 }}
+                        </div>
                     </div>
-                    <button class="btn-circle today-btn" @click="goToday">Сегодня</button>
                 </div>
-                <div class="slots-grid">
-                    <div v-for="day in monthDays" :key="day.date" class="slot-card" :style="{ opacity: day.isCurrentMonth ? 1 : 0.5 }">
-                        <div style="font-weight:500;">{{ day.dayNum }} {{ day.weekday }}</div>
-                        <div v-if="day.slots.length === 0" style="color:#9a82a2;font-size:0.9rem;">Нет слотов</div>
-                        <div v-for="slot in day.slots" :key="slot.id" style="font-size:0.9rem;margin-top:0.3rem;padding:0.3rem;background:#efe6f2;border-radius:12px;">
-                            {{ slot.time }} - {{ slot.booked ? '📕 занято' : '📗 свободно' }}
+                <div v-else class="no-data">
+                    <i class="fas fa-users"></i>
+                    <p>Пока нет учеников</p>
+                </div>
+            </div>
+
+            <!-- 4. РАСПИСАНИЕ (ДЕНЬ/НЕДЕЛЯ/МЕСЯЦ) -->
+            <div v-if="viewMode === 'schedule'">
+                <!-- Переключатель вида -->
+                <div class="tabs" style="margin-bottom:1rem;">
+                    <button class="tab-btn" :class="{ active: scheduleView === 'day' }" @click="scheduleView = 'day'">
+                        <i class="fas fa-day"></i> День
+                    </button>
+                    <button class="tab-btn" :class="{ active: scheduleView === 'week' }" @click="scheduleView = 'week'">
+                        <i class="fas fa-week"></i> Неделя
+                    </button>
+                    <button class="tab-btn" :class="{ active: scheduleView === 'month' }" @click="scheduleView = 'month'">
+                        <i class="fas fa-month"></i> Месяц
+                    </button>
+                    <button class="tab-btn copy-btn" @click="openCopyModal" style="background:#d9ebd9;border-color:#b8d5b8;color:#1f5420;">
+                        <i class="fas fa-copy"></i> Копировать день
+                    </button>
+                </div>
+
+                <!-- Навигация -->
+                <div class="calendar-nav">
+                    <div class="nav-group">
+                        <button class="btn-circle" @click="changeSchedulePeriod(-1)"><i class="fas fa-chevron-left"></i></button>
+                        <button class="btn-circle today-btn" @click="goTodaySchedule"><i class="fas fa-calendar-day"></i> Сегодня</button>
+                        <button class="btn-circle" @click="changeSchedulePeriod(1)"><i class="fas fa-chevron-right"></i></button>
+                    </div>
+                    <div class="date-display"><i class="far fa-calendar-alt"></i> {{ schedulePeriodLabel }}</div>
+                </div>
+
+                <!-- ДЕНЬ -->
+                <div v-if="scheduleView === 'day'">
+                    <div class="day-students-grid">
+                        <div v-if="dayLessons.length === 0" class="no-data">
+                            <i class="fas fa-seedling"></i>
+                            <p>Нет занятий на {{ formattedScheduleDate }}</p>
+                        </div>
+                        <div v-for="(student, idx) in dayLessons" :key="idx" class="day-student-card">
+                            <div class="day-student-header">
+                                <span class="day-student-name">
+                                    <i class="fas fa-user-circle"></i> {{ student.name }}
+                                    <span style="background:#ebdfef;padding:0.2rem 1rem;border-radius:60px;font-size:0.8rem;color:#46304b;">{{ student.lessons.length }} занятий</span>
+                                </span>
+                            </div>
+                            <div class="day-lessons-table-wrap">
+                                <table class="day-lessons-table">
+                                    <thead><tr><th>Время</th><th>Стоимость</th><th>Статус</th><th>Заметка</th></tr></thead>
+                                    <tbody>
+                                        <tr v-for="(lesson, lIdx) in student.lessons" :key="lIdx">
+                                            <td>{{ lesson.time }}</td><td>{{ lesson.price }}</td>
+                                            <td><span v-if="lesson.paid === 'paid'" class="status-paid"><i class="fas fa-check-circle"></i> оплачено</span><span v-else class="status-unpaid"><i class="fas fa-exclamation-circle"></i> не оплачено</span></td>
+                                            <td><span class="note-badge" :title="lesson.note || '—'">{{ lesson.note || '—' }}</span></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- НЕДЕЛЯ -->
+                <div v-if="scheduleView === 'week'">
+                    <div class="week-grid">
+                        <div v-for="day in weekDays" :key="day.date" class="day-cell" :class="{ today: day.isToday }">
+                            <div class="day-header">
+                                <span class="day-name">{{ day.weekday }}</span>
+                                <span class="day-num">{{ day.dayNum }}</span>
+                            </div>
+                            <div v-for="lesson in day.lessons" :key="lesson.id" class="day-lesson">
+                                <div><span class="student-name">{{ lesson.student }}</span> <span class="time">{{ lesson.time }}</span></div>
+                                <div><span class="price">{{ lesson.price }}</span> <span class="paid-badge" :class="{'unpaid-badge': lesson.paid === 'unpaid'}">{{ lesson.paid === 'paid' ? '✅' : '❌' }}</span></div>
+                                <div style="font-size:0.65rem;color:#6a4e72;">{{ lesson.note || '' }}</div>
+                            </div>
+                            <div class="add-mini" @click="quickAddToDiary(day.date)"><i class="fas fa-plus-circle"></i> добавить</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- МЕСЯЦ -->
+                <div v-if="scheduleView === 'month'">
+                    <div class="month-grid">
+                        <div v-for="day in monthDays" :key="day.date" class="day-cell" :class="{ today: day.isToday, 'other-month': !day.isCurrentMonth }">
+                            <div class="day-header">
+                                <span class="day-name">{{ day.weekdayShort }}</span>
+                                <span class="day-num">{{ day.dayNum }}</span>
+                            </div>
+                            <div v-for="lesson in day.lessons" :key="lesson.id" class="day-lesson">
+                                <div><span class="student-name">{{ lesson.student }}</span> <span class="time">{{ lesson.time }}</span></div>
+                                <div><span class="price">{{ lesson.price }}</span> <span class="paid-badge" :class="{'unpaid-badge': lesson.paid === 'unpaid'}">{{ lesson.paid === 'paid' ? '✅' : '❌' }}</span></div>
+                            </div>
+                            <div class="add-mini" @click="quickAddToDiary(day.date)"><i class="fas fa-plus-circle"></i></div>
                         </div>
                     </div>
                 </div>
@@ -517,7 +626,6 @@
         <!-- ===== РЕЖИМ РОДИТЕЛЯ ===== -->
         <!-- ============================================ -->
         <template v-else>
-            
             <!-- Свободные слоты -->
             <div v-if="viewMode === 'slots'">
                 <div style="margin-bottom:1rem;color:#6a4e72;">
@@ -588,6 +696,22 @@
                 </div>
             </div>
         </template>
+
+        <!-- МОДАЛКА КОПИРОВАНИЯ -->
+        <div v-if="copyModalVisible" class="modal-overlay" @click.self="copyModalVisible = false">
+            <div class="modal-content">
+                <h3><i class="fas fa-copy"></i> Копировать день</h3>
+                <div class="field-group"><label>Исходная дата</label><input type="date" v-model="copySourceDate"></div>
+                <div class="field-group"><label>Целевая дата</label><input type="date" v-model="copyTargetDate"></div>
+                <div class="field-group"><label><i class="fas fa-check-circle"></i> Действие</label>
+                    <select v-model="copyAction"><option value="copy">Копировать все занятия</option><option value="move">Перенести (удалить исходные)</option></select>
+                </div>
+                <div class="modal-actions">
+                    <button class="btn-secondary" @click="copyModalVisible = false">Отмена</button>
+                    <button class="btn-primary" @click="executeCopy"><i class="fas fa-check"></i> Выполнить</button>
+                </div>
+            </div>
+        </div>
     </template>
 </div>
 
@@ -618,20 +742,22 @@
             registerEmail: '',
             registerPassword: '',
             
-            // Данные для слотов
+            // Слоты
             slots: [],
             tutorSlots: [],
             freeSlots: [],
             myBookings: [],
             myStudents: [],
             
-            // Данные для дневника (старые функции)
+            // Дневник
             diaryStudents: [],
             diaryLessons: [],
-            students: [],
+            
+            // Просмотр расписания
+            scheduleView: 'day',
+            scheduleDate: new Date(),
             
             viewMode: 'slots',
-            currentDate: new Date(),
             
             // Форма добавления слота
             newSlotDate: '',
@@ -646,23 +772,112 @@
             newLessonPaid: 'paid',
             newLessonNote: '',
             
-            monthDays: []
+            // Копирование
+            copyModalVisible: false,
+            copySourceDate: '',
+            copyTargetDate: '',
+            copyAction: 'copy'
         },
         computed: {
-            currentMonth() {
-                return ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'][this.currentDate.getMonth()];
-            },
-            currentYear() {
-                return this.currentDate.getFullYear();
-            },
+            // Для дневника
             formattedSelectedDate() {
-                const d = this.currentDate; 
+                const d = this.scheduleDate; 
                 return `${String(d.getDate()).padStart(2,'0')}.${String(d.getMonth()+1).padStart(2,'0')}.${d.getFullYear()}`;
             },
             selectedDateStr() {
-                const d = this.currentDate; 
+                const d = this.scheduleDate; 
                 return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-            }
+            },
+            
+            // Для расписания
+            formattedScheduleDate() {
+                const d = this.scheduleDate; 
+                return `${String(d.getDate()).padStart(2,'0')}.${String(d.getMonth()+1).padStart(2,'0')}.${d.getFullYear()}`;
+            },
+            scheduleDateStr() {
+                const d = this.scheduleDate; 
+                return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+            },
+            schedulePeriodLabel() {
+                if (this.scheduleView === 'day') return this.formattedScheduleDate;
+                if (this.scheduleView === 'week') {
+                    const start = this.weekStart; 
+                    const end = new Date(start); 
+                    end.setDate(end.getDate()+6);
+                    return `${String(start.getDate()).padStart(2,'0')}.${String(start.getMonth()+1).padStart(2,'0')} – ${String(end.getDate()).padStart(2,'0')}.${String(end.getMonth()+1).padStart(2,'0')}`;
+                }
+                const d = this.scheduleDate; 
+                return `${this.monthNames[d.getMonth()]} ${d.getFullYear()}`;
+            },
+            weekStart() {
+                const d = new Date(this.scheduleDate); 
+                d.setDate(d.getDate() - d.getDay()); 
+                return d;
+            },
+            weekDays() {
+                const start = new Date(this.weekStart); 
+                const days = [];
+                for (let i = 0; i < 7; i++) {
+                    const d = new Date(start); 
+                    d.setDate(d.getDate() + i);
+                    const dateStr = this.formatDate(d);
+                    const today = new Date(); 
+                    const isToday = d.getDate() === today.getDate() && d.getMonth() === today.getMonth() && d.getFullYear() === today.getFullYear();
+                    const lessons = this.getDiaryLessonsForDate(dateStr);
+                    days.push({ 
+                        date: dateStr, 
+                        weekday: ['вс','пн','вт','ср','чт','пт','сб'][d.getDay()], 
+                        dayNum: d.getDate(), 
+                        isToday, 
+                        lessons 
+                    });
+                }
+                return days;
+            },
+            monthDays() {
+                const d = new Date(this.scheduleDate); 
+                d.setDate(1);
+                const firstDay = d.getDay();
+                const monthStart = new Date(d); 
+                monthStart.setDate(1 - firstDay);
+                const days = [];
+                const today = new Date();
+                for (let i = 0; i < 42; i++) {
+                    const date = new Date(monthStart); 
+                    date.setDate(monthStart.getDate() + i);
+                    const dateStr = this.formatDate(date);
+                    const isCurrentMonth = date.getMonth() === d.getMonth();
+                    const isToday = date.getDate() === today.getDate() && date.getMonth() === today.getMonth() && date.getFullYear() === today.getFullYear();
+                    const lessons = this.getDiaryLessonsForDate(dateStr);
+                    days.push({ 
+                        date: dateStr, 
+                        weekdayShort: ['вс','пн','вт','ср','чт','пт','сб'][date.getDay()], 
+                        dayNum: date.getDate(), 
+                        isCurrentMonth, 
+                        isToday, 
+                        lessons 
+                    });
+                }
+                return days;
+            },
+            dayLessons() {
+                const dateStr = this.scheduleDateStr;
+                const result = [];
+                const studentsMap = new Map();
+                
+                this.diaryLessons.filter(l => l.date === dateStr).forEach(l => {
+                    if (!studentsMap.has(l.student_name)) {
+                        studentsMap.set(l.student_name, {
+                            name: l.student_name,
+                            lessons: []
+                        });
+                    }
+                    studentsMap.get(l.student_name).lessons.push(l);
+                });
+                
+                return Array.from(studentsMap.values());
+            },
+            monthNames() { return ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь']; }
         },
         methods: {
             formatDate(date) {
@@ -846,11 +1061,9 @@
                 }
             },
             
-            // ===== ЗАГРУЗКА ДНЕВНИКА (старые функции) =====
             async loadDiary() {
                 try {
                     const user = await supabaseClient.auth.getUser();
-                    // Загружаем все занятия из дневника
                     const { data, error } = await supabaseClient
                         .from('diary_lessons')
                         .select('*')
@@ -859,12 +1072,10 @@
                     
                     if (error) throw error;
                     
-                    // Группируем по ученикам и датам для отображения
-                    const lessons = data || [];
-                    this.diaryLessons = lessons;
+                    this.diaryLessons = data || [];
                     
                     // Фильтруем для отображения на выбранную дату
-                    const filtered = lessons.filter(l => l.date === this.selectedDateStr);
+                    const filtered = this.diaryLessons.filter(l => l.date === this.selectedDateStr);
                     const result = [];
                     const studentsMap = new Map();
                     
@@ -878,14 +1089,28 @@
                         studentsMap.get(l.student_name).lessons.push(l);
                     });
                     
-                    this.diaryStudents = Array.from(studentsMap.values()).map(s => ({
+                    this.diaryStudents = Array.from(studentsMap.values()).map((s, idx) => ({
                         ...s,
-                        originalIndex: this.diaryStudents.findIndex(d => d.name === s.name) || 0
+                        originalIndex: idx
                     }));
                     
                 } catch (e) {
                     console.error('Ошибка загрузки дневника:', e);
                 }
+            },
+            
+            getDiaryLessonsForDate(dateStr) {
+                const result = [];
+                this.diaryLessons.forEach(l => {
+                    if (l.date === dateStr) {
+                        result.push({ 
+                            ...l, 
+                            student: l.student_name,
+                            id: l.id + Math.random()
+                        });
+                    }
+                });
+                return result;
             },
             
             async loadFreeSlots() {
@@ -1040,7 +1265,7 @@
                 }
             },
             
-            // ===== ДНЕВНИК (старые функции) =====
+            // ===== ДНЕВНИК =====
             async addDiaryLesson() {
                 const name = this.newStudentName.trim(), 
                       date = this.newLessonDate.trim(), 
@@ -1078,6 +1303,7 @@
                 this.newLessonNote = '';
                 
                 await this.loadDiary();
+                await this.loadTutorSlots();
             },
             
             async removeDiaryLesson(studentIdx, lessonIdx) {
@@ -1093,6 +1319,7 @@
                         .eq('id', lesson.id);
                     
                     await this.loadDiary();
+                    await this.loadTutorSlots();
                 }
             },
             
@@ -1109,13 +1336,13 @@
                     .eq('id', lesson.id);
                 
                 await this.loadDiary();
+                await this.loadTutorSlots();
             },
             
             async removeStudent(studentIdx) {
                 const student = this.diaryStudents[studentIdx];
                 if (!student) return;
                 if (confirm(`Удалить все занятия ученика "${student.name}"?`)) {
-                    // Удаляем все занятия этого ученика
                     const lessons = this.diaryLessons.filter(l => l.student_name === student.name);
                     for (const lesson of lessons) {
                         await supabaseClient
@@ -1124,41 +1351,91 @@
                             .eq('id', lesson.id);
                     }
                     await this.loadDiary();
+                    await this.loadTutorSlots();
                 }
             },
             
-            // ===== КАЛЕНДАРЬ =====
-            changeMonth(delta) {
-                const newDate = new Date(this.currentDate);
-                newDate.setMonth(newDate.getMonth() + delta);
-                this.currentDate = newDate;
-                this.buildCalendar();
+            quickAddToDiary(date) {
+                this.viewMode = 'diary';
+                this.newLessonDate = date;
+                const d = new Date(date);
+                if (!isNaN(d)) this.scheduleDate = d;
             },
             
-            goToday() {
-                this.currentDate = new Date();
-                this.buildCalendar();
+            // ===== РАСПИСАНИЕ =====
+            changeSchedulePeriod(delta) {
+                if (this.scheduleView === 'day') { 
+                    const d = new Date(this.scheduleDate); 
+                    d.setDate(d.getDate()+delta); 
+                    this.scheduleDate = d; 
+                } else if (this.scheduleView === 'week') { 
+                    const d = new Date(this.scheduleDate); 
+                    d.setDate(d.getDate()+delta*7); 
+                    this.scheduleDate = d; 
+                } else { 
+                    const d = new Date(this.scheduleDate); 
+                    d.setMonth(d.getMonth()+delta); 
+                    this.scheduleDate = d; 
+                }
             },
             
-            async buildCalendar() {
-                const year = this.currentDate.getFullYear();
-                const month = this.currentDate.getMonth();
-                const lastDay = new Date(year, month + 1, 0);
+            goTodaySchedule() {
+                this.scheduleDate = new Date();
+            },
+            
+            // ===== КОПИРОВАНИЕ =====
+            openCopyModal() {
+                this.copySourceDate = this.scheduleDateStr;
+                const d = new Date(this.scheduleDate); 
+                d.setDate(d.getDate()+1);
+                this.copyTargetDate = this.formatDate(d);
+                this.copyModalVisible = true;
+            },
+            
+            async executeCopy() {
+                if (!this.copySourceDate || !this.copyTargetDate) { 
+                    alert('Выберите даты'); 
+                    return; 
+                }
                 
-                const days = [];
-                for (let d = 1; d <= lastDay.getDate(); d++) {
-                    const date = new Date(year, month, d);
-                    const dateStr = this.formatDate(date);
-                    const slots = this.tutorSlots.filter(s => s.date === dateStr);
-                    days.push({
-                        date: dateStr,
-                        dayNum: d,
-                        weekday: ['Вс','Пн','Вт','Ср','Чт','Пт','Сб'][date.getDay()],
-                        isCurrentMonth: true,
-                        slots: slots
-                    });
+                const lessonsToCopy = this.diaryLessons.filter(l => l.date === this.copySourceDate);
+                
+                if (lessonsToCopy.length === 0) { 
+                    alert('Нет занятий для копирования'); 
+                    return; 
                 }
-                this.monthDays = days;
+                
+                const user = await supabaseClient.auth.getUser();
+                
+                if (this.copyAction === 'move') {
+                    // Удаляем исходные
+                    for (const lesson of lessonsToCopy) {
+                        await supabaseClient
+                            .from('diary_lessons')
+                            .delete()
+                            .eq('id', lesson.id);
+                    }
+                }
+                
+                // Копируем в целевую дату
+                for (const lesson of lessonsToCopy) {
+                    await supabaseClient
+                        .from('diary_lessons')
+                        .insert({
+                            tutor_id: user.data.user.id,
+                            student_name: lesson.student_name,
+                            date: this.copyTargetDate,
+                            time: lesson.time,
+                            price: lesson.price,
+                            paid: lesson.paid,
+                            note: lesson.note || ''
+                        });
+                }
+                
+                this.copyModalVisible = false;
+                await this.loadDiary();
+                await this.loadTutorSlots();
+                alert(`Скопировано ${lessonsToCopy.length} занятий на ${this.copyTargetDate}`);
             }
         },
         
@@ -1180,9 +1457,6 @@
                 this.userEmail = data.session.user.email;
                 this.isLoggedIn = true;
                 await this.loadData();
-                if (this.userRole === 'tutor') {
-                    await this.buildCalendar();
-                }
                 console.log('🔄 Загружена роль при монтировании:', this.userRole);
             }
             
@@ -1213,10 +1487,11 @@
                 }
             });
             
-            // Устанавливаем сегодняшнюю дату для форм
+            // Устанавливаем сегодняшние даты
             const today = new Date();
             this.newSlotDate = this.formatDate(today);
             this.newLessonDate = this.formatDate(today);
+            this.scheduleDate = today;
         }
     });
 </script>
