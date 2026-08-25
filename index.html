@@ -113,7 +113,7 @@
             flex-wrap: wrap; 
         }
         
-        /* ===== ЭКРАН ВХОДА (ИСПРАВЛЕННЫЙ) ===== */
+        /* ===== ЭКРАН ВХОДА (ИСПРАВЛЕННЫЙ - КАК БЫЛО РАНЬШЕ) ===== */
         .login-overlay { 
             position: fixed; 
             top: 0; 
@@ -141,10 +141,23 @@
             overflow-y: auto;
             position: relative;
         }
-        .login-card h2 { color: #4a2e4f; margin-bottom: 0.5rem; font-size: 1.8rem; }
-        .login-card h2 i { color: #7d5f86; }
-        .login-card .subtitle { color: #7f5f89; margin-bottom: 1.5rem; font-size: 0.95rem; }
-        .login-card .field-group { margin-bottom: 1rem; text-align: left; }
+        .login-card h2 { 
+            color: #4a2e4f; 
+            margin-bottom: 0.5rem; 
+            font-size: 1.8rem; 
+        }
+        .login-card h2 i { 
+            color: #7d5f86; 
+        }
+        .login-card .subtitle { 
+            color: #7f5f89; 
+            margin-bottom: 1.5rem; 
+            font-size: 0.95rem; 
+        }
+        .login-card .field-group { 
+            margin-bottom: 1rem; 
+            text-align: left; 
+        }
         .login-card label { 
             display: block; 
             font-weight: 500; 
@@ -152,6 +165,7 @@
             margin-bottom: 0.3rem; 
             font-size: 0.9rem; 
         }
+        /* ===== ИСХОДНЫЕ СТИЛИ ПОЛЕЙ ВВОДА (без темной рамки) ===== */
         .login-card input, 
         .login-card select { 
             width: 100%; 
@@ -162,12 +176,12 @@
             outline: none; 
             background: white;
             color: #2e1f32;
-            box-shadow: none;
+            transition: border-color 0.2s ease;
         }
         .login-card input:focus, 
         .login-card select:focus { 
             border-color: #b48dbd; 
-            box-shadow: 0 0 0 3px rgba(180, 130, 190, 0.2); 
+            box-shadow: 0 0 0 3px rgba(180, 130, 190, 0.2);
         }
         .login-card input::placeholder {
             color: #b5a5ba;
@@ -186,7 +200,10 @@
             transition: 0.2s;
             border: 1px solid #c9a8d3;
         }
-        .login-card .btn-primary:hover { background: #a47bae; transform: scale(0.98); }
+        .login-card .btn-primary:hover { 
+            background: #a47bae; 
+            transform: scale(0.98); 
+        }
         .login-card .btn-secondary { 
             background: transparent; 
             border: none; 
@@ -195,7 +212,10 @@
             font-size: 0.9rem; 
             padding: 0.5rem;
         }
-        .login-card .btn-secondary:hover { color: #4a2e4f; text-decoration: underline; }
+        .login-card .btn-secondary:hover { 
+            color: #4a2e4f; 
+            text-decoration: underline; 
+        }
         .login-card .error { 
             color: #8a4040; 
             background: #f7e6e6; 
@@ -235,7 +255,7 @@
             padding-top: 1rem;
         }
         
-        /* ===== ОСТАЛЬНЫЕ СТИЛИ (СОКРАЩЕНЫ) ===== */
+        /* ===== ОСТАЛЬНЫЕ СТИЛИ ===== */
         .role-badge { 
             background: #b48dbd; 
             color: white; 
@@ -1128,34 +1148,25 @@
             registerEmail: '',
             registerPassword: '',
             
-            // Слоты
             slots: [],
             tutorSlots: [],
             freeSlots: [],
-            
-            // Записи
             myBookings: [],
             allBookings: [],
+            allStudents: [],
             
-            // Дневник (единое расписание)
             diaryStudents: [],
             diaryLessons: [],
             
-            // Ученики (единая база)
-            allStudents: [],
-            
-            // Просмотр расписания
             scheduleView: 'day',
             scheduleDate: new Date(),
             
             viewMode: 'slots',
             
-            // Форма добавления слота
             newSlotDate: '',
             newSlotTime: '',
             newSlotPrice: '',
             
-            // Форма добавления занятия в дневник
             newStudentName: '',
             newLessonDate: '',
             newLessonTime: '',
@@ -1164,11 +1175,9 @@
             newLessonPaid: 'paid',
             newLessonNote: '',
             
-            // Автокомплит
             showAutocomplete: false,
             filteredStudentList: [],
             
-            // Форма добавления ученика
             newStudentForm: {
                 name: '',
                 class: '',
@@ -1176,14 +1185,11 @@
                 parent_name: ''
             },
             
-            // Редактирование ученика
             editStudentData: {},
             editingStudentIndex: -1,
             
-            // Сохраненные данные родителя
             savedParentData: null,
             
-            // Копирование
             copyModalVisible: false,
             copySourceDate: '',
             copyTargetDate: '',
@@ -1297,7 +1303,6 @@
                 return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;
             },
             
-            // ===== АВТОРИЗАЦИЯ =====
             async login() {
                 this.loginError = '';
                 if (!this.loginEmail || !this.loginPassword) {
@@ -1417,7 +1422,6 @@
                 localStorage.removeItem('savedParentData');
             },
             
-            // ===== СОХРАНЕНИЕ ДАННЫХ РОДИТЕЛЯ =====
             loadSavedParentData() {
                 try {
                     const saved = localStorage.getItem('savedParentData');
@@ -1463,7 +1467,6 @@
                 slot.showBookingForm = true;
             },
             
-            // ===== АВТОКОМПЛИТ =====
             filterStudents() {
                 const query = this.newStudentName.toLowerCase().trim();
                 if (!query) {
@@ -1488,7 +1491,6 @@
                 this.filteredStudentList = [];
             },
             
-            // ===== РЕДАКТИРОВАНИЕ УЧЕНИКОВ =====
             startEditStudent(index) {
                 const student = this.allStudents[index];
                 this.editingStudentIndex = index;
@@ -1556,7 +1558,6 @@
                 alert('✅ Данные ученика обновлены!');
             },
             
-            // ===== ЗАГРУЗКА ДАННЫХ =====
             async loadData() {
                 console.log('Загрузка данных для роли:', this.userRole);
                 if (this.userRole === 'tutor') {
@@ -1583,7 +1584,6 @@
                     
                     if (error) throw error;
                     this.tutorSlots = data || [];
-                    console.log('Загружено слотов репетитора:', this.tutorSlots.length);
                 } catch (e) {
                     console.error('Ошибка загрузки слотов:', e);
                 }
@@ -1644,7 +1644,6 @@
                     });
                     
                     this.allStudents = Array.from(studentsMap.values());
-                    console.log('Загружено учеников:', this.allStudents.length);
                 } catch (e) {
                     console.error('Ошибка загрузки учеников:', e);
                 }
@@ -1662,7 +1661,6 @@
                     if (error) throw error;
                     
                     this.diaryLessons = data || [];
-                    console.log('Загружено занятий в дневнике:', this.diaryLessons.length);
                     
                     const filtered = this.diaryLessons.filter(l => l.date === this.selectedDateStr);
                     const result = [];
@@ -1714,7 +1712,6 @@
                             diary_lesson_id: diaryLesson?.id || null
                         };
                     });
-                    console.log('Загружено записей родителей:', this.allBookings.length);
                 } catch (e) {
                     console.error('Ошибка загрузки записей:', e);
                 }
@@ -1758,7 +1755,6 @@
                             note: this.savedParentData?.note || ''
                         }
                     }));
-                    console.log('Загружено свободных слотов:', this.freeSlots.length);
                 } catch (e) {
                     console.error('Ошибка загрузки свободных слотов:', e);
                 }
@@ -1775,13 +1771,11 @@
                     
                     if (error) throw error;
                     this.myBookings = data || [];
-                    console.log('Загружено моих записей:', this.myBookings.length);
                 } catch (e) {
                     console.error('Ошибка загрузки записей:', e);
                 }
             },
             
-            // ===== УПРАВЛЕНИЕ СЛОТАМИ =====
             async addSlot() {
                 if (!this.newSlotDate || !this.newSlotTime || !this.newSlotPrice) {
                     alert('Заполните все поля');
@@ -1817,7 +1811,6 @@
                 }
             },
             
-            // ===== ГЛАВНАЯ ЛОГИКА: ЗАПИСЬ РОДИТЕЛЯ =====
             async bookSlot(slot) {
                 const form = slot.bookForm;
                 if (!form.parent_name || !form.parent_phone || !form.student_name) {
@@ -1826,7 +1819,6 @@
                 }
                 const user = await supabaseClient.auth.getUser();
                 
-                // 1. Проверяем, не занят ли слот
                 const { data: slotCheck, error: checkError } = await supabaseClient
                     .from('slots')
                     .select('booked')
@@ -1844,7 +1836,6 @@
                     return;
                 }
                 
-                // 2. СОЗДАЕМ ЗАНЯТИЕ В ДНЕВНИКЕ (ГЛАВНОЕ ХРАНИЛИЩЕ!)
                 const { data: diaryData, error: diaryError } = await supabaseClient
                     .from('diary_lessons')
                     .insert({
@@ -1865,7 +1856,6 @@
                     return;
                 }
                 
-                // 3. СОЗДАЕМ ЗАПИСЬ В BOOKINGS (СВЯЗЬ С РОДИТЕЛЕМ)
                 const { error: bookingError } = await supabaseClient
                     .from('bookings')
                     .insert({
@@ -1882,7 +1872,6 @@
                     });
                 
                 if (bookingError) {
-                    // Откатываем созданное занятие
                     await supabaseClient
                         .from('diary_lessons')
                         .delete()
@@ -1891,7 +1880,6 @@
                     return;
                 }
                 
-                // 4. ОБНОВЛЯЕМ СЛОТ - ПОМЕЧАЕМ КАК ЗАНЯТЫЙ
                 await supabaseClient
                     .from('slots')
                     .update({ 
@@ -1906,7 +1894,6 @@
                     })
                     .eq('id', slot.id);
                 
-                // 5. Сохраняем данные родителя
                 this.saveParentData({
                     parent_name: form.parent_name,
                     parent_phone: form.parent_phone,
@@ -1915,7 +1902,6 @@
                     note: form.note || ''
                 });
                 
-                // 6. ОБНОВЛЯЕМ ВСЕ СПИСКИ
                 await this.loadFreeSlots();      
                 await this.loadMyBookings();     
                 await this.loadAllBookings();    
@@ -1926,25 +1912,21 @@
                 alert('✅ Вы успешно записались! Занятие добавлено в расписание репетитора.');
             },
             
-            // ===== ОТМЕНА ЗАПИСИ РОДИТЕЛЕМ =====
             async cancelMyBooking(bookingId) {
                 if (confirm('Отменить запись?')) {
                     const booking = this.myBookings.find(b => b.id === bookingId);
                     if (booking) {
-                        // Удаляем из дневника
                         await supabaseClient
                             .from('diary_lessons')
                             .delete()
                             .eq('id', booking.diary_lesson_id);
                         
-                        // Освобождаем слот
                         await supabaseClient
                             .from('slots')
                             .update({ booked: false, student: null })
                             .eq('id', booking.slot_id);
                     }
                     
-                    // Удаляем запись
                     await supabaseClient
                         .from('bookings')
                         .delete()
@@ -1959,26 +1941,22 @@
                 }
             },
             
-            // ===== ОТМЕНА ЗАПИСИ РЕПЕТИТОРОМ =====
             async cancelSlotBooking(slotId) {
                 if (confirm('Отменить запись на этот слот?')) {
                     const booking = this.allBookings.find(b => b.slot_id === slotId);
                     
                     if (booking) {
-                        // Удаляем из дневника
                         await supabaseClient
                             .from('diary_lessons')
                             .delete()
                             .eq('id', booking.diary_lesson_id);
                         
-                        // Удаляем запись
                         await supabaseClient
                             .from('bookings')
                             .delete()
                             .eq('id', booking.id);
                     }
                     
-                    // Освобождаем слот
                     await supabaseClient
                         .from('slots')
                         .update({ booked: false, student: null })
@@ -1993,7 +1971,6 @@
                 }
             },
             
-            // ===== ПРОВЕРКА ОТМЕНЫ =====
             canCancelBooking(booking) {
                 if (!booking.slot) return false;
                 try {
@@ -2018,7 +1995,6 @@
                 }
             },
             
-            // ===== УПРАВЛЕНИЕ УЧЕНИКАМИ =====
             async addStudent() {
                 const name = this.newStudentForm.name.trim();
                 if (!name) {
@@ -2068,7 +2044,6 @@
                 await this.loadAllBookings();
             },
             
-            // ===== УПРАВЛЕНИЕ В ДНЕВНИКЕ =====
             async addDiaryLesson() {
                 const name = this.newStudentName.trim(), 
                       date = this.newLessonDate.trim(), 
@@ -2182,7 +2157,6 @@
                 if (!isNaN(d)) this.scheduleDate = d;
             },
             
-            // ===== УПРАВЛЕНИЕ В РАСПИСАНИИ =====
             async toggleSchedulePaid(lessonId) {
                 const lesson = this.diaryLessons.find(l => l.id === lessonId);
                 if (!lesson) return;
@@ -2212,7 +2186,6 @@
                 await this.loadAllStudents();
             },
             
-            // ===== УПРАВЛЕНИЕ ЗАПИСЯМИ РОДИТЕЛЕЙ (РЕПЕТИТОР) =====
             async toggleBookingPaid(bookingId) {
                 const booking = this.allBookings.find(b => b.id === bookingId);
                 if (!booking) return;
@@ -2264,7 +2237,6 @@
                 }
             },
             
-            // ===== РАСПИСАНИЕ =====
             changeSchedulePeriod(delta) {
                 if (this.scheduleView === 'day') { 
                     const d = new Date(this.scheduleDate); 
@@ -2285,7 +2257,6 @@
                 this.scheduleDate = new Date();
             },
             
-            // ===== КОПИРОВАНИЕ =====
             openCopyModal() {
                 this.copySourceDate = this.scheduleDateStr;
                 const d = new Date(this.scheduleDate); 
