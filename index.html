@@ -21,6 +21,7 @@
             border: 1px solid #e5d5e9; 
         }
         
+        /* Все стили из предыдущей версии остаются */
         .login-overlay { 
             position: fixed; 
             top: 0; left: 0; right: 0; bottom: 0;
@@ -231,13 +232,24 @@
         .day-student-name { font-size: 1.5rem; font-weight: 450; color: #3b2740; display: flex; align-items: center; gap: 8px; }
         .day-student-name i { color: #8f6f9a; font-size: 1.3rem; }
         .day-lessons-table-wrap { overflow-x: auto; margin: 0.5rem 0 0.8rem; }
-        .day-lessons-table { width: 100%; border-collapse: collapse; font-size: 0.95rem; min-width: 600px; }
+        .day-lessons-table { width: 100%; border-collapse: collapse; font-size: 0.95rem; min-width: 650px; }
         .day-lessons-table th { text-align: left; padding: 0.7rem 0.6rem 0.7rem 0; font-weight: 500; color: #5b4363; border-bottom: 1px solid #dcc7e2; }
         .day-lessons-table td { padding: 0.8rem 0.6rem 0.8rem 0; border-bottom: 1px dashed #e8d9ed; vertical-align: middle; }
         .day-lessons-table tr:last-child td { border-bottom: none; }
         .status-paid { background: #d9ebd9; color: #1f5420; padding: 0.3rem 1.2rem; border-radius: 60px; font-size: 0.85rem; font-weight: 500; display: inline-block; border: 1px solid #b8d5b8; }
         .status-unpaid { background: #f7e6e6; color: #8a4040; padding: 0.3rem 1.2rem; border-radius: 60px; font-size: 0.85rem; font-weight: 500; display: inline-block; border: 1px solid #eac8c8; }
         .note-badge { background: #efe6f2; padding: 0.3rem 1rem; border-radius: 30px; font-size: 0.85rem; color: #3f2a44; max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: inline-block; border: 1px solid #dcc7e2; }
+        .source-badge { 
+            font-size: 0.65rem; 
+            padding: 0.15rem 0.6rem; 
+            border-radius: 30px; 
+            background: #c9d4e8; 
+            color: #2e3f5a; 
+            display: inline-block;
+            margin-left: 0.3rem;
+        }
+        .source-badge.parent { background: #d9ebd9; color: #1f5420; }
+        .source-badge.tutor { background: #c9d4e8; color: #2e3f5a; }
 
         .add-student-section { 
             background: #fcf8fe; 
@@ -271,6 +283,15 @@
         .day-lesson .price { color: #5e4166; font-size: 0.7rem; }
         .day-lesson .paid-badge { font-size: 0.6rem; padding: 0.1rem 0.4rem; border-radius: 20px; background: #d9ebd9; color: #1f5420; margin-left: 4px; }
         .day-lesson .unpaid-badge { background: #f7e6e6; color: #8a4040; }
+        .day-lesson .source-badge-small { 
+            font-size: 0.5rem; 
+            padding: 0.05rem 0.4rem; 
+            border-radius: 20px; 
+            background: #c9d4e8; 
+            color: #2e3f5a; 
+            margin-left: 4px;
+        }
+        .day-lesson .source-badge-small.parent { background: #d9ebd9; color: #1f5420; }
         .day-lesson-actions { 
             margin-top: 0.3rem; 
             display: flex; 
@@ -456,7 +477,6 @@
             background: #dcbfe2;
         }
 
-        /* Стили для сохраненных данных родителя */
         .saved-data-badge {
             background: #efe6f2;
             border: 1px solid #dcc7e2;
@@ -603,9 +623,6 @@
             <button class="tab-btn" :class="{ active: viewMode === 'schedule' }" @click="viewMode = 'schedule'">
                 <i class="fas fa-calendar-alt"></i> Расписание
             </button>
-            <button class="tab-btn" :class="{ active: viewMode === 'bookings' }" @click="viewMode = 'bookings'">
-                <i class="fas fa-calendar-check"></i> Записи родителей
-            </button>
         </div>
 
         <!-- Вкладки для родителя -->
@@ -620,7 +637,6 @@
 
         <!-- ===== РЕЖИМ РЕПЕТИТОРА ===== -->
         <template v-if="userRole === 'tutor'">
-            <!-- ВСЕ ВКЛАДКИ РЕПЕТИТОРА (ТЕ ЖЕ, ЧТО И РАНЬШЕ) -->
             <!-- 1. СЛОТЫ -->
             <div v-if="viewMode === 'slots'">
                 <div class="add-slot-form">
@@ -669,7 +685,7 @@
                 </div>
             </div>
 
-            <!-- 2. ДНЕВНИК -->
+            <!-- 2. ДНЕВНИК (С КЛАССОМ) -->
             <div v-if="viewMode === 'diary'">
                 <div class="add-student-section">
                     <div class="field-group">
@@ -708,7 +724,7 @@
                                 <i class="fas fa-user-circle"></i> {{ student.name }}
                                 <span style="background:#ebdfef;padding:0.2rem 1rem;border-radius:60px;font-size:0.8rem;color:#46304b;">{{ student.lessons.length }} занятий</span>
                             </span>
-                            <button class="btn-danger" @click="removeStudent(student.originalIndex)">
+                            <button class="btn-danger" @click="removeStudentFromDiary(student.originalIndex)">
                                 <i class="fas fa-trash-alt"></i> удалить ученика
                             </button>
                         </div>
@@ -718,15 +734,18 @@
                                     <tr>
                                         <th>Время</th>
                                         <th>Стоимость</th>
+                                        <th>Класс</th>
                                         <th>Статус оплаты</th>
                                         <th>Заметка</th>
-                                        <th style="width:120px;">Действия</th>
+                                        <th>Источник</th>
+                                        <th style="width:100px;">Действия</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr v-for="(lesson, lIdx) in student.lessons" :key="lIdx">
                                         <td>{{ lesson.time }}</td>
                                         <td>{{ lesson.price }}</td>
+                                        <td>{{ lesson.class || '—' }}</td>
                                         <td>
                                             <button class="status-paid" :class="lesson.paid === 'paid' ? 'paid' : 'unpaid'" 
                                                     @click="toggleDiaryPaid(student.originalIndex, lesson.originalIndex)"
@@ -735,6 +754,11 @@
                                             </button>
                                         </td>
                                         <td><span class="note-badge" :title="lesson.note || '—'">{{ lesson.note || '—' }}</span></td>
+                                        <td>
+                                            <span class="source-badge" :class="lesson.source || 'tutor'">
+                                                {{ lesson.source === 'parent' ? '👨‍👩‍👦 Родитель' : '📝 Репетитор' }}
+                                            </span>
+                                        </td>
                                         <td>
                                             <button class="btn-icon" @click="removeDiaryLesson(student.originalIndex, lesson.originalIndex)" title="Удалить занятие">
                                                 <i class="fas fa-trash" style="color:#a079aa;"></i>
@@ -748,7 +772,7 @@
                 </div>
             </div>
 
-            <!-- 3. УЧЕНИКИ -->
+            <!-- 3. УЧЕНИКИ (ЕДИНАЯ БАЗА) -->
             <div v-if="viewMode === 'students'">
                 <div class="add-student-section" style="background:#fcf8fe;border-radius:40px;padding:1.5rem 2rem;margin:1.5rem 0;border:1px solid #dcc7e2;">
                     <div class="field-group"><label><i class="fas fa-user-graduate"></i> Имя ученика *</label><input v-model="newStudentForm.name" placeholder="Имя"></div>
@@ -763,6 +787,7 @@
                         <div v-if="!student.isEditing">
                             <div style="font-size:1.2rem;font-weight:500;">
                                 <i class="fas fa-user-circle"></i> {{ student.name }}
+                                <span style="font-size:0.8rem;color:#6a4e72;font-weight:400;">({{ student.source || 'tutor' }})</span>
                             </div>
                             <div>📞 {{ student.parent_phone || student.phone || '—' }}</div>
                             <div>🏫 {{ student.class || '—' }}</div>
@@ -813,7 +838,7 @@
                 </div>
             </div>
 
-            <!-- 4. РАСПИСАНИЕ -->
+            <!-- 4. РАСПИСАНИЕ (ЕДИНОЕ) -->
             <div v-if="viewMode === 'schedule'">
                 <div class="tabs" style="margin-bottom:1rem;">
                     <button class="tab-btn" :class="{ active: scheduleView === 'day' }" @click="scheduleView = 'day'">
@@ -859,20 +884,28 @@
                                         <tr>
                                             <th>Время</th>
                                             <th>Стоимость</th>
+                                            <th>Класс</th>
                                             <th>Статус</th>
                                             <th>Заметка</th>
-                                            <th style="width:150px;">Действия</th>
+                                            <th>Источник</th>
+                                            <th style="width:130px;">Действия</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr v-for="(lesson, lIdx) in student.lessons" :key="lIdx">
                                             <td>{{ lesson.time }}</td>
                                             <td>{{ lesson.price }}</td>
+                                            <td>{{ lesson.class || '—' }}</td>
                                             <td>
                                                 <span v-if="lesson.paid === 'paid'" class="status-paid"><i class="fas fa-check-circle"></i> оплачено</span>
                                                 <span v-else class="status-unpaid"><i class="fas fa-exclamation-circle"></i> не оплачено</span>
                                             </td>
                                             <td><span class="note-badge" :title="lesson.note || '—'">{{ lesson.note || '—' }}</span></td>
+                                            <td>
+                                                <span class="source-badge" :class="lesson.source || 'tutor'">
+                                                    {{ lesson.source === 'parent' ? '👨‍👩‍👦 Родитель' : '📝 Репетитор' }}
+                                                </span>
+                                            </td>
                                             <td>
                                                 <div style="display:flex;gap:0.3rem;flex-wrap:wrap;">
                                                     <button class="btn-icon" @click="toggleSchedulePaid(lesson.id)" title="Сменить оплату">
@@ -900,11 +933,19 @@
                                 <span class="day-num">{{ day.dayNum }}</span>
                             </div>
                             <div v-for="lesson in day.lessons" :key="lesson.id" class="day-lesson">
-                                <div><span class="student-name">{{ lesson.student }}</span> <span class="time">{{ lesson.time }}</span></div>
-                                <div><span class="price">{{ lesson.price }}</span> 
+                                <div>
+                                    <span class="student-name">{{ lesson.student }}</span> 
+                                    <span class="time">{{ lesson.time }}</span>
+                                    <span class="source-badge-small" :class="lesson.source || 'tutor'">
+                                        {{ lesson.source === 'parent' ? '👪' : '📝' }}
+                                    </span>
+                                </div>
+                                <div>
+                                    <span class="price">{{ lesson.price }}</span> 
                                     <span class="paid-badge" :class="{'unpaid-badge': lesson.paid === 'unpaid'}">
                                         {{ lesson.paid === 'paid' ? '✅' : '❌' }}
                                     </span>
+                                    <span style="font-size:0.6rem;color:#7f5f89;">{{ lesson.class || '' }}</span>
                                 </div>
                                 <div style="font-size:0.65rem;color:#6a4e72;">{{ lesson.note || '' }}</div>
                                 <div class="day-lesson-actions">
@@ -931,8 +972,15 @@
                                 <span class="day-num">{{ day.dayNum }}</span>
                             </div>
                             <div v-for="lesson in day.lessons" :key="lesson.id" class="day-lesson">
-                                <div><span class="student-name">{{ lesson.student }}</span> <span class="time">{{ lesson.time }}</span></div>
-                                <div><span class="price">{{ lesson.price }}</span> 
+                                <div>
+                                    <span class="student-name">{{ lesson.student }}</span> 
+                                    <span class="time">{{ lesson.time }}</span>
+                                    <span class="source-badge-small" :class="lesson.source || 'tutor'">
+                                        {{ lesson.source === 'parent' ? '👪' : '📝' }}
+                                    </span>
+                                </div>
+                                <div>
+                                    <span class="price">{{ lesson.price }}</span> 
                                     <span class="paid-badge" :class="{'unpaid-badge': lesson.paid === 'unpaid'}">
                                         {{ lesson.paid === 'paid' ? '✅' : '❌' }}
                                     </span>
@@ -952,50 +1000,9 @@
                     </div>
                 </div>
             </div>
-
-            <!-- 5. ЗАПИСИ РОДИТЕЛЕЙ -->
-            <div v-if="viewMode === 'bookings'">
-                <div style="margin-bottom:1rem;color:#6a4e72;">
-                    <i class="fas fa-info-circle"></i> Управление записями родителей и добавление занятий
-                </div>
-                <div class="slots-grid" v-if="allBookings.length > 0">
-                    <div v-for="booking in allBookings" :key="booking.id" class="slot-card" :class="{ booked: true }">
-                        <div class="time">{{ booking.slot?.time || '—' }}</div>
-                        <div>{{ booking.slot?.date || '—' }}</div>
-                        <div style="font-weight:500;">{{ booking.slot?.price || '—' }}</div>
-                        <span class="status booked">📕 Записано</span>
-                        <div class="student-info">
-                            <div><strong>👤 {{ booking.student_name }}</strong></div>
-                            <div>🏫 {{ booking.student_class || '—' }}</div>
-                            <div>📞 {{ booking.parent_phone || '—' }}</div>
-                            <div style="font-size:0.8rem;color:#6a4e72;">Родитель: {{ booking.parent_name || '' }}</div>
-                        </div>
-                        
-                        <div class="booking-controls">
-                            <button class="btn-add-lesson" @click="openAddLessonModal(booking)">
-                                <i class="fas fa-plus"></i> Добавить занятие
-                            </button>
-                            <button class="btn-cancel" @click="cancelSlotBooking(booking.slot_id)">
-                                <i class="fas fa-times"></i> Отменить запись
-                            </button>
-                            <button class="paid-status" :class="booking.paid_status === 'paid' ? 'paid' : 'unpaid'" 
-                                    @click="toggleBookingPaid(booking.id)">
-                                {{ booking.paid_status === 'paid' ? '✅ Оплачено' : '❌ Не оплачено' }}
-                            </button>
-                            <button class="btn-delete" @click="deleteBooking(booking.id)" title="Удалить запись">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                <div v-else class="no-data">
-                    <i class="fas fa-calendar-check"></i>
-                    <p>Нет записей от родителей</p>
-                </div>
-            </div>
         </template>
 
-        <!-- ===== РЕЖИМ РОДИТЕЛЯ (С СОХРАНЕНИЕМ ДАННЫХ) ===== -->
+        <!-- ===== РЕЖИМ РОДИТЕЛЯ ===== -->
         <template v-else>
             <!-- Свободные слоты -->
             <div v-if="viewMode === 'slots'">
@@ -1003,7 +1010,6 @@
                     <i class="fas fa-info-circle"></i> Выберите свободный слот для записи
                 </div>
                 
-                <!-- Блок с сохраненными данными -->
                 <div v-if="savedParentData" class="saved-data-badge">
                     <i class="fas fa-user-check"></i> 
                     Вы записываете: <strong>{{ savedParentData.student_name }}</strong> 
@@ -1087,7 +1093,7 @@
                             <div v-else>
                                 <div class="cancel-error">
                                     <i class="fas fa-exclamation-circle"></i> 
-                                    Занятия уже нельзя отменить, свяжитесь со мной по телефону 
+                                    Занятие уже нельзя отменить, свяжитесь со мной по телефону 
                                     <strong>+7 952 246-81-85</strong>
                                 </div>
                             </div>
@@ -1101,29 +1107,7 @@
             </div>
         </template>
 
-        <!-- МОДАЛКИ -->
-        <div v-if="addLessonModalVisible" class="modal-overlay" @click.self="addLessonModalVisible = false">
-            <div class="modal-content">
-                <h3><i class="fas fa-plus-circle"></i> Добавить занятие для {{ selectedBooking?.student_name }}</h3>
-                <div class="field-group">
-                    <label><i class="fas fa-calendar-day"></i> Дата занятия</label>
-                    <input type="date" v-model="newBookingLessonDate">
-                </div>
-                <div class="field-group">
-                    <label><i class="far fa-clock"></i> Время</label>
-                    <input type="text" v-model="newBookingLessonTime" placeholder="15:00–16:30">
-                </div>
-                <div class="field-group">
-                    <label><i class="fas fa-coins"></i> Стоимость</label>
-                    <input type="text" v-model="newBookingLessonPrice" placeholder="1500 ₽">
-                </div>
-                <div class="modal-actions">
-                    <button class="btn-secondary" @click="addLessonModalVisible = false">Отмена</button>
-                    <button class="btn-primary" @click="addLessonForParent"><i class="fas fa-check"></i> Добавить</button>
-                </div>
-            </div>
-        </div>
-
+        <!-- МОДАЛКА КОПИРОВАНИЯ -->
         <div v-if="copyModalVisible" class="modal-overlay" @click.self="copyModalVisible = false">
             <div class="modal-content">
                 <h3><i class="fas fa-copy"></i> Копировать день</h3>
@@ -1217,13 +1201,6 @@
             
             // Сохраненные данные родителя
             savedParentData: null,
-            
-            // Форма добавления занятия для родителей
-            addLessonModalVisible: false,
-            selectedBooking: null,
-            newBookingLessonDate: '',
-            newBookingLessonTime: '',
-            newBookingLessonPrice: '',
             
             // Копирование
             copyModalVisible: false,
@@ -1385,9 +1362,7 @@
                     this.loginPassword = '';
                     this.loginError = '';
                     
-                    // Загружаем сохраненные данные родителя
                     this.loadSavedParentData();
-                    
                     await this.loadData();
                 } catch (e) {
                     console.error('Ошибка входа:', e);
@@ -1482,7 +1457,6 @@
             clearSavedData() {
                 this.savedParentData = null;
                 localStorage.removeItem('savedParentData');
-                // Обновляем все формы
                 this.freeSlots.forEach(slot => {
                     if (slot.bookForm) {
                         slot.bookForm.parent_name = '';
@@ -1493,9 +1467,7 @@
                 });
             },
             
-            // ===== ОТКРЫТИЕ ФОРМЫ ЗАПИСИ С СОХРАНЕННЫМИ ДАННЫМИ =====
             openBookingForm(slot) {
-                // Если есть сохраненные данные, подставляем их
                 if (this.savedParentData) {
                     slot.bookForm.parent_name = this.savedParentData.parent_name || '';
                     slot.bookForm.parent_phone = this.savedParentData.parent_phone || '';
@@ -1569,6 +1541,7 @@
                         .from('diary_lessons')
                         .update({ 
                             student_name: newData.name.trim(),
+                            student_class: newData.class || '',
                             note: lesson.note ? 
                                 lesson.note.replace(`Имя: ${oldName}`, `Имя: ${newData.name.trim()}`) :
                                 `Имя: ${newData.name.trim()}, Класс: ${newData.class || '—'}`
@@ -1632,6 +1605,7 @@
                 try {
                     const user = await supabaseClient.auth.getUser();
                     
+                    // Загружаем из bookings
                     const { data: bookingsData, error: bookingsError } = await supabaseClient
                         .from('bookings')
                         .select('student_name, student_class, parent_phone, parent_name, created_at')
@@ -1640,9 +1614,10 @@
                     
                     if (bookingsError) throw bookingsError;
                     
+                    // Загружаем из diary_lessons
                     const { data: diaryData, error: diaryError } = await supabaseClient
                         .from('diary_lessons')
-                        .select('student_name, note, created_at')
+                        .select('student_name, student_class, note, created_at')
                         .eq('tutor_id', user.data.user.id)
                         .order('created_at', { ascending: false });
                     
@@ -1650,6 +1625,7 @@
                     
                     const studentsMap = new Map();
                     
+                    // Добавляем из bookings
                     (bookingsData || []).forEach(b => {
                         const key = b.student_name + (b.parent_phone || '');
                         if (!studentsMap.has(key)) {
@@ -1666,12 +1642,13 @@
                         studentsMap.get(key).totalLessons++;
                     });
                     
+                    // Добавляем из diary_lessons
                     (diaryData || []).forEach(d => {
-                        const key = d.student_name + 'diary';
+                        const key = d.student_name + 'diary' + (d.student_class || '');
                         if (!studentsMap.has(key)) {
                             studentsMap.set(key, {
                                 name: d.student_name,
-                                class: '—',
+                                class: d.student_class || '—',
                                 phone: '—',
                                 parent_name: '—',
                                 totalLessons: 0,
@@ -1713,7 +1690,10 @@
                                 lessons: []
                             });
                         }
-                        studentsMap.get(l.student_name).lessons.push(l);
+                        studentsMap.get(l.student_name).lessons.push({
+                            ...l,
+                            source: l.source || 'tutor'
+                        });
                     });
                     
                     this.diaryStudents = Array.from(studentsMap.values()).map((s, idx) => ({
@@ -1761,7 +1741,8 @@
                         result.push({ 
                             ...l, 
                             student: l.student_name,
-                            id: l.id
+                            id: l.id,
+                            source: l.source || 'tutor'
                         });
                     }
                 });
@@ -1865,7 +1846,7 @@
                 }
             },
             
-            // ===== ЗАПИСЬ РОДИТЕЛЯ (С СОХРАНЕНИЕМ ДАННЫХ) =====
+            // ===== ЗАПИСЬ РОДИТЕЛЯ =====
             async bookSlot(slot) {
                 const form = slot.bookForm;
                 if (!form.parent_name || !form.parent_phone || !form.student_name) {
@@ -1874,7 +1855,7 @@
                 }
                 const user = await supabaseClient.auth.getUser();
                 
-                // Проверяем, не занят ли слот уже
+                // Проверяем, не занят ли слот
                 const { data: slotCheck, error: checkError } = await supabaseClient
                     .from('slots')
                     .select('booked')
@@ -1933,22 +1914,20 @@
                     student_class: form.student_class || ''
                 });
                 
+                // Добавляем в дневник репетитора
+                await this.addBookingToDiary(slot, form);
+                
                 // Обновляем все списки
                 await this.loadFreeSlots();
                 await this.loadMyBookings();
                 await this.loadAllBookings();
                 await this.loadAllStudents();
-                
-                // Добавляем занятие в дневник репетитора
-                const diaryError = await this.addBookingToDiary(slot, form);
-                if (diaryError) {
-                    console.warn('Ошибка добавления в дневник:', diaryError);
-                }
+                await this.loadDiary();
                 
                 alert('✅ Вы успешно записались! Занятие добавлено в расписание репетитора.');
             },
             
-            // ===== ДОБАВЛЕНИЕ ЗАПИСИ В ДНЕВНИК РЕПЕТИТОРА =====
+            // ===== ДОБАВЛЕНИЕ В ДНЕВНИК РЕПЕТИТОРА =====
             async addBookingToDiary(slot, form) {
                 try {
                     const user = await supabaseClient.auth.getUser();
@@ -1957,10 +1936,12 @@
                         .insert({
                             tutor_id: slot.tutor_id,
                             student_name: form.student_name,
+                            student_class: form.student_class || '',
                             date: slot.date,
                             time: slot.time,
                             price: slot.price,
                             paid: 'unpaid',
+                            source: 'parent',
                             note: `Запись от родителя ${form.parent_name} (${form.parent_phone})`
                         });
                     
@@ -1968,9 +1949,6 @@
                         console.error('Ошибка добавления в дневник:', error);
                         return error;
                     }
-                    
-                    // Обновляем дневник репетитора
-                    await this.loadDiary();
                     return null;
                 } catch (e) {
                     console.error('Ошибка:', e);
@@ -1982,13 +1960,11 @@
                 if (confirm('Отменить запись?')) {
                     const booking = this.myBookings.find(b => b.id === bookingId);
                     if (booking) {
-                        // Удаляем из слотов
                         await supabaseClient
                             .from('slots')
                             .update({ booked: false, student: null })
                             .eq('id', booking.slot_id);
                         
-                        // Удаляем из дневника
                         await supabaseClient
                             .from('diary_lessons')
                             .delete()
@@ -2010,7 +1986,7 @@
                 }
             },
             
-            // ===== ПРОВЕРКА ОТМЕНЫ ДЛЯ РОДИТЕЛЕЙ =====
+            // ===== ПРОВЕРКА ОТМЕНЫ =====
             canCancelBooking(booking) {
                 if (!booking.slot) return false;
                 try {
@@ -2049,10 +2025,12 @@
                     .insert({
                         tutor_id: user.data.user.id,
                         student_name: name,
+                        student_class: this.newStudentForm.class || '',
                         date: new Date().toISOString().split('T')[0],
                         time: '—',
                         price: '—',
                         paid: 'unpaid',
+                        source: 'tutor',
                         note: `Ученик добавлен репетитором. Имя: ${name}, Класс: ${this.newStudentForm.class || '—'}, Телефон: ${this.newStudentForm.phone || '—'}, Родитель: ${this.newStudentForm.parent_name || '—'}`
                     });
                 
@@ -2083,99 +2061,7 @@
                 await this.loadAllBookings();
             },
             
-            // ===== УПРАВЛЕНИЕ ЗАПИСЯМИ РОДИТЕЛЕЙ (РЕПЕТИТОР) =====
-            openAddLessonModal(booking) {
-                this.selectedBooking = booking;
-                this.newBookingLessonDate = booking.slot?.date || '';
-                this.newBookingLessonTime = booking.slot?.time || '';
-                this.newBookingLessonPrice = booking.slot?.price || '';
-                this.addLessonModalVisible = true;
-            },
-            
-            async addLessonForParent() {
-                if (!this.selectedBooking) return;
-                if (!this.newBookingLessonDate || !this.newBookingLessonTime || !this.newBookingLessonPrice) {
-                    alert('Заполните все поля');
-                    return;
-                }
-                
-                const user = await supabaseClient.auth.getUser();
-                const { error } = await supabaseClient
-                    .from('diary_lessons')
-                    .insert({
-                        tutor_id: user.data.user.id,
-                        student_name: this.selectedBooking.student_name,
-                        date: this.newBookingLessonDate,
-                        time: this.newBookingLessonTime,
-                        price: this.newBookingLessonPrice,
-                        paid: 'unpaid',
-                        note: `Занятие для ${this.selectedBooking.parent_name || ''} (родитель)`
-                    });
-                
-                if (error) {
-                    alert('Ошибка: ' + error.message);
-                    return;
-                }
-                
-                this.addLessonModalVisible = false;
-                this.selectedBooking = null;
-                this.newBookingLessonDate = '';
-                this.newBookingLessonTime = '';
-                this.newBookingLessonPrice = '';
-                
-                await this.loadDiary();
-                await this.loadAllBookings();
-                await this.loadAllStudents();
-                alert('✅ Занятие добавлено в расписание!');
-            },
-            
-            async toggleBookingPaid(bookingId) {
-                const booking = this.allBookings.find(b => b.id === bookingId);
-                if (!booking) return;
-                
-                const diaryLesson = this.diaryLessons.find(
-                    l => l.student_name === booking.student_name && 
-                         l.date === booking.slot?.date && 
-                         l.time === booking.slot?.time
-                );
-                
-                if (!diaryLesson) {
-                    alert('Сначала добавьте занятие для этого ученика через кнопку "Добавить занятие"');
-                    return;
-                }
-                
-                const newStatus = diaryLesson.paid === 'paid' ? 'unpaid' : 'paid';
-                await supabaseClient
-                    .from('diary_lessons')
-                    .update({ paid: newStatus })
-                    .eq('id', diaryLesson.id);
-                
-                await this.loadDiary();
-                await this.loadAllBookings();
-            },
-            
-            async deleteBooking(bookingId) {
-                if (confirm('Удалить эту запись? Это действие нельзя отменить.')) {
-                    const booking = this.allBookings.find(b => b.id === bookingId);
-                    if (booking) {
-                        await supabaseClient
-                            .from('bookings')
-                            .delete()
-                            .eq('id', bookingId);
-                        
-                        await supabaseClient
-                            .from('slots')
-                            .update({ booked: false, student: null })
-                            .eq('id', booking.slot_id);
-                    }
-                    
-                    await this.loadAllBookings();
-                    await this.loadTutorSlots();
-                    await this.loadAllStudents();
-                }
-            },
-            
-            // ===== ДНЕВНИК =====
+            // ===== УПРАВЛЕНИЕ В ДНЕВНИКЕ =====
             async addDiaryLesson() {
                 const name = this.newStudentName.trim(), 
                       date = this.newLessonDate.trim(), 
@@ -2188,15 +2074,21 @@
                 }
                 
                 const user = await supabaseClient.auth.getUser();
+                // Проверяем, есть ли ученик в базе
+                const student = this.allStudents.find(s => s.name === name);
+                const studentClass = student?.class || '';
+                
                 const { error } = await supabaseClient
                     .from('diary_lessons')
                     .insert({
                         tutor_id: user.data.user.id,
                         student_name: name,
+                        student_class: studentClass,
                         date: date,
                         time: time,
                         price: price,
                         paid: this.newLessonPaid,
+                        source: 'tutor',
                         note: note || ''
                     });
                 
@@ -2253,7 +2145,7 @@
                 await this.loadAllBookings();
             },
             
-            async removeStudent(studentIdx) {
+            async removeStudentFromDiary(studentIdx) {
                 const student = this.diaryStudents[studentIdx];
                 if (!student) return;
                 if (confirm(`Удалить все занятия ученика "${student.name}"?`)) {
@@ -2368,10 +2260,12 @@
                         .insert({
                             tutor_id: user.data.user.id,
                             student_name: lesson.student_name,
+                            student_class: lesson.student_class || '',
                             date: this.copyTargetDate,
                             time: lesson.time,
                             price: lesson.price,
                             paid: lesson.paid,
+                            source: lesson.source || 'tutor',
                             note: lesson.note || ''
                         });
                 }
