@@ -21,7 +21,6 @@
             border: 1px solid #e5d5e9; 
         }
         
-        /* ===== ЭКРАН ВХОДА ===== */
         .login-overlay { 
             position: fixed; 
             top: 0; left: 0; right: 0; bottom: 0;
@@ -441,7 +440,6 @@
                         <div style="font-weight:500;">{{ slot.price }}</div>
                         <span class="status free">📗 Свободно</span>
                         
-                        <!-- Форма записи -->
                         <div v-if="slot.showBookingForm" style="margin-top:1rem;padding-top:1rem;border-top:1px dashed #dcc7e2;">
                             <div class="field-group" style="margin-bottom:0.5rem;">
                                 <input type="text" v-model="slot.bookForm.name" placeholder="Имя ученика *" style="width:100%;padding:0.5rem;border-radius:40px;border:1px solid #dcc7e2;">
@@ -520,7 +518,7 @@
         data: {
             isLoggedIn: false,
             userEmail: '',
-            userRole: 'tutor',
+            userRole: 'parent',
             selectedRole: 'tutor',
             loginEmail: '',
             loginPassword: '',
@@ -574,18 +572,19 @@
                     });
                     if (error) throw error;
                     
-                    // Получаем роль из таблицы users
+                    // 🔥 ПРИНУДИТЕЛЬНО ОБНОВЛЯЕМ РОЛЬ
+                    // Сначала проверяем, есть ли пользователь в таблице users
                     const { data: userData, error: userError } = await supabaseClient
                         .from('users')
                         .select('role')
                         .eq('id', data.user.id)
                         .maybeSingle();
                     
-                    if (userError) {
-                        console.error('Ошибка получения роли:', userError);
-                        // Если нет записи в users, создаем с выбранной ролью
-                        const defaultRole = this.selectedRole || 'parent';
-                        await supabaseClient
+                    // Если пользователь не найден в таблице users - создаем
+                    if (userError || !userData) {
+                        console.log('Пользователь не найден в таблице users, создаем...');
+                        const defaultRole = this.selectedRole === 'tutor' ? 'tutor' : 'parent';
+                        const { error: insertError } = await supabaseClient
                             .from('users')
                             .insert({
                                 id: data.user.id,
@@ -593,9 +592,31 @@
                                 name: data.user.user_metadata?.name || 'Пользователь',
                                 role: defaultRole
                             });
-                        this.userRole = defaultRole;
+                        if (insertError) {
+                            console.error('Ошибка создания пользователя:', insertError);
+                            this.userRole = 'parent'; // fallback
+                        } else {
+                            this.userRole = defaultRole;
+                        }
                     } else {
-                        this.userRole = userData?.role || 'parent';
+                        // Пользователь найден - используем его роль
+                        this.userRole = userData.role || 'parent';
+                        console.log('Роль пользователя из БД:', this.userRole);
+                    }
+                    
+                    // Если роль не совпадает с выбранной - обновляем
+                    if (this.userRole !== this.selectedRole) {
+                        console.log(`Обновляем роль с ${this.userRole} на ${this.selectedRole}`);
+                        const { error: updateError } = await supabaseClient
+                            .from('users')
+                            .update({ role: this.selectedRole })
+                            .eq('id', data.user.id);
+                        if (updateError) {
+                            console.error('Ошибка обновления роли:', updateError);
+                        } else {
+                            this.userRole = this.selectedRole;
+                            console.log('Роль обновлена на:', this.userRole);
+                        }
                     }
                     
                     this.userEmail = data.user.email;
@@ -604,6 +625,7 @@
                     this.loginPassword = '';
                     this.loginError = '';
                     
+                    console.log('✅ Вход выполнен. Роль:', this.userRole);
                     await this.loadData();
                 } catch (e) {
                     console.error('Ошибка входа:', e);
@@ -635,6 +657,7 @@
                     if (error) throw error;
                     
                     if (data.user) {
+                        // Создаем запись в таблице users с выбранной ролью
                         const { error: insertError } = await supabaseClient
                             .from('users')
                             .insert({
@@ -644,15 +667,18 @@
                                 role: this.selectedRole
                             });
                         
-                        if (insertError && insertError.code === '23505') {
-                            // Обновляем существующую запись
-                            await supabaseClient
-                                .from('users')
-                                .update({
-                                    name: this.registerName,
-                                    role: this.selectedRole
-                                })
-                                .eq('id', data.user.id);
+                        if (insertError) {
+                            console.error('Ошибка сохранения роли:', insertError);
+                            if (insertError.code === '23505') {
+                                // Обновляем существующую запись
+                                await supabaseClient
+                                    .from('users')
+                                    .update({
+                                        name: this.registerName,
+                                        role: this.selectedRole
+                                    })
+                                    .eq('id', data.user.id);
+                            }
                         }
                     }
                     
@@ -948,6 +974,7 @@
                     console.error('Ошибка получения роли:', error);
                 }
                 
+                // Если роль не найдена - устанавливаем parent по умолчанию
                 this.userRole = userData?.role || 'parent';
                 this.userEmail = data.session.user.email;
                 this.isLoggedIn = true;
@@ -955,22 +982,26 @@
                 if (this.userRole === 'tutor') {
                     await this.buildCalendar();
                 }
+                console.log('🔄 Загружена роль при монтировании:', this.userRole);
             }
             
             // Слушаем изменения сессии
-            supabaseClient.auth.onAuthStateChange((event, session) => {
+            supabaseClient.auth.onAuthStateChange(async (event, session) => {
+                console.log('🔔 Событие аутентификации:', event);
                 if (event === 'SIGNED_IN' && session) {
                     this.userEmail = session.user.email;
                     this.isLoggedIn = true;
-                    supabaseClient
+                    
+                    // Получаем роль после входа
+                    const { data: userData } = await supabaseClient
                         .from('users')
                         .select('role')
                         .eq('id', session.user.id)
-                        .maybeSingle()
-                        .then(({ data }) => {
-                            this.userRole = data?.role || 'parent';
-                            this.loadData();
-                        });
+                        .maybeSingle();
+                    
+                    this.userRole = userData?.role || 'parent';
+                    console.log('🔄 Роль после входа:', this.userRole);
+                    await this.loadData();
                 }
                 if (event === 'SIGNED_OUT') {
                     this.isLoggedIn = false;
