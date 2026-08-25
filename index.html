@@ -538,8 +538,7 @@
                     <i class="fas fa-chalkboard-teacher"></i> Репетитор
                 </button>
                 <button :class="{ active: selectedRole === 'parent' }" @click="selectedRole = 'parent'">
-                    <i class="fas fa-user-friends"></i> Родитель
-                </button>
+                    <i class="fas fa-user-friends"></i> Родитель                </button>
             </div>
             
             <div v-if="!showRegister">
@@ -1005,10 +1004,10 @@
                 </div>
             </div>
 
-            <!-- 5. ЗАПИСИ РОДИТЕЛЕЙ -->
+            <!-- 5. ЗАПИСИ РОДИТЕЛЕЙ (БЕЗ КНОПКИ ДОБАВИТЬ ЗАНЯТИЕ) -->
             <div v-if="viewMode === 'bookings'">
                 <div style="margin-bottom:1rem;color:#6a4e72;">
-                    <i class="fas fa-info-circle"></i> Управление записями родителей и добавление занятий
+                    <i class="fas fa-info-circle"></i> Управление записями родителей
                 </div>
                 <div class="slots-grid" v-if="allBookings.length > 0">
                     <div v-for="booking in allBookings" :key="booking.id" class="slot-card" :class="{ booked: true }">
@@ -1025,9 +1024,6 @@
                         </div>
                         
                         <div class="booking-controls">
-                            <button class="btn-add-lesson" @click="openAddLessonModal(booking)">
-                                <i class="fas fa-plus"></i> Добавить занятие
-                            </button>
                             <button class="btn-cancel" @click="cancelSlotBooking(booking.slot_id)">
                                 <i class="fas fa-times"></i> Отменить запись
                             </button>
@@ -1144,7 +1140,7 @@
                             <div v-else>
                                 <div class="cancel-error">
                                     <i class="fas fa-exclamation-circle"></i> 
-                                    Занятия уже нельзя отменить, свяжитесь со мной по телефону 
+                                    Занятие уже нельзя отменить, свяжитесь со мной по телефону 
                                     <strong>+7 952 246-81-85</strong>
                                 </div>
                             </div>
@@ -1885,10 +1881,11 @@
                     await this.loadTutorSlots();
                     await this.loadAllBookings();
                     await this.loadAllStudents();
+                    await this.loadDiary();
                 }
             },
             
-            // ===== ЗАПИСЬ РОДИТЕЛЯ (ИСПРАВЛЕННАЯ) =====
+            // ===== ЗАПИСЬ РОДИТЕЛЯ =====
             async bookSlot(slot) {
                 const form = slot.bookForm;
                 if (!form.parent_name || !form.parent_phone || !form.student_name) {
@@ -1897,7 +1894,6 @@
                 }
                 const user = await supabaseClient.auth.getUser();
                 
-                // Проверяем, не занят ли слот уже
                 const { data: slotCheck, error: checkError } = await supabaseClient
                     .from('slots')
                     .select('booked')
@@ -1935,7 +1931,7 @@
                     return;
                 }
                 
-                // 2. Обновляем слот - помечаем как занятый
+                // 2. Обновляем слот
                 await supabaseClient
                     .from('slots')
                     .update({ 
@@ -1960,7 +1956,7 @@
                 });
                 
                 // 4. Добавляем в дневник репетитора
-                await supabaseClient
+                const { error: diaryError } = await supabaseClient
                     .from('diary_lessons')
                     .insert({
                         tutor_id: slot.tutor_id,
@@ -1974,12 +1970,17 @@
                         note: `${form.note || ''} (Запись от родителя ${form.parent_name}, тел: ${form.parent_phone})`
                     });
                 
+                if (diaryError) {
+                    console.error('Ошибка добавления в дневник:', diaryError);
+                }
+                
                 // 5. Обновляем все списки
-                await this.loadFreeSlots();      // 👈 Слот исчезает из свободных
-                await this.loadMyBookings();     // 👈 Обновляем записи родителя
-                await this.loadAllBookings();    // 👈 Обновляем все записи
-                await this.loadAllStudents();    // 👈 Обновляем учеников
-                await this.loadDiary();          // 👈 Обновляем дневник репетитора
+                await this.loadFreeSlots();
+                await this.loadMyBookings();
+                await this.loadAllBookings();
+                await this.loadAllStudents();
+                await this.loadDiary();
+                await this.loadTutorSlots();
                 
                 alert('✅ Вы успешно записались! Занятие добавлено в расписание репетитора.');
             },
@@ -2011,6 +2012,7 @@
                     await this.loadAllBookings();
                     await this.loadAllStudents();
                     await this.loadDiary();
+                    await this.loadTutorSlots();
                 }
             },
             
@@ -2234,53 +2236,6 @@
             },
             
             // ===== УПРАВЛЕНИЕ ЗАПИСЯМИ РОДИТЕЛЕЙ (РЕПЕТИТОР) =====
-            openAddLessonModal(booking) {
-                this.selectedBooking = booking;
-                this.newBookingLessonDate = booking.slot?.date || '';
-                this.newBookingLessonTime = booking.slot?.time || '';
-                this.newBookingLessonPrice = booking.slot?.price || '';
-                this.addLessonModalVisible = true;
-            },
-            
-            async addLessonForParent() {
-                if (!this.selectedBooking) return;
-                if (!this.newBookingLessonDate || !this.newBookingLessonTime || !this.newBookingLessonPrice) {
-                    alert('Заполните все поля');
-                    return;
-                }
-                
-                const user = await supabaseClient.auth.getUser();
-                const { error } = await supabaseClient
-                    .from('diary_lessons')
-                    .insert({
-                        tutor_id: user.data.user.id,
-                        student_name: this.selectedBooking.student_name,
-                        student_class: this.selectedBooking.student_class || '',
-                        date: this.newBookingLessonDate,
-                        time: this.newBookingLessonTime,
-                        price: this.newBookingLessonPrice,
-                        paid: 'unpaid',
-                        source: 'tutor',
-                        note: `Занятие для ${this.selectedBooking.parent_name || ''} (родитель)`
-                    });
-                
-                if (error) {
-                    alert('Ошибка: ' + error.message);
-                    return;
-                }
-                
-                this.addLessonModalVisible = false;
-                this.selectedBooking = null;
-                this.newBookingLessonDate = '';
-                this.newBookingLessonTime = '';
-                this.newBookingLessonPrice = '';
-                
-                await this.loadDiary();
-                await this.loadAllBookings();
-                await this.loadAllStudents();
-                alert('✅ Занятие добавлено в расписание!');
-            },
-            
             async toggleBookingPaid(bookingId) {
                 const booking = this.allBookings.find(b => b.id === bookingId);
                 if (!booking) return;
@@ -2292,7 +2247,30 @@
                 );
                 
                 if (!diaryLesson) {
-                    alert('Сначала добавьте занятие для этого ученика через кнопку "Добавить занятие"');
+                    // Если нет занятия в дневнике, создаем его
+                    const user = await supabaseClient.auth.getUser();
+                    const { error } = await supabaseClient
+                        .from('diary_lessons')
+                        .insert({
+                            tutor_id: user.data.user.id,
+                            student_name: booking.student_name,
+                            student_class: booking.student_class || '',
+                            date: booking.slot?.date,
+                            time: booking.slot?.time,
+                            price: booking.slot?.price,
+                            paid: 'unpaid',
+                            source: 'parent',
+                            note: `Запись от родителя ${booking.parent_name || ''}, тел: ${booking.parent_phone || ''}`
+                        });
+                    
+                    if (error) {
+                        alert('Ошибка создания занятия: ' + error.message);
+                        return;
+                    }
+                    
+                    await this.loadDiary();
+                    await this.loadAllBookings();
+                    alert('✅ Занятие создано в дневнике! Теперь можно менять статус оплаты.');
                     return;
                 }
                 
@@ -2319,11 +2297,19 @@
                             .from('slots')
                             .update({ booked: false, student: null })
                             .eq('id', booking.slot_id);
+                        
+                        await supabaseClient
+                            .from('diary_lessons')
+                            .delete()
+                            .eq('student_name', booking.student_name)
+                            .eq('date', booking.slot?.date)
+                            .eq('time', booking.slot?.time);
                     }
                     
                     await this.loadAllBookings();
                     await this.loadTutorSlots();
                     await this.loadAllStudents();
+                    await this.loadDiary();
                 }
             },
             
