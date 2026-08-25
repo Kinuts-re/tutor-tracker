@@ -276,6 +276,13 @@
                     <label><i class="fas fa-lock"></i> Пароль (мин. 6 символов)</label>
                     <input type="password" v-model="registerPassword" placeholder="••••••••" @keydown.enter="register">
                 </div>
+                <div class="field-group">
+                    <label><i class="fas fa-user-tag"></i> Кто вы?</label>
+                    <select v-model="selectedRole" style="width:100%;padding:0.8rem 1.2rem;border-radius:60px;border:1px solid #dcc7e2;font-size:1rem;outline:none;background:white;">
+                        <option value="tutor">👩‍🏫 Репетитор</option>
+                        <option value="parent">👨‍👩‍👦 Родитель</option>
+                    </select>
+                </div>
                 <button class="btn-primary" @click="register" style="background:#a47bae;"><i class="fas fa-user-plus"></i> Зарегистрироваться</button>
                 <div style="margin-top: 0.8rem;">
                     <button class="btn-secondary" @click="showRegister = !showRegister">
@@ -381,7 +388,7 @@
             <!-- Ученики репетитора -->
             <div v-if="viewMode === 'students'">
                 <div class="slots-grid" v-if="myStudents.length > 0">
-                    <div v-for="student in myStudents" :key="student.id" class="slot-card">
+                    <div v-for="student in myStudents" :key="student.name + student.phone" class="slot-card">
                         <div style="font-size:1.2rem;font-weight:500;">
                             <i class="fas fa-user-circle"></i> {{ student.name }}
                         </div>
@@ -401,9 +408,9 @@
             <!-- Календарь репетитора -->
             <div v-if="viewMode === 'calendar'">
                 <div class="calendar-nav">
-                    <div class="nav-group">
+                    <div>
                         <button class="btn-circle" @click="changeMonth(-1)"><i class="fas fa-chevron-left"></i></button>
-                        <span style="font-weight:500;">{{ currentMonth }} {{ currentYear }}</span>
+                        <span style="font-weight:500;margin:0 1rem;">{{ currentMonth }} {{ currentYear }}</span>
                         <button class="btn-circle" @click="changeMonth(1)"><i class="fas fa-chevron-right"></i></button>
                     </div>
                     <button class="btn-circle today-btn" @click="goToday">Сегодня</button>
@@ -471,9 +478,9 @@
             <div v-if="viewMode === 'mybookings'">
                 <div class="slots-grid" v-if="myBookings.length > 0">
                     <div v-for="booking in myBookings" :key="booking.id" class="slot-card" :class="{ booked: true }">
-                        <div class="time">{{ booking.time }}</div>
-                        <div>{{ booking.date }}</div>
-                        <div>{{ booking.price }}</div>
+                        <div class="time">{{ booking.slot?.time || '—' }}</div>
+                        <div>{{ booking.slot?.date || '—' }}</div>
+                        <div>{{ booking.slot?.price || '—' }}</div>
                         <span class="status booked">📕 Записано</span>
                         <div class="student-info">
                             <div><strong>👤 {{ booking.student_name }}</strong></div>
@@ -523,7 +530,6 @@
             registerEmail: '',
             registerPassword: '',
             
-            // Данные
             slots: [],
             students: [],
             bookings: [],
@@ -568,14 +574,30 @@
                     });
                     if (error) throw error;
                     
-                    // Определяем роль пользователя
-                    const { data: userData } = await supabaseClient
+                    // Получаем роль из таблицы users
+                    const { data: userData, error: userError } = await supabaseClient
                         .from('users')
                         .select('role')
                         .eq('id', data.user.id)
                         .maybeSingle();
                     
-                    this.userRole = userData?.role || 'parent';
+                    if (userError) {
+                        console.error('Ошибка получения роли:', userError);
+                        // Если нет записи в users, создаем с выбранной ролью
+                        const defaultRole = this.selectedRole || 'parent';
+                        await supabaseClient
+                            .from('users')
+                            .insert({
+                                id: data.user.id,
+                                email: data.user.email,
+                                name: data.user.user_metadata?.name || 'Пользователь',
+                                role: defaultRole
+                            });
+                        this.userRole = defaultRole;
+                    } else {
+                        this.userRole = userData?.role || 'parent';
+                    }
+                    
                     this.userEmail = data.user.email;
                     this.isLoggedIn = true;
                     this.loginEmail = '';
@@ -584,6 +606,7 @@
                     
                     await this.loadData();
                 } catch (e) {
+                    console.error('Ошибка входа:', e);
                     this.loginError = e.message || 'Ошибка входа. Проверьте email и пароль.';
                 }
             },
@@ -603,14 +626,16 @@
                         email: this.registerEmail,
                         password: this.registerPassword,
                         options: {
-                            data: { name: this.registerName, role: this.selectedRole }
+                            data: { 
+                                name: this.registerName,
+                                role: this.selectedRole 
+                            }
                         }
                     });
                     if (error) throw error;
                     
-                    // Сохраняем роль в таблицу users
                     if (data.user) {
-                        await supabaseClient
+                        const { error: insertError } = await supabaseClient
                             .from('users')
                             .insert({
                                 id: data.user.id,
@@ -618,9 +643,20 @@
                                 name: this.registerName,
                                 role: this.selectedRole
                             });
+                        
+                        if (insertError && insertError.code === '23505') {
+                            // Обновляем существующую запись
+                            await supabaseClient
+                                .from('users')
+                                .update({
+                                    name: this.registerName,
+                                    role: this.selectedRole
+                                })
+                                .eq('id', data.user.id);
+                        }
                     }
                     
-                    alert('✅ Регистрация успешна! Проверьте почту для подтверждения.');
+                    alert(`✅ Регистрация успешна! Вы зарегистрированы как ${this.selectedRole === 'tutor' ? 'репетитор' : 'родитель'}. Проверьте почту для подтверждения.`);
                     this.showRegister = false;
                     this.registerName = '';
                     this.registerEmail = '';
@@ -628,6 +664,7 @@
                     this.loginEmail = this.registerEmail;
                     this.loginError = '✅ Теперь войдите с вашим email и паролем.';
                 } catch (e) {
+                    console.error('Ошибка регистрации:', e);
                     this.loginError = e.message || 'Ошибка регистрации.';
                 }
             },
@@ -640,10 +677,15 @@
                 this.slots = [];
                 this.students = [];
                 this.bookings = [];
+                this.tutorSlots = [];
+                this.freeSlots = [];
+                this.myBookings = [];
+                this.myStudents = [];
             },
             
             // ===== ЗАГРУЗКА ДАННЫХ =====
             async loadData() {
+                console.log('Загрузка данных для роли:', this.userRole);
                 if (this.userRole === 'tutor') {
                     await this.loadTutorSlots();
                     await this.loadStudents();
@@ -656,62 +698,91 @@
             },
             
             async loadTutorSlots() {
-                const { data } = await supabaseClient
-                    .from('slots')
-                    .select('*')
-                    .eq('tutor_id', (await supabaseClient.auth.getUser()).data.user.id)
-                    .order('date', { ascending: true });
-                this.tutorSlots = data || [];
+                try {
+                    const user = await supabaseClient.auth.getUser();
+                    const { data, error } = await supabaseClient
+                        .from('slots')
+                        .select('*')
+                        .eq('tutor_id', user.data.user.id)
+                        .order('date', { ascending: true });
+                    
+                    if (error) throw error;
+                    this.tutorSlots = data || [];
+                    console.log('Загружено слотов репетитора:', this.tutorSlots.length);
+                } catch (e) {
+                    console.error('Ошибка загрузки слотов:', e);
+                }
             },
             
             async loadStudents() {
-                const { data } = await supabaseClient
-                    .from('bookings')
-                    .select('student_name, student_class, student_phone, slot:slots(*)')
-                    .eq('tutor_id', (await supabaseClient.auth.getUser()).data.user.id)
-                    .order('created_at', { ascending: false });
-                
-                // Группируем по ученикам
-                const studentsMap = new Map();
-                (data || []).forEach(b => {
-                    const key = b.student_name + b.student_phone;
-                    if (!studentsMap.has(key)) {
-                        studentsMap.set(key, {
-                            name: b.student_name,
-                            phone: b.student_phone,
-                            class: b.student_class || '—',
-                            totalLessons: 0
-                        });
-                    }
-                    studentsMap.get(key).totalLessons++;
-                });
-                this.myStudents = Array.from(studentsMap.values());
+                try {
+                    const user = await supabaseClient.auth.getUser();
+                    const { data, error } = await supabaseClient
+                        .from('bookings')
+                        .select('student_name, student_class, student_phone, created_at')
+                        .eq('tutor_id', user.data.user.id)
+                        .order('created_at', { ascending: false });
+                    
+                    if (error) throw error;
+                    
+                    const studentsMap = new Map();
+                    (data || []).forEach(b => {
+                        const key = b.student_name + b.student_phone;
+                        if (!studentsMap.has(key)) {
+                            studentsMap.set(key, {
+                                name: b.student_name,
+                                phone: b.student_phone || '—',
+                                class: b.student_class || '—',
+                                totalLessons: 0
+                            });
+                        }
+                        studentsMap.get(key).totalLessons++;
+                    });
+                    this.myStudents = Array.from(studentsMap.values());
+                    console.log('Загружено учеников:', this.myStudents.length);
+                } catch (e) {
+                    console.error('Ошибка загрузки учеников:', e);
+                }
             },
             
             async loadFreeSlots() {
-                const today = this.formatDate(new Date());
-                const { data } = await supabaseClient
-                    .from('slots')
-                    .select('*')
-                    .eq('booked', false)
-                    .gte('date', today)
-                    .order('date', { ascending: true });
-                
-                this.freeSlots = (data || []).map(s => ({
-                    ...s,
-                    showBookingForm: false,
-                    bookForm: { name: '', class: '', phone: '' }
-                }));
+                try {
+                    const today = this.formatDate(new Date());
+                    const { data, error } = await supabaseClient
+                        .from('slots')
+                        .select('*')
+                        .eq('booked', false)
+                        .gte('date', today)
+                        .order('date', { ascending: true });
+                    
+                    if (error) throw error;
+                    
+                    this.freeSlots = (data || []).map(s => ({
+                        ...s,
+                        showBookingForm: false,
+                        bookForm: { name: '', class: '', phone: '' }
+                    }));
+                    console.log('Загружено свободных слотов:', this.freeSlots.length);
+                } catch (e) {
+                    console.error('Ошибка загрузки свободных слотов:', e);
+                }
             },
             
             async loadMyBookings() {
-                const user = await supabaseClient.auth.getUser();
-                const { data } = await supabaseClient
-                    .from('bookings')
-                    .select('*, slot:slots(*)')
-                    .eq('parent_id', user.data.user.id)
-                    .order('created_at', { ascending: false });
-                this.myBookings = data || [];
+                try {
+                    const user = await supabaseClient.auth.getUser();
+                    const { data, error } = await supabaseClient
+                        .from('bookings')
+                        .select('*, slot:slots(*)')
+                        .eq('parent_id', user.data.user.id)
+                        .order('created_at', { ascending: false });
+                    
+                    if (error) throw error;
+                    this.myBookings = data || [];
+                    console.log('Загружено записей:', this.myBookings.length);
+                } catch (e) {
+                    console.error('Ошибка загрузки записей:', e);
+                }
             },
             
             // ===== УПРАВЛЕНИЕ СЛОТАМИ (РЕПЕТИТОР) =====
@@ -844,7 +915,6 @@
             async buildCalendar() {
                 const year = this.currentDate.getFullYear();
                 const month = this.currentDate.getMonth();
-                const firstDay = new Date(year, month, 1);
                 const lastDay = new Date(year, month + 1, 0);
                 
                 const days = [];
@@ -864,37 +934,51 @@
             }
         },
         
-        mounted() {
+        async mounted() {
             // Проверяем сессию
-            supabaseClient.auth.getSession().then(async ({ data }) => {
-                if (data.session) {
-                    const { data: userData } = await supabaseClient
-                        .from('users')
-                        .select('role')
-                        .eq('id', data.session.user.id)
-                        .maybeSingle();
-                    
-                    this.userRole = userData?.role || 'parent';
-                    this.userEmail = data.session.user.email;
-                    this.isLoggedIn = true;
-                    await this.loadData();
-                    if (this.userRole === 'tutor') {
-                        this.buildCalendar();
-                    }
+            const { data } = await supabaseClient.auth.getSession();
+            if (data.session) {
+                const { data: userData, error } = await supabaseClient
+                    .from('users')
+                    .select('role')
+                    .eq('id', data.session.user.id)
+                    .maybeSingle();
+                
+                if (error) {
+                    console.error('Ошибка получения роли:', error);
                 }
-            });
+                
+                this.userRole = userData?.role || 'parent';
+                this.userEmail = data.session.user.email;
+                this.isLoggedIn = true;
+                await this.loadData();
+                if (this.userRole === 'tutor') {
+                    await this.buildCalendar();
+                }
+            }
             
             // Слушаем изменения сессии
             supabaseClient.auth.onAuthStateChange((event, session) => {
                 if (event === 'SIGNED_IN' && session) {
                     this.userEmail = session.user.email;
                     this.isLoggedIn = true;
-                    this.loadData();
+                    supabaseClient
+                        .from('users')
+                        .select('role')
+                        .eq('id', session.user.id)
+                        .maybeSingle()
+                        .then(({ data }) => {
+                            this.userRole = data?.role || 'parent';
+                            this.loadData();
+                        });
                 }
                 if (event === 'SIGNED_OUT') {
                     this.isLoggedIn = false;
                     this.userEmail = '';
                     this.userRole = '';
+                    this.tutorSlots = [];
+                    this.freeSlots = [];
+                    this.myBookings = [];
                 }
             });
             
