@@ -361,7 +361,6 @@
         .student-card-actions .btn-delete-student { background: #f7e6e6; color: #8a4040; }
         .student-card-actions .btn-delete-student:hover { background: #eac8c8; }
 
-        /* Стили для автокомплита */
         .autocomplete-container {
             position: relative;
             width: 100%;
@@ -403,6 +402,90 @@
         .autocomplete-item .student-name {
             font-weight: 500;
             color: #3b2740;
+        }
+
+        .edit-student-form {
+            margin-top: 0.5rem;
+            padding: 0.5rem;
+            background: #f5f0f7;
+            border-radius: 20px;
+        }
+        .edit-student-form .field-group {
+            margin-bottom: 0.3rem;
+        }
+        .edit-student-form label {
+            font-size: 0.7rem;
+            color: #5e4166;
+        }
+        .edit-student-form input {
+            width: 100%;
+            padding: 0.3rem 0.6rem;
+            border-radius: 30px;
+            border: 1px solid #dcc7e2;
+            font-size: 0.8rem;
+            outline: none;
+        }
+        .edit-student-form input:focus {
+            border-color: #b48dbd;
+        }
+        .edit-student-form .edit-actions {
+            display: flex;
+            gap: 0.3rem;
+            margin-top: 0.3rem;
+        }
+        .edit-student-form .edit-actions button {
+            padding: 0.2rem 0.8rem;
+            border-radius: 30px;
+            border: none;
+            font-size: 0.7rem;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        .edit-student-form .edit-actions .btn-save {
+            background: #b48dbd;
+            color: white;
+        }
+        .edit-student-form .edit-actions .btn-save:hover {
+            background: #a47bae;
+        }
+        .edit-student-form .edit-actions .btn-cancel-edit {
+            background: #e9d4ed;
+            color: #55335e;
+        }
+        .edit-student-form .edit-actions .btn-cancel-edit:hover {
+            background: #dcbfe2;
+        }
+
+        /* Стили для сохраненных данных родителя */
+        .saved-data-badge {
+            background: #efe6f2;
+            border: 1px solid #dcc7e2;
+            border-radius: 30px;
+            padding: 0.3rem 1rem;
+            font-size: 0.8rem;
+            color: #5e4166;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 0.5rem;
+        }
+        .saved-data-badge i {
+            color: #7d5f86;
+        }
+        .btn-change-child {
+            background: transparent;
+            border: 1px solid #d5bedb;
+            border-radius: 30px;
+            padding: 0.2rem 0.8rem;
+            font-size: 0.7rem;
+            color: #553a5c;
+            cursor: pointer;
+            transition: 0.15s;
+            margin-left: 0.5rem;
+        }
+        .btn-change-child:hover {
+            background: #efe6f2;
+            border-color: #b48dbd;
         }
 
         @media (max-width: 768px) {
@@ -535,11 +618,9 @@
             </button>
         </div>
 
-        <!-- ============================================ -->
         <!-- ===== РЕЖИМ РЕПЕТИТОРА ===== -->
-        <!-- ============================================ -->
         <template v-if="userRole === 'tutor'">
-            
+            <!-- ВСЕ ВКЛАДКИ РЕПЕТИТОРА (ТЕ ЖЕ, ЧТО И РАНЬШЕ) -->
             <!-- 1. СЛОТЫ -->
             <div v-if="viewMode === 'slots'">
                 <div class="add-slot-form">
@@ -588,7 +669,7 @@
                 </div>
             </div>
 
-            <!-- 2. ДНЕВНИК (С АВТОКОМПЛИТОМ) -->
+            <!-- 2. ДНЕВНИК -->
             <div v-if="viewMode === 'diary'">
                 <div class="add-student-section">
                     <div class="field-group">
@@ -678,20 +759,51 @@
                 </div>
 
                 <div class="slots-grid" v-if="allStudents.length > 0">
-                    <div v-for="student in allStudents" :key="student.name + student.phone" class="slot-card">
-                        <div style="font-size:1.2rem;font-weight:500;">
-                            <i class="fas fa-user-circle"></i> {{ student.name }}
+                    <div v-for="(student, index) in allStudents" :key="student.name + student.phone + index" class="slot-card">
+                        <div v-if="!student.isEditing">
+                            <div style="font-size:1.2rem;font-weight:500;">
+                                <i class="fas fa-user-circle"></i> {{ student.name }}
+                            </div>
+                            <div>📞 {{ student.parent_phone || student.phone || '—' }}</div>
+                            <div>🏫 {{ student.class || '—' }}</div>
+                            <div style="font-size:0.8rem;color:#6a4e72;">👤 {{ student.parent_name || '—' }}</div>
+                            <div style="margin-top:0.5rem;font-size:0.9rem;color:#6a4e72;">
+                                Всего занятий: {{ student.totalLessons || 0 }}
+                            </div>
+                            <div class="student-card-actions" style="margin-top:0.5rem;padding-top:0.5rem;border-top:1px dashed #e8d9ed;">
+                                <button class="btn-edit" @click="startEditStudent(index)">
+                                    <i class="fas fa-pen"></i> Редактировать
+                                </button>
+                                <button class="btn-delete-student" @click="deleteStudent(student.name)" title="Удалить ученика">
+                                    <i class="fas fa-trash"></i> Удалить
+                                </button>
+                            </div>
                         </div>
-                        <div>📞 {{ student.parent_phone || student.phone || '—' }}</div>
-                        <div>🏫 {{ student.class || '—' }}</div>
-                        <div style="font-size:0.8rem;color:#6a4e72;">👤 {{ student.parent_name || '—' }}</div>
-                        <div style="margin-top:0.5rem;font-size:0.9rem;color:#6a4e72;">
-                            Всего занятий: {{ student.totalLessons || 0 }}
-                        </div>
-                        <div class="student-card-actions" style="margin-top:0.5rem;padding-top:0.5rem;border-top:1px dashed #e8d9ed;">
-                            <button class="btn-delete-student" @click="deleteStudent(student.name)" title="Удалить ученика">
-                                <i class="fas fa-trash"></i> Удалить
-                            </button>
+                        <div v-else class="edit-student-form">
+                            <div class="field-group">
+                                <label><i class="fas fa-user-graduate"></i> Имя ученика *</label>
+                                <input v-model="editStudentData.name" placeholder="Имя">
+                            </div>
+                            <div class="field-group">
+                                <label><i class="fas fa-user-tag"></i> Класс</label>
+                                <input v-model="editStudentData.class" placeholder="7А">
+                            </div>
+                            <div class="field-group">
+                                <label><i class="fas fa-phone"></i> Телефон родителя</label>
+                                <input v-model="editStudentData.phone" placeholder="+7 999 123-45-67">
+                            </div>
+                            <div class="field-group">
+                                <label><i class="fas fa-user"></i> Имя родителя</label>
+                                <input v-model="editStudentData.parent_name" placeholder="Анна">
+                            </div>
+                            <div class="edit-actions">
+                                <button class="btn-save" @click="saveEditStudent(index)">
+                                    <i class="fas fa-check"></i> Сохранить
+                                </button>
+                                <button class="btn-cancel-edit" @click="cancelEditStudent(index)">
+                                    <i class="fas fa-times"></i> Отмена
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -883,15 +995,24 @@
             </div>
         </template>
 
-        <!-- ============================================ -->
-        <!-- ===== РЕЖИМ РОДИТЕЛЯ ===== -->
-        <!-- ============================================ -->
+        <!-- ===== РЕЖИМ РОДИТЕЛЯ (С СОХРАНЕНИЕМ ДАННЫХ) ===== -->
         <template v-else>
             <!-- Свободные слоты -->
             <div v-if="viewMode === 'slots'">
                 <div style="margin-bottom:1rem;color:#6a4e72;">
                     <i class="fas fa-info-circle"></i> Выберите свободный слот для записи
                 </div>
+                
+                <!-- Блок с сохраненными данными -->
+                <div v-if="savedParentData" class="saved-data-badge">
+                    <i class="fas fa-user-check"></i> 
+                    Вы записываете: <strong>{{ savedParentData.student_name }}</strong> 
+                    ({{ savedParentData.student_class || 'без класса' }})
+                    <button class="btn-change-child" @click="clearSavedData">
+                        <i class="fas fa-pen"></i> Записать другого ребенка
+                    </button>
+                </div>
+                
                 <div class="slots-grid" v-if="freeSlots.length > 0">
                     <div v-for="slot in freeSlots" :key="slot.id" class="slot-card">
                         <div class="time">{{ slot.time }}</div>
@@ -932,7 +1053,7 @@
                             </div>
                         </div>
                         <div class="actions" v-else>
-                            <button class="btn-book" @click="slot.showBookingForm = true">
+                            <button class="btn-book" @click="openBookingForm(slot)">
                                 <i class="fas fa-pen"></i> Записаться
                             </button>
                         </div>
@@ -980,7 +1101,7 @@
             </div>
         </template>
 
-        <!-- МОДАЛКА ДОБАВЛЕНИЯ ЗАНЯТИЯ ДЛЯ РОДИТЕЛЯ -->
+        <!-- МОДАЛКИ -->
         <div v-if="addLessonModalVisible" class="modal-overlay" @click.self="addLessonModalVisible = false">
             <div class="modal-content">
                 <h3><i class="fas fa-plus-circle"></i> Добавить занятие для {{ selectedBooking?.student_name }}</h3>
@@ -1003,7 +1124,6 @@
             </div>
         </div>
 
-        <!-- МОДАЛКА КОПИРОВАНИЯ -->
         <div v-if="copyModalVisible" class="modal-overlay" @click.self="copyModalVisible = false">
             <div class="modal-content">
                 <h3><i class="fas fa-copy"></i> Копировать день</h3>
@@ -1054,7 +1174,6 @@
             freeSlots: [],
             myBookings: [],
             allBookings: [],
-            myStudents: [],
             allStudents: [],
             
             // Дневник
@@ -1091,6 +1210,13 @@
                 phone: '',
                 parent_name: ''
             },
+            
+            // Редактирование ученика
+            editStudentData: {},
+            editingStudentIndex: -1,
+            
+            // Сохраненные данные родителя
+            savedParentData: null,
             
             // Форма добавления занятия для родителей
             addLessonModalVisible: false,
@@ -1259,6 +1385,9 @@
                     this.loginPassword = '';
                     this.loginError = '';
                     
+                    // Загружаем сохраненные данные родителя
+                    this.loadSavedParentData();
+                    
                     await this.loadData();
                 } catch (e) {
                     console.error('Ошибка входа:', e);
@@ -1325,6 +1454,55 @@
                 this.allStudents = [];
                 this.diaryStudents = [];
                 this.diaryLessons = [];
+                this.savedParentData = null;
+                localStorage.removeItem('savedParentData');
+            },
+            
+            // ===== СОХРАНЕНИЕ ДАННЫХ РОДИТЕЛЯ =====
+            loadSavedParentData() {
+                try {
+                    const saved = localStorage.getItem('savedParentData');
+                    if (saved) {
+                        this.savedParentData = JSON.parse(saved);
+                    }
+                } catch (e) {
+                    console.error('Ошибка загрузки сохраненных данных:', e);
+                }
+            },
+            
+            saveParentData(data) {
+                try {
+                    this.savedParentData = data;
+                    localStorage.setItem('savedParentData', JSON.stringify(data));
+                } catch (e) {
+                    console.error('Ошибка сохранения данных:', e);
+                }
+            },
+            
+            clearSavedData() {
+                this.savedParentData = null;
+                localStorage.removeItem('savedParentData');
+                // Обновляем все формы
+                this.freeSlots.forEach(slot => {
+                    if (slot.bookForm) {
+                        slot.bookForm.parent_name = '';
+                        slot.bookForm.parent_phone = '';
+                        slot.bookForm.student_name = '';
+                        slot.bookForm.student_class = '';
+                    }
+                });
+            },
+            
+            // ===== ОТКРЫТИЕ ФОРМЫ ЗАПИСИ С СОХРАНЕННЫМИ ДАННЫМИ =====
+            openBookingForm(slot) {
+                // Если есть сохраненные данные, подставляем их
+                if (this.savedParentData) {
+                    slot.bookForm.parent_name = this.savedParentData.parent_name || '';
+                    slot.bookForm.parent_phone = this.savedParentData.parent_phone || '';
+                    slot.bookForm.student_name = this.savedParentData.student_name || '';
+                    slot.bookForm.student_class = this.savedParentData.student_class || '';
+                }
+                slot.showBookingForm = true;
             },
             
             // ===== АВТОКОМПЛИТ =====
@@ -1349,6 +1527,73 @@
                 this.newStudentName = student.name;
                 this.showAutocomplete = false;
                 this.filteredStudentList = [];
+            },
+            
+            // ===== РЕДАКТИРОВАНИЕ УЧЕНИКОВ =====
+            startEditStudent(index) {
+                const student = this.allStudents[index];
+                this.editingStudentIndex = index;
+                this.editStudentData = {
+                    name: student.name,
+                    class: student.class || '',
+                    phone: student.parent_phone || student.phone || '',
+                    parent_name: student.parent_name || ''
+                };
+                this.allStudents = this.allStudents.map((s, i) => ({
+                    ...s,
+                    isEditing: i === index
+                }));
+            },
+            cancelEditStudent(index) {
+                this.allStudents = this.allStudents.map((s, i) => ({
+                    ...s,
+                    isEditing: false
+                }));
+                this.editingStudentIndex = -1;
+                this.editStudentData = {};
+            },
+            async saveEditStudent(index) {
+                const student = this.allStudents[index];
+                const newData = this.editStudentData;
+                
+                if (!newData.name.trim()) {
+                    alert('Имя ученика обязательно');
+                    return;
+                }
+                
+                const oldName = student.name;
+                const lessons = this.diaryLessons.filter(l => l.student_name === oldName);
+                
+                for (const lesson of lessons) {
+                    await supabaseClient
+                        .from('diary_lessons')
+                        .update({ 
+                            student_name: newData.name.trim(),
+                            note: lesson.note ? 
+                                lesson.note.replace(`Имя: ${oldName}`, `Имя: ${newData.name.trim()}`) :
+                                `Имя: ${newData.name.trim()}, Класс: ${newData.class || '—'}`
+                        })
+                        .eq('id', lesson.id);
+                }
+                
+                const bookings = this.allBookings.filter(b => b.student_name === oldName);
+                for (const booking of bookings) {
+                    await supabaseClient
+                        .from('bookings')
+                        .update({ 
+                            student_name: newData.name.trim(),
+                            student_class: newData.class || booking.student_class,
+                            parent_phone: newData.phone || booking.parent_phone,
+                            parent_name: newData.parent_name || booking.parent_name
+                        })
+                        .eq('id', booking.id);
+                }
+                
+                this.cancelEditStudent(index);
+                await this.loadAllStudents();
+                await this.loadDiary();
+                await this.loadAllBookings();
+                alert('✅ Данные ученика обновлены!');
             },
             
             // ===== ЗАГРУЗКА ДАННЫХ =====
@@ -1414,7 +1659,8 @@
                                 phone: b.parent_phone || '—',
                                 parent_name: b.parent_name || '—',
                                 totalLessons: 0,
-                                source: 'booking'
+                                source: 'booking',
+                                isEditing: false
                             });
                         }
                         studentsMap.get(key).totalLessons++;
@@ -1429,7 +1675,8 @@
                                 phone: '—',
                                 parent_name: '—',
                                 totalLessons: 0,
-                                source: 'diary'
+                                source: 'diary',
+                                isEditing: false
                             });
                         }
                         studentsMap.get(key).totalLessons++;
@@ -1537,10 +1784,10 @@
                         ...s,
                         showBookingForm: false,
                         bookForm: { 
-                            parent_name: '',
-                            parent_phone: '',
-                            student_name: '',
-                            student_class: ''
+                            parent_name: this.savedParentData?.parent_name || '',
+                            parent_phone: this.savedParentData?.parent_phone || '',
+                            student_name: this.savedParentData?.student_name || '',
+                            student_class: this.savedParentData?.student_class || ''
                         }
                     }));
                 } catch (e) {
@@ -1618,7 +1865,7 @@
                 }
             },
             
-            // ===== ЗАПИСЬ РОДИТЕЛЯ =====
+            // ===== ЗАПИСЬ РОДИТЕЛЯ (С СОХРАНЕНИЕМ ДАННЫХ) =====
             async bookSlot(slot) {
                 const form = slot.bookForm;
                 if (!form.parent_name || !form.parent_phone || !form.student_name) {
@@ -1627,6 +1874,25 @@
                 }
                 const user = await supabaseClient.auth.getUser();
                 
+                // Проверяем, не занят ли слот уже
+                const { data: slotCheck, error: checkError } = await supabaseClient
+                    .from('slots')
+                    .select('booked')
+                    .eq('id', slot.id)
+                    .single();
+                
+                if (checkError) {
+                    alert('Ошибка проверки слота');
+                    return;
+                }
+                
+                if (slotCheck.booked) {
+                    alert('Этот слот уже занят!');
+                    await this.loadFreeSlots();
+                    return;
+                }
+                
+                // Создаем запись
                 const { error } = await supabaseClient
                     .from('bookings')
                     .insert({
@@ -1636,7 +1902,8 @@
                         parent_name: form.parent_name,
                         parent_phone: form.parent_phone,
                         student_name: form.student_name,
-                        student_class: form.student_class || ''
+                        student_class: form.student_class || '',
+                        student_phone: form.parent_phone
                     });
                 
                 if (error) {
@@ -1644,6 +1911,7 @@
                     return;
                 }
                 
+                // Обновляем слот
                 await supabaseClient
                     .from('slots')
                     .update({ 
@@ -1657,21 +1925,76 @@
                     })
                     .eq('id', slot.id);
                 
+                // Сохраняем данные родителя
+                this.saveParentData({
+                    parent_name: form.parent_name,
+                    parent_phone: form.parent_phone,
+                    student_name: form.student_name,
+                    student_class: form.student_class || ''
+                });
+                
+                // Обновляем все списки
                 await this.loadFreeSlots();
                 await this.loadMyBookings();
                 await this.loadAllBookings();
                 await this.loadAllStudents();
-                alert('✅ Вы успешно записались!');
+                
+                // Добавляем занятие в дневник репетитора
+                const diaryError = await this.addBookingToDiary(slot, form);
+                if (diaryError) {
+                    console.warn('Ошибка добавления в дневник:', diaryError);
+                }
+                
+                alert('✅ Вы успешно записались! Занятие добавлено в расписание репетитора.');
+            },
+            
+            // ===== ДОБАВЛЕНИЕ ЗАПИСИ В ДНЕВНИК РЕПЕТИТОРА =====
+            async addBookingToDiary(slot, form) {
+                try {
+                    const user = await supabaseClient.auth.getUser();
+                    const { error } = await supabaseClient
+                        .from('diary_lessons')
+                        .insert({
+                            tutor_id: slot.tutor_id,
+                            student_name: form.student_name,
+                            date: slot.date,
+                            time: slot.time,
+                            price: slot.price,
+                            paid: 'unpaid',
+                            note: `Запись от родителя ${form.parent_name} (${form.parent_phone})`
+                        });
+                    
+                    if (error) {
+                        console.error('Ошибка добавления в дневник:', error);
+                        return error;
+                    }
+                    
+                    // Обновляем дневник репетитора
+                    await this.loadDiary();
+                    return null;
+                } catch (e) {
+                    console.error('Ошибка:', e);
+                    return e;
+                }
             },
             
             async cancelMyBooking(bookingId) {
                 if (confirm('Отменить запись?')) {
                     const booking = this.myBookings.find(b => b.id === bookingId);
                     if (booking) {
+                        // Удаляем из слотов
                         await supabaseClient
                             .from('slots')
                             .update({ booked: false, student: null })
                             .eq('id', booking.slot_id);
+                        
+                        // Удаляем из дневника
+                        await supabaseClient
+                            .from('diary_lessons')
+                            .delete()
+                            .eq('student_name', booking.student_name)
+                            .eq('date', booking.slot?.date)
+                            .eq('time', booking.slot?.time);
                     }
                     
                     await supabaseClient
@@ -1683,6 +2006,7 @@
                     await this.loadFreeSlots();
                     await this.loadAllBookings();
                     await this.loadAllStudents();
+                    await this.loadDiary();
                 }
             },
             
@@ -1729,7 +2053,7 @@
                         time: '—',
                         price: '—',
                         paid: 'unpaid',
-                        note: `Ученик добавлен репетитором. Класс: ${this.newStudentForm.class || '—'}, Телефон: ${this.newStudentForm.phone || '—'}, Родитель: ${this.newStudentForm.parent_name || '—'}`
+                        note: `Ученик добавлен репетитором. Имя: ${name}, Класс: ${this.newStudentForm.class || '—'}, Телефон: ${this.newStudentForm.phone || '—'}, Родитель: ${this.newStudentForm.parent_name || '—'}`
                     });
                 
                 if (error) {
@@ -2077,6 +2401,7 @@
                 this.userRole = userData?.role || 'parent';
                 this.userEmail = data.session.user.email;
                 this.isLoggedIn = true;
+                this.loadSavedParentData();
                 await this.loadData();
                 console.log('🔄 Загружена роль при монтировании:', this.userRole);
             }
@@ -2085,6 +2410,7 @@
                 if (event === 'SIGNED_IN' && session) {
                     this.userEmail = session.user.email;
                     this.isLoggedIn = true;
+                    this.loadSavedParentData();
                     
                     const { data: userData } = await supabaseClient
                         .from('users')
