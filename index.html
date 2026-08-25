@@ -9,7 +9,7 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', 'Roboto', system-ui, sans-serif; }
         
-        /* ===== ФОН С БОТАНИЧЕСКИМ ПАТТЕРНОМ ===== */
+        /* ===== БОТАНИЧЕСКИЙ ФОН ===== */
         body { 
             background: #f8f3fa; 
             min-height: 100vh; 
@@ -18,13 +18,9 @@
             align-items: center; 
             margin: 0; 
             padding: 20px;
-            /* Создаем паттерн с листочками через CSS */
             background-image: 
-                /* Листочки */
                 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cpath d='M30 10 C25 15, 20 25, 20 30 C20 38, 25 45, 30 50 C35 45, 40 38, 40 30 C40 25, 35 15, 30 10Z' fill='rgba(180, 141, 189, 0.08)'/%3E%3Cpath d='M30 12 C26 16, 22 24, 22 30 C22 36, 26 43, 30 47 C34 43, 38 36, 38 30 C38 24, 34 16, 30 12Z' fill='rgba(200, 170, 210, 0.06)'/%3E%3C/svg%3E"),
-                /* Маленькие листочки */
                 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='30' height='30' viewBox='0 0 30 30'%3E%3Cpath d='M15 5 C12 8, 10 13, 10 16 C10 20, 12 24, 15 26 C18 24, 20 20, 20 16 C20 13, 18 8, 15 5Z' fill='rgba(200, 170, 210, 0.05)'/%3E%3C/svg%3E"),
-                /* Цветочки */
                 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Ccircle cx='40' cy='40' r='6' fill='rgba(200, 170, 210, 0.06)'/%3E%3Ccircle cx='34' cy='34' r='4' fill='rgba(200, 170, 210, 0.04)'/%3E%3Ccircle cx='46' cy='34' r='4' fill='rgba(200, 170, 210, 0.04)'/%3E%3Ccircle cx='34' cy='46' r='4' fill='rgba(200, 170, 210, 0.04)'/%3E%3Ccircle cx='46' cy='46' r='4' fill='rgba(200, 170, 210, 0.04)'/%3E%3C/svg%3E");
             background-repeat: repeat, repeat, repeat;
             background-size: 120px 120px, 80px 80px, 160px 160px;
@@ -44,7 +40,7 @@
             overflow: hidden;
         }
         
-        /* Декоративные уголки с листочками */
+        /* Декоративные листочки */
         .app-container::before {
             content: '🌿';
             position: absolute;
@@ -64,7 +60,7 @@
             transform: rotate(-15deg);
         }
         
-        /* ===== ШАПКА С ПОДЗАГОЛОВКОМ ===== */
+        /* ===== ШАПКА ===== */
         .header-botanical { 
             display: flex; 
             align-items: center; 
@@ -102,8 +98,7 @@
             margin-left: 2.8rem;
         }
         .header-botanical .subtitle i {
-            color: #b48dbd;
-            margin-right: 4px;
+            color: #e8a0b0;
         }
         .botanical-icon { 
             background: #ebdfef; 
@@ -118,10 +113,13 @@
             flex-wrap: wrap; 
         }
         
-        /* Остальные стили остаются без изменений */
+        /* ===== ЭКРАН ВХОДА ===== */
         .login-overlay { 
             position: fixed; 
-            top: 0; left: 0; right: 0; bottom: 0;
+            top: 0; 
+            left: 0; 
+            right: 0; 
+            bottom: 0;
             background: rgba(60, 40, 70, 0.7); 
             backdrop-filter: blur(8px); 
             display: flex; 
@@ -141,6 +139,7 @@
             text-align: center; 
             max-height: 90vh;
             overflow-y: auto;
+            position: relative;
         }
         .login-card h2 { color: #4a2e4f; margin-bottom: 0.5rem; font-size: 1.8rem; }
         .login-card .subtitle { color: #7f5f89; margin-bottom: 1.5rem; font-size: 0.95rem; }
@@ -217,6 +216,8 @@
             border-top: 1px dashed #dcc7e2; 
             padding-top: 1rem;
         }
+        
+        /* ===== ОСТАЛЬНЫЕ СТИЛИ ===== */
         .role-badge { 
             background: #b48dbd; 
             color: white; 
@@ -244,44 +245,16 @@
         .calendar-nav .date-display { font-size: 1.1rem; font-weight: 450; color: #3b2740; min-width: 160px; text-align: center; }
 
         .slots-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; margin: 1rem 0; }
-        .slot-card { 
-            background: #fcf8fe; 
-            border-radius: 30px; 
-            padding: 1.5rem; 
-            border: 1px solid #decbe3; 
-            transition: 0.15s; 
-            position: relative;
-        }
+        .slot-card { background: #fcf8fe; border-radius: 30px; padding: 1.5rem; border: 1px solid #decbe3; transition: 0.15s; position: relative; }
         .slot-card:hover { border-color: #cbafd3; box-shadow: 0 4px 12px rgba(140, 100, 160, 0.1); }
         .slot-card.booked { border-color: #eac8c8; background: #fdf8f8; }
         .slot-card .time { font-size: 1.2rem; font-weight: 500; color: #3b2740; }
-        .slot-card .status { 
-            display: inline-block; 
-            padding: 0.2rem 1rem; 
-            border-radius: 60px; 
-            font-size: 0.8rem; 
-            font-weight: 500;
-            margin-top: 0.5rem;
-        }
+        .slot-card .status { display: inline-block; padding: 0.2rem 1rem; border-radius: 60px; font-size: 0.8rem; font-weight: 500; margin-top: 0.5rem; }
         .slot-card .status.free { background: #d9ebd9; color: #1f5420; }
         .slot-card .status.booked { background: #f7e6e6; color: #8a4040; }
-        .slot-card .student-info { 
-            margin-top: 0.5rem; 
-            padding: 0.5rem; 
-            background: #efe6f2; 
-            border-radius: 20px; 
-            font-size: 0.9rem;
-        }
+        .slot-card .student-info { margin-top: 0.5rem; padding: 0.5rem; background: #efe6f2; border-radius: 20px; font-size: 0.9rem; }
         .slot-card .actions { margin-top: 0.8rem; display: flex; gap: 0.5rem; flex-wrap: wrap; }
-        .slot-card .actions button { 
-            padding: 0.3rem 1rem; 
-            border-radius: 60px; 
-            border: none; 
-            cursor: pointer; 
-            font-size: 0.8rem; 
-            font-weight: 500;
-            transition: 0.15s;
-        }
+        .slot-card .actions button { padding: 0.3rem 1rem; border-radius: 60px; border: none; cursor: pointer; font-size: 0.8rem; font-weight: 500; transition: 0.15s; }
         .slot-card .actions .btn-book { background: #b48dbd; color: white; }
         .slot-card .actions .btn-book:hover { background: #a47bae; }
         .slot-card .actions .btn-cancel { background: #e9d4ed; color: #55335e; }
@@ -289,17 +262,7 @@
         .slot-card .actions .btn-delete { background: #f7e6e6; color: #8a4040; }
         .slot-card .actions .btn-delete:hover { background: #eac8c8; }
 
-        .add-slot-form { 
-            background: #fcf8fe; 
-            border-radius: 40px; 
-            padding: 1.5rem 2rem; 
-            margin: 1.5rem 0; 
-            border: 1px solid #dcc7e2; 
-            display: flex; 
-            flex-wrap: wrap; 
-            align-items: flex-end; 
-            gap: 1rem 1.5rem; 
-        }
+        .add-slot-form { background: #fcf8fe; border-radius: 40px; padding: 1.5rem 2rem; margin: 1.5rem 0; border: 1px solid #dcc7e2; display: flex; flex-wrap: wrap; align-items: flex-end; gap: 1rem 1.5rem; }
         .add-slot-form .field-group { display: flex; flex-direction: column; gap: 0.3rem; flex: 1 0 120px; }
         .add-slot-form label { font-size: 0.8rem; font-weight: 500; color: #5e4166; }
         .add-slot-form input { background: white; border: 1px solid #dcc7e2; border-radius: 40px; padding: 0.6rem 1rem; font-size: 0.9rem; outline: none; width: 100%; }
@@ -328,42 +291,12 @@
         .day-lessons-table tr:last-child td { border-bottom: none; }
         .status-paid { background: #d9ebd9; color: #1f5420; padding: 0.3rem 1.2rem; border-radius: 60px; font-size: 0.85rem; font-weight: 500; display: inline-block; border: 1px solid #b8d5b8; }
         .status-unpaid { background: #f7e6e6; color: #8a4040; padding: 0.3rem 1.2rem; border-radius: 60px; font-size: 0.85rem; font-weight: 500; display: inline-block; border: 1px solid #eac8c8; }
-        .note-badge { 
-            background: #efe6f2; 
-            padding: 0.3rem 1rem; 
-            border-radius: 30px; 
-            font-size: 0.85rem; 
-            color: #3f2a44; 
-            max-width: 200px; 
-            white-space: nowrap; 
-            overflow: hidden; 
-            text-overflow: ellipsis; 
-            display: inline-block; 
-            border: 1px solid #dcc7e2; 
-        }
-        .source-badge { 
-            font-size: 0.65rem; 
-            padding: 0.15rem 0.6rem; 
-            border-radius: 30px; 
-            background: #c9d4e8; 
-            color: #2e3f5a; 
-            display: inline-block;
-            margin-left: 0.3rem;
-        }
+        .note-badge { background: #efe6f2; padding: 0.3rem 1rem; border-radius: 30px; font-size: 0.85rem; color: #3f2a44; max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: inline-block; border: 1px solid #dcc7e2; }
+        .source-badge { font-size: 0.65rem; padding: 0.15rem 0.6rem; border-radius: 30px; background: #c9d4e8; color: #2e3f5a; display: inline-block; margin-left: 0.3rem; }
         .source-badge.parent { background: #d9ebd9; color: #1f5420; }
         .source-badge.tutor { background: #c9d4e8; color: #2e3f5a; }
 
-        .add-student-section { 
-            background: #fcf8fe; 
-            border-radius: 40px; 
-            padding: 1.5rem 2rem; 
-            margin: 1.5rem 0; 
-            border: 1px solid #dcc7e2; 
-            display: flex; 
-            flex-wrap: wrap; 
-            align-items: flex-end; 
-            gap: 1rem 1.5rem; 
-        }
+        .add-student-section { background: #fcf8fe; border-radius: 40px; padding: 1.5rem 2rem; margin: 1.5rem 0; border: 1px solid #dcc7e2; display: flex; flex-wrap: wrap; align-items: flex-end; gap: 1rem 1.5rem; }
         .add-student-section .field-group { display: flex; flex-direction: column; gap: 0.3rem; flex: 1 0 100px; }
         .add-student-section label { font-size: 0.8rem; font-weight: 500; color: #5e4166; display: flex; align-items: center; gap: 6px; }
         .add-student-section input, .add-student-section select { background: white; border: 1px solid #dcc7e2; border-radius: 40px; padding: 0.6rem 1rem; font-size: 0.9rem; color: #2e1f32; outline: none; width: 100%; }
@@ -385,48 +318,15 @@
         .day-lesson .price { color: #5e4166; font-size: 0.7rem; }
         .day-lesson .paid-badge { font-size: 0.6rem; padding: 0.1rem 0.4rem; border-radius: 20px; background: #d9ebd9; color: #1f5420; margin-left: 4px; }
         .day-lesson .unpaid-badge { background: #f7e6e6; color: #8a4040; }
-        .day-lesson .source-badge-small { 
-            font-size: 0.5rem; 
-            padding: 0.05rem 0.4rem; 
-            border-radius: 20px; 
-            background: #c9d4e8; 
-            color: #2e3f5a; 
-            margin-left: 4px;
-        }
+        .day-lesson .source-badge-small { font-size: 0.5rem; padding: 0.05rem 0.4rem; border-radius: 20px; background: #c9d4e8; color: #2e3f5a; margin-left: 4px; }
         .day-lesson .source-badge-small.parent { background: #d9ebd9; color: #1f5420; }
-        .day-lesson-actions { 
-            margin-top: 0.3rem; 
-            display: flex; 
-            gap: 0.3rem; 
-            flex-wrap: wrap; 
-        }
-        .day-lesson-actions button { 
-            padding: 0.1rem 0.5rem; 
-            border-radius: 30px; 
-            border: none; 
-            font-size: 0.6rem; 
-            cursor: pointer; 
-            font-weight: 500;
-            transition: 0.15s;
-        }
-        .day-lesson-actions .btn-toggle-paid { 
-            background: #d9ebd9; 
-            color: #1f5420; 
-        }
-        .day-lesson-actions .btn-toggle-paid.unpaid { 
-            background: #f7e6e6; 
-            color: #8a4040; 
-        }
-        .day-lesson-actions .btn-delete-lesson { 
-            background: #f7e6e6; 
-            color: #8a4040; 
-        }
-        .day-lesson-actions .btn-delete-lesson:hover { 
-            background: #eac8c8; 
-        }
-        .day-lesson-actions .btn-toggle-paid:hover { 
-            opacity: 0.8; 
-        }
+        .day-lesson-actions { margin-top: 0.3rem; display: flex; gap: 0.3rem; flex-wrap: wrap; }
+        .day-lesson-actions button { padding: 0.1rem 0.5rem; border-radius: 30px; border: none; font-size: 0.6rem; cursor: pointer; font-weight: 500; transition: 0.15s; }
+        .day-lesson-actions .btn-toggle-paid { background: #d9ebd9; color: #1f5420; }
+        .day-lesson-actions .btn-toggle-paid.unpaid { background: #f7e6e6; color: #8a4040; }
+        .day-lesson-actions .btn-delete-lesson { background: #f7e6e6; color: #8a4040; }
+        .day-lesson-actions .btn-delete-lesson:hover { background: #eac8c8; }
+        .day-lesson-actions .btn-toggle-paid:hover { opacity: 0.8; }
         .add-mini { background: transparent; border: 1px dashed #d5bedb; border-radius: 12px; padding: 0.2rem; text-align: center; color: #9a82a2; font-size: 0.7rem; cursor: pointer; margin-top: 0.3rem; transition: 0.1s; }
         .add-mini:hover { background: #efe6f2; border-color: #b48dbd; }
 
@@ -440,175 +340,43 @@
         .modal-actions .btn-secondary { background: #efe6f2; border: 1px solid #d5bedb; border-radius: 40px; padding: 0.5rem 1.5rem; cursor: pointer; }
         .modal-actions .btn-secondary:hover { background: #dcc7e2; }
 
-        .cancel-error { 
-            background: #f7e6e6; 
-            color: #8a4040; 
-            padding: 0.5rem 1rem; 
-            border-radius: 30px; 
-            font-size: 0.85rem; 
-            margin-top: 0.5rem;
-            border: 1px solid #eac8c8;
-        }
-
-        .booking-controls { 
-            display: flex; 
-            gap: 0.5rem; 
-            flex-wrap: wrap; 
-            margin-top: 0.5rem;
-            padding-top: 0.5rem;
-            border-top: 1px dashed #e8d9ed;
-        }
-        .booking-controls .paid-status { 
-            padding: 0.2rem 0.8rem; 
-            border-radius: 60px; 
-            font-size: 0.75rem; 
-            font-weight: 500;
-            cursor: pointer;
-            border: none;
-        }
+        .cancel-error { background: #f7e6e6; color: #8a4040; padding: 0.5rem 1rem; border-radius: 30px; font-size: 0.85rem; margin-top: 0.5rem; border: 1px solid #eac8c8; }
+        .booking-controls { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px dashed #e8d9ed; }
+        .booking-controls .paid-status { padding: 0.2rem 0.8rem; border-radius: 60px; font-size: 0.75rem; font-weight: 500; cursor: pointer; border: none; }
         .booking-controls .paid-status.paid { background: #d9ebd9; color: #1f5420; }
         .booking-controls .paid-status.unpaid { background: #f7e6e6; color: #8a4040; }
 
         .student-card-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
-        .student-card-actions button { 
-            padding: 0.2rem 0.8rem; 
-            border-radius: 60px; 
-            border: none; 
-            font-size: 0.7rem; 
-            cursor: pointer; 
-            font-weight: 500;
-            transition: 0.15s;
-        }
+        .student-card-actions button { padding: 0.2rem 0.8rem; border-radius: 60px; border: none; font-size: 0.7rem; cursor: pointer; font-weight: 500; transition: 0.15s; }
         .student-card-actions .btn-edit { background: #c9d4e8; color: #2e3f5a; }
         .student-card-actions .btn-edit:hover { background: #b5c4dc; }
         .student-card-actions .btn-delete-student { background: #f7e6e6; color: #8a4040; }
         .student-card-actions .btn-delete-student:hover { background: #eac8c8; }
 
-        .autocomplete-container {
-            position: relative;
-            width: 100%;
-        }
-        .autocomplete-list {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
-            background: white;
-            border: 1px solid #dcc7e2;
-            border-radius: 20px;
-            max-height: 200px;
-            overflow-y: auto;
-            z-index: 100;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-            margin-top: 4px;
-        }
-        .autocomplete-item {
-            padding: 0.6rem 1rem;
-            cursor: pointer;
-            border-bottom: 1px solid #f0ebf2;
-            transition: 0.1s;
-            font-size: 0.9rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .autocomplete-item:hover {
-            background: #efe6f2;
-        }
-        .autocomplete-item:last-child {
-            border-bottom: none;
-        }
-        .autocomplete-item .student-info {
-            font-size: 0.75rem;
-            color: #7f5f89;
-        }
-        .autocomplete-item .student-name {
-            font-weight: 500;
-            color: #3b2740;
-        }
+        .autocomplete-container { position: relative; width: 100%; }
+        .autocomplete-list { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #dcc7e2; border-radius: 20px; max-height: 200px; overflow-y: auto; z-index: 100; box-shadow: 0 8px 20px rgba(0,0,0,0.1); margin-top: 4px; }
+        .autocomplete-item { padding: 0.6rem 1rem; cursor: pointer; border-bottom: 1px solid #f0ebf2; transition: 0.1s; font-size: 0.9rem; display: flex; justify-content: space-between; align-items: center; }
+        .autocomplete-item:hover { background: #efe6f2; }
+        .autocomplete-item:last-child { border-bottom: none; }
+        .autocomplete-item .student-info { font-size: 0.75rem; color: #7f5f89; }
+        .autocomplete-item .student-name { font-weight: 500; color: #3b2740; }
 
-        .edit-student-form {
-            margin-top: 0.5rem;
-            padding: 0.5rem;
-            background: #f5f0f7;
-            border-radius: 20px;
-        }
-        .edit-student-form .field-group {
-            margin-bottom: 0.3rem;
-        }
-        .edit-student-form label {
-            font-size: 0.7rem;
-            color: #5e4166;
-        }
-        .edit-student-form input {
-            width: 100%;
-            padding: 0.3rem 0.6rem;
-            border-radius: 30px;
-            border: 1px solid #dcc7e2;
-            font-size: 0.8rem;
-            outline: none;
-        }
-        .edit-student-form input:focus {
-            border-color: #b48dbd;
-        }
-        .edit-student-form .edit-actions {
-            display: flex;
-            gap: 0.3rem;
-            margin-top: 0.3rem;
-        }
-        .edit-student-form .edit-actions button {
-            padding: 0.2rem 0.8rem;
-            border-radius: 30px;
-            border: none;
-            font-size: 0.7rem;
-            cursor: pointer;
-            font-weight: 500;
-        }
-        .edit-student-form .edit-actions .btn-save {
-            background: #b48dbd;
-            color: white;
-        }
-        .edit-student-form .edit-actions .btn-save:hover {
-            background: #a47bae;
-        }
-        .edit-student-form .edit-actions .btn-cancel-edit {
-            background: #e9d4ed;
-            color: #55335e;
-        }
-        .edit-student-form .edit-actions .btn-cancel-edit:hover {
-            background: #dcbfe2;
-        }
+        .edit-student-form { margin-top: 0.5rem; padding: 0.5rem; background: #f5f0f7; border-radius: 20px; }
+        .edit-student-form .field-group { margin-bottom: 0.3rem; }
+        .edit-student-form label { font-size: 0.7rem; color: #5e4166; }
+        .edit-student-form input { width: 100%; padding: 0.3rem 0.6rem; border-radius: 30px; border: 1px solid #dcc7e2; font-size: 0.8rem; outline: none; }
+        .edit-student-form input:focus { border-color: #b48dbd; }
+        .edit-student-form .edit-actions { display: flex; gap: 0.3rem; margin-top: 0.3rem; }
+        .edit-student-form .edit-actions button { padding: 0.2rem 0.8rem; border-radius: 30px; border: none; font-size: 0.7rem; cursor: pointer; font-weight: 500; }
+        .edit-student-form .edit-actions .btn-save { background: #b48dbd; color: white; }
+        .edit-student-form .edit-actions .btn-save:hover { background: #a47bae; }
+        .edit-student-form .edit-actions .btn-cancel-edit { background: #e9d4ed; color: #55335e; }
+        .edit-student-form .edit-actions .btn-cancel-edit:hover { background: #dcbfe2; }
 
-        .saved-data-badge {
-            background: #efe6f2;
-            border: 1px solid #dcc7e2;
-            border-radius: 30px;
-            padding: 0.3rem 1rem;
-            font-size: 0.8rem;
-            color: #5e4166;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            margin-bottom: 0.5rem;
-        }
-        .saved-data-badge i {
-            color: #7d5f86;
-        }
-        .btn-change-child {
-            background: transparent;
-            border: 1px solid #d5bedb;
-            border-radius: 30px;
-            padding: 0.2rem 0.8rem;
-            font-size: 0.7rem;
-            color: #553a5c;
-            cursor: pointer;
-            transition: 0.15s;
-            margin-left: 0.5rem;
-        }
-        .btn-change-child:hover {
-            background: #efe6f2;
-            border-color: #b48dbd;
-        }
+        .saved-data-badge { background: #efe6f2; border: 1px solid #dcc7e2; border-radius: 30px; padding: 0.3rem 1rem; font-size: 0.8rem; color: #5e4166; display: inline-flex; align-items: center; gap: 6px; margin-bottom: 0.5rem; }
+        .saved-data-badge i { color: #7d5f86; }
+        .btn-change-child { background: transparent; border: 1px solid #d5bedb; border-radius: 30px; padding: 0.2rem 0.8rem; font-size: 0.7rem; color: #553a5c; cursor: pointer; transition: 0.15s; margin-left: 0.5rem; }
+        .btn-change-child:hover { background: #efe6f2; border-color: #b48dbd; }
 
         @media (max-width: 768px) {
             .app-container { padding: 1rem; }
@@ -620,14 +388,8 @@
             .month-grid { grid-template-columns: repeat(4, 1fr); }
             .day-lessons-table { min-width: 400px; }
             .autocomplete-list { max-height: 150px; }
-            .header-botanical .subtitle {
-                margin-left: 0;
-                font-size: 0.75rem;
-            }
-            .app-container::before,
-            .app-container::after {
-                display: none;
-            }
+            .header-botanical .subtitle { margin-left: 0; font-size: 0.75rem; }
+            .app-container::before, .app-container::after { display: none; }
         }
         @media (max-width: 500px) {
             .week-grid, .month-grid { grid-template-columns: repeat(2, 1fr); }
@@ -636,16 +398,8 @@
     </style>
 </head>
 <body>
-
-    
-
-        <!-- ОСТАЛЬНОЙ КОД БЕЗ ИЗМЕНЕНИЙ -->
-        <!-- ... -->
-
-    </template>
-</div>
 <div class="app-container" id="app">
-    <!-- ЭКРАН ВХОДА -->
+    <!-- ===== ЭКРАН ВХОДА ===== -->
     <div v-if="!isLoggedIn" class="login-overlay">
         <div class="login-card">
             <h2><i class="fas fa-leaf"></i> Ученический сад</h2>
@@ -660,7 +414,7 @@
                 <button :class="{ active: selectedRole === 'parent' }" @click="selectedRole = 'parent'">
                     <i class="fas fa-user-friends"></i> Родитель
                 </button>
-            </div> 
+            </div>
             
             <div v-if="!showRegister">
                 <div class="field-group">
@@ -713,9 +467,9 @@
         </div>
     </div>
 
-   <!-- ОСНОВНОЙ ИНТЕРФЕЙС -->
+    <!-- ===== ОСНОВНОЙ ИНТЕРФЕЙС ===== -->
     <template v-if="isLoggedIn">
-        <!-- ===== НОВАЯ ШАПКА С ПОДЗАГОЛОВКОМ ===== -->
+        <!-- ШАПКА -->
         <div class="header-botanical">
             <div class="title-group">
                 <h1>
@@ -724,9 +478,9 @@
                     <i class="fas fa-seedling" style="font-size: 1.4rem;"></i>
                 </h1>
                 <div class="subtitle">
-                    <i class="fas fa-heart" style="color: #e8a0b0;"></i>
+                    <i class="fas fa-heart"></i>
                     Наталья Леонидовна - математика по любви
-                    <i class="fas fa-heart" style="color: #e8a0b0; margin-left: 4px;"></i>
+                    <i class="fas fa-heart"></i>
                 </div>
             </div>
             <span class="botanical-icon">
@@ -771,7 +525,7 @@
 
         <!-- ===== РЕЖИМ РЕПЕТИТОРА ===== -->
         <template v-if="userRole === 'tutor'">
-            <!-- 1. СЛОТЫ -->
+            <!-- СЛОТЫ -->
             <div v-if="viewMode === 'slots'">
                 <div class="add-slot-form">
                     <div class="field-group">
@@ -820,7 +574,7 @@
                 </div>
             </div>
 
-            <!-- 2. ДНЕВНИК -->
+            <!-- ДНЕВНИК -->
             <div v-if="viewMode === 'diary'">
                 <div class="add-student-section">
                     <div class="field-group">
@@ -912,7 +666,7 @@
                 </div>
             </div>
 
-            <!-- 3. УЧЕНИКИ -->
+            <!-- УЧЕНИКИ -->
             <div v-if="viewMode === 'students'">
                 <div class="add-student-section" style="background:#fcf8fe;border-radius:40px;padding:1.5rem 2rem;margin:1.5rem 0;border:1px solid #dcc7e2;">
                     <div class="field-group"><label><i class="fas fa-user-graduate"></i> Имя ученика *</label><input v-model="newStudentForm.name" placeholder="Имя"></div>
@@ -978,7 +732,7 @@
                 </div>
             </div>
 
-            <!-- 4. РАСПИСАНИЕ (ЕДИНОЕ) -->
+            <!-- РАСПИСАНИЕ -->
             <div v-if="viewMode === 'schedule'">
                 <div class="tabs" style="margin-bottom:1rem;">
                     <button class="tab-btn" :class="{ active: scheduleView === 'day' }" @click="scheduleView = 'day'">
@@ -1141,7 +895,7 @@
                 </div>
             </div>
 
-            <!-- 5. ЗАПИСИ РОДИТЕЛЕЙ -->
+            <!-- ЗАПИСИ РОДИТЕЛЕЙ -->
             <div v-if="viewMode === 'bookings'">
                 <div style="margin-bottom:1rem;color:#6a4e72;">
                     <i class="fas fa-info-circle"></i> Управление записями родителей
@@ -1277,7 +1031,7 @@
                             <div v-else>
                                 <div class="cancel-error">
                                     <i class="fas fa-exclamation-circle"></i> 
-                                    Занятие уже нельзя отменить, свяжитесь со мной по телефону 
+                                    Занятия уже нельзя отменить, свяжитесь со мной по телефону 
                                     <strong>+7 952 246-81-85</strong>
                                 </div>
                             </div>
@@ -1291,7 +1045,7 @@
             </div>
         </template>
 
-        <!-- МОДАЛКИ -->
+        <!-- МОДАЛКА КОПИРОВАНИЯ -->
         <div v-if="copyModalVisible" class="modal-overlay" @click.self="copyModalVisible = false">
             <div class="modal-content">
                 <h3><i class="fas fa-copy"></i> Копировать день</h3>
@@ -1306,46 +1060,29 @@
                 </div>
             </div>
         </div>
-                <!-- ===== МОДАЛКА КОПИРОВАНИЯ ===== -->
-        <div v-if="copyModalVisible" class="modal-overlay" @click.self="copyModalVisible = false">
-            <div class="modal-content">
-                <h3><i class="fas fa-copy"></i> Копировать день</h3>
-                <div class="field-group"><label>Исходная дата</label><input type="date" v-model="copySourceDate"></div>
-                <div class="field-group"><label>Целевая дата</label><input type="date" v-model="copyTargetDate"></div>
-                <div class="field-group"><label><i class="fas fa-check-circle"></i> Действие</label>
-                    <select v-model="copyAction"><option value="copy">Копировать все занятия</option><option value="move">Перенести (удалить исходные)</option></select>
-                </div>
-                <div class="modal-actions">
-                    <button class="btn-secondary" @click="copyModalVisible = false">Отмена</button>
-                    <button class="btn-primary" @click="executeCopy"><i class="fas fa-check"></i> Выполнить</button>
-                </div>
-            </div>
-        </div>
-        <div style="
-            text-align: center; 
-            padding: 2rem 0 0.5rem; 
-            margin-top: 2rem; 
-            border-top: 2px solid #e8d9ed; 
-            width: 100%;
-        ">
-            <p style="color: #9a82a2; font-size: 0.75rem; margin-bottom: 0.3rem;">
-                <i class="fas fa-leaf" style="color: #7d5f86;"></i> Ученический сад © 2026
+
+        <!-- ===== ФУТЕР ВНУТРИ ШАБЛОНА ===== -->
+        <div style="text-align:center;padding:2rem 0 0.5rem;margin-top:2rem;border-top:2px solid #e8d9ed;width:100%;">
+            <p style="color:#9a82a2;font-size:0.75rem;margin-bottom:0.3rem;">
+                <i class="fas fa-leaf" style="color:#7d5f86;"></i> Ученический сад © 2026
             </p>
-            <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; font-size: 0.8rem;">
-                <a href="privacy.html" style="color: #7d5f86; text-decoration: none;">
+            <div style="display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;font-size:0.8rem;">
+                <a href="privacy.html" style="color:#7d5f86;text-decoration:none;">
                     <i class="fas fa-shield-alt"></i> Политика конфиденциальности
                 </a>
-                <span style="color: #dcc7e2;">|</span>
-                <a href="mailto:ваш-email@example.com" style="color: #9a82a2; text-decoration: none;">
+                <span style="color:#dcc7e2;">|</span>
+                <a href="mailto:ваш-email@example.com" style="color:#9a82a2;text-decoration:none;">
                     <i class="fas fa-envelope"></i> natlumail@mail.ru
                 </a>
             </div>
-            <p style="font-size: 0.65rem; color: #b5a5ba; margin-top: 0.3rem;">
+            <p style="font-size:0.65rem;color:#b5a5ba;margin-top:0.3rem;">
                 Данные хранятся в Supabase и доступны только авторизованным пользователям
             </p>
         </div>
+
     </template>
 </div>
+
 <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
 <script>
     // ==========================================
@@ -1434,7 +1171,7 @@
             copyTargetDate: '',
             copyAction: 'copy',
             
-            tutorPhone: '+7 952 246-81-85'
+            tutorPhone: '+7 999 123-45-67'
         },
         computed: {
             formattedSelectedDate() {
