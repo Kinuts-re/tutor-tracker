@@ -3,20 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Репетитор · облачный учёт</title>
+    <title>Репетитор · ученический сад</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', 'Roboto', system-ui, sans-serif; }
-        body { 
-            background: #f8f3fa; 
-            min-height: 100vh; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            margin: 0;
-            padding: 0;
-        }
+        body { background: #f8f3fa; min-height: 100vh; display: flex; justify-content: center; align-items: center; margin: 0; padding: 20px; }
         
         .app-container { 
             max-width: 1400px; 
@@ -27,18 +19,12 @@
             padding: 2rem; 
             box-shadow: 0 20px 40px -12px rgba(120, 80, 130, 0.25); 
             border: 1px solid #e5d5e9; 
-            margin: 20px;
         }
         
-        /* ===== ЭКРАН ВХОДА - ИДЕАЛЬНО ПО ЦЕНТРУ ===== */
+        /* ===== ЭКРАН ВХОДА ===== */
         .login-overlay { 
             position: fixed; 
-            top: 0; 
-            left: 0; 
-            right: 0;
-            bottom: 0;
-            width: 100vw; 
-            height: 100vh; 
+            top: 0; left: 0; right: 0; bottom: 0;
             background: rgba(60, 40, 70, 0.7); 
             backdrop-filter: blur(8px); 
             display: flex; 
@@ -46,13 +32,11 @@
             justify-content: center; 
             z-index: 9999; 
             padding: 20px;
-            margin: 0;
-            overflow: hidden;
         }
         .login-card { 
             background: #fcf8fe; 
             border-radius: 60px; 
-            padding: 2.5rem 2.5rem; 
+            padding: 2.5rem; 
             max-width: 440px; 
             width: 100%; 
             border: 1px solid #dcc7e2; 
@@ -60,33 +44,23 @@
             text-align: center; 
             max-height: 90vh;
             overflow-y: auto;
-            margin: auto;
-            position: relative;
-            animation: fadeIn 0.3s ease;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: scale(0.95); }
-            to { opacity: 1; transform: scale(1); }
         }
         .login-card h2 { color: #4a2e4f; margin-bottom: 0.5rem; font-size: 1.8rem; }
-        .login-card h2 i { color: #7d5f86; }
         .login-card .subtitle { color: #7f5f89; margin-bottom: 1.5rem; font-size: 0.95rem; }
         .login-card .field-group { margin-bottom: 1rem; text-align: left; }
         .login-card label { display: block; font-weight: 500; color: #5e4166; margin-bottom: 0.3rem; font-size: 0.9rem; }
-        .login-card input { 
+        .login-card input, .login-card select { 
             width: 100%; 
             padding: 0.8rem 1.2rem; 
             border-radius: 60px; 
             border: 1px solid #dcc7e2; 
             font-size: 1rem; 
             outline: none; 
-            transition: 0.2s;
             background: white;
         }
-        .login-card input:focus { border-color: #b48dbd; box-shadow: 0 0 0 3px rgba(180, 130, 190, 0.2); }
+        .login-card input:focus, .login-card select:focus { border-color: #b48dbd; box-shadow: 0 0 0 3px rgba(180, 130, 190, 0.2); }
         .login-card .btn-primary { 
             width: 100%; 
-            justify-content: center; 
             padding: 0.8rem; 
             font-size: 1rem; 
             background: #b48dbd;
@@ -97,10 +71,6 @@
             cursor: pointer;
             transition: 0.2s;
             border: 1px solid #c9a8d3;
-            box-shadow: 0 4px 8px rgba(150, 110, 165, 0.2);
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
         }
         .login-card .btn-primary:hover { background: #a47bae; transform: scale(0.98); }
         .login-card .btn-secondary { 
@@ -110,7 +80,6 @@
             cursor: pointer; 
             font-size: 0.9rem; 
             padding: 0.5rem;
-            transition: 0.2s;
         }
         .login-card .btn-secondary:hover { color: #4a2e4f; text-decoration: underline; }
         .login-card .error { 
@@ -121,6 +90,29 @@
             font-size: 0.9rem; 
             margin-bottom: 1rem; 
         }
+        .login-card .role-selector { 
+            display: flex; 
+            gap: 0.5rem; 
+            margin-bottom: 1rem; 
+            background: #efe6f2; 
+            border-radius: 60px; 
+            padding: 0.3rem;
+        }
+        .login-card .role-selector button { 
+            flex: 1; 
+            padding: 0.5rem; 
+            border: none; 
+            border-radius: 60px; 
+            cursor: pointer; 
+            font-weight: 500; 
+            transition: 0.2s;
+            background: transparent;
+            color: #5e4166;
+        }
+        .login-card .role-selector button.active { 
+            background: #b48dbd; 
+            color: white; 
+        }
         .login-card .hint { 
             font-size: 0.8rem; 
             color: #9a82a2; 
@@ -128,112 +120,110 @@
             border-top: 1px dashed #dcc7e2; 
             padding-top: 1rem;
         }
-        .login-card .register-section { 
-            margin-top: 1.5rem; 
-            border-top: 1px dashed #dcc7e2; 
-            padding-top: 1.5rem;
-        }
-        .login-card .register-section .field-group { margin-bottom: 0.8rem; }
 
-        /* ОСТАЛЬНЫЕ СТИЛИ (сокращены для экономии места) */
         .header-botanical { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 2rem; flex-wrap: wrap; border-bottom: 2px dashed #cdb5d4; padding-bottom: 1.2rem; }
         .header-botanical h1 { font-weight: 400; font-size: 2.1rem; letter-spacing: 2px; color: #4a2e4f; display: flex; align-items: center; gap: 0.6rem; }
         .header-botanical h1 i { color: #7d5f86; font-size: 2rem; }
-        .botanical-icon { background: #ebdfef; padding: 0.4rem 0.9rem; border-radius: 60px; font-size: 0.9rem; color: #553a5c; border: 1px solid #d5bedb; display: flex; align-items: center; gap: 8px; margin-left: auto; flex-wrap: wrap; }
-        .save-status { font-size: 0.8rem; color: #6a4e72; background: #efe6f2; padding: 0.3rem 1rem; border-radius: 60px; border: 1px solid #d5bedb; }
-        .save-status.synced { background: #d9ebd9; border-color: #b8d5b8; color: #1f5420; }
-        
+        .botanical-icon { background: #ebdfef; padding: 0.4rem 0.9rem; border-radius: 60px; font-size: 0.9rem; color: #553a5c; border: 1px solid #d5bedb; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+        .role-badge { 
+            background: #b48dbd; 
+            color: white; 
+            padding: 0.2rem 1rem; 
+            border-radius: 60px; 
+            font-size: 0.8rem; 
+            font-weight: 500;
+        }
+        .role-badge.parent { background: #7d9b9b; }
+
         .btn-circle { background: #efe6f2; border: 1px solid #d5bedb; border-radius: 60px; width: 38px; height: 38px; display: inline-flex; align-items: center; justify-content: center; color: #553a5c; font-size: 1rem; cursor: pointer; transition: 0.15s; }
         .btn-circle:hover { background: #dcc7e2; border-color: #b48dbd; }
         .btn-circle.today-btn { background: #b48dbd; color: white; border-color: #b48dbd; width: auto; padding: 0 1.2rem; font-weight: 500; font-size: 0.85rem; }
         .btn-circle.today-btn:hover { background: #a47bae; }
-        .btn-circle.copy-btn { background: #d9ebd9; border-color: #b8d5b8; color: #1f5420; width: auto; padding: 0 1.2rem; font-weight: 500; font-size: 0.85rem; }
-        .btn-circle.copy-btn:hover { background: #c5e0c5; }
-        .btn-circle.cloud-btn { background: #c9d4e8; border-color: #a8b8d0; color: #2e3f5a; width: auto; padding: 0 1.2rem; font-weight: 500; font-size: 0.85rem; }
-        .btn-circle.cloud-btn:hover { background: #b5c4dc; }
-        .btn-circle.cloud-btn.synced { background: #d9ebd9; border-color: #b8d5b8; color: #1f5420; }
-        .btn-circle.cloud-btn.synced:hover { background: #c5e0c5; }
 
         .tabs { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
         .tab-btn { background: #efe6f2; border: 1px solid #d5bedb; border-radius: 60px; padding: 0.5rem 1.5rem; font-weight: 500; color: #553a5c; cursor: pointer; transition: 0.15s; font-size: 0.95rem; }
         .tab-btn:hover { background: #dcc7e2; }
-        .tab-btn.active { background: #b48dbd; color: white; border-color: #b48dbd; box-shadow: 0 4px 10px rgba(150, 110, 165, 0.25); }
+        .tab-btn.active { background: #b48dbd; color: white; border-color: #b48dbd; }
 
         .calendar-nav { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; background: #fcf8fe; border-radius: 60px; padding: 0.6rem 1.5rem; margin-bottom: 1.5rem; border: 1px solid #dcc7e2; }
-        .calendar-nav .nav-group { display: flex; align-items: center; gap: 0.8rem; flex-wrap: wrap; }
         .calendar-nav .date-display { font-size: 1.1rem; font-weight: 450; color: #3b2740; min-width: 160px; text-align: center; }
 
-        .add-student-section { background: #fcf8fe; border-radius: 40px; padding: 1.5rem 2rem; margin: 1.5rem 0; border: 1px solid #dcc7e2; display: flex; flex-wrap: wrap; align-items: flex-end; gap: 1rem 1.5rem; }
-        .add-student-section .field-group { display: flex; flex-direction: column; gap: 0.3rem; flex: 1 0 100px; }
-        .add-student-section label { font-size: 0.8rem; font-weight: 500; color: #5e4166; display: flex; align-items: center; gap: 6px; }
-        .add-student-section input, .add-student-section select { background: white; border: 1px solid #dcc7e2; border-radius: 40px; padding: 0.6rem 1rem; font-size: 0.9rem; color: #2e1f32; outline: none; width: 100%; }
-        .add-student-section input:focus, .add-student-section select:focus { border-color: #b48dbd; box-shadow: 0 0 0 3px rgba(180, 130, 190, 0.2); }
-        .btn-primary { background: #b48dbd; border: none; border-radius: 60px; padding: 0.6rem 1.5rem; font-weight: 500; color: white; font-size: 0.95rem; display: inline-flex; align-items: center; gap: 8px; cursor: pointer; transition: 0.2s; border: 1px solid #c9a8d3; box-shadow: 0 4px 8px rgba(150, 110, 165, 0.2); white-space: nowrap; }
+        .slots-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; margin: 1rem 0; }
+        .slot-card { 
+            background: #fcf8fe; 
+            border-radius: 30px; 
+            padding: 1.5rem; 
+            border: 1px solid #decbe3; 
+            transition: 0.15s; 
+            position: relative;
+        }
+        .slot-card:hover { border-color: #cbafd3; box-shadow: 0 4px 12px rgba(140, 100, 160, 0.1); }
+        .slot-card.booked { border-color: #eac8c8; background: #fdf8f8; }
+        .slot-card .time { font-size: 1.2rem; font-weight: 500; color: #3b2740; }
+        .slot-card .status { 
+            display: inline-block; 
+            padding: 0.2rem 1rem; 
+            border-radius: 60px; 
+            font-size: 0.8rem; 
+            font-weight: 500;
+            margin-top: 0.5rem;
+        }
+        .slot-card .status.free { background: #d9ebd9; color: #1f5420; }
+        .slot-card .status.booked { background: #f7e6e6; color: #8a4040; }
+        .slot-card .student-info { 
+            margin-top: 0.5rem; 
+            padding: 0.5rem; 
+            background: #efe6f2; 
+            border-radius: 20px; 
+            font-size: 0.9rem;
+        }
+        .slot-card .actions { margin-top: 0.8rem; display: flex; gap: 0.5rem; flex-wrap: wrap; }
+        .slot-card .actions button { 
+            padding: 0.3rem 1rem; 
+            border-radius: 60px; 
+            border: none; 
+            cursor: pointer; 
+            font-size: 0.8rem; 
+            font-weight: 500;
+            transition: 0.15s;
+        }
+        .slot-card .actions .btn-book { background: #b48dbd; color: white; }
+        .slot-card .actions .btn-book:hover { background: #a47bae; }
+        .slot-card .actions .btn-cancel { background: #e9d4ed; color: #55335e; }
+        .slot-card .actions .btn-cancel:hover { background: #dcbfe2; }
+        .slot-card .actions .btn-delete { background: #f7e6e6; color: #8a4040; }
+        .slot-card .actions .btn-delete:hover { background: #eac8c8; }
+
+        .add-slot-form { 
+            background: #fcf8fe; 
+            border-radius: 40px; 
+            padding: 1.5rem 2rem; 
+            margin: 1.5rem 0; 
+            border: 1px solid #dcc7e2; 
+            display: flex; 
+            flex-wrap: wrap; 
+            align-items: flex-end; 
+            gap: 1rem 1.5rem; 
+        }
+        .add-slot-form .field-group { display: flex; flex-direction: column; gap: 0.3rem; flex: 1 0 120px; }
+        .add-slot-form label { font-size: 0.8rem; font-weight: 500; color: #5e4166; }
+        .add-slot-form input { background: white; border: 1px solid #dcc7e2; border-radius: 40px; padding: 0.6rem 1rem; font-size: 0.9rem; outline: none; width: 100%; }
+        .add-slot-form input:focus { border-color: #b48dbd; }
+
+        .btn-primary { background: #b48dbd; border: none; border-radius: 60px; padding: 0.6rem 1.5rem; font-weight: 500; color: white; font-size: 0.95rem; display: inline-flex; align-items: center; gap: 8px; cursor: pointer; transition: 0.2s; border: 1px solid #c9a8d3; }
         .btn-primary:hover { background: #a47bae; transform: scale(0.98); }
         .btn-danger { background: #e9d4ed; border: 1px solid #d5b8dc; color: #55335e; padding: 0.3rem 0.8rem; border-radius: 40px; font-size: 0.75rem; font-weight: 500; cursor: pointer; transition: 0.15s; display: inline-flex; align-items: center; gap: 4px; }
         .btn-danger:hover { background: #dcbfe2; }
-        .btn-icon { background: transparent; border: none; color: #7f5f89; font-size: 0.9rem; cursor: pointer; padding: 0 4px; }
-        .btn-icon:hover { color: #4a2e4f; }
 
-        .day-students-grid { display: flex; flex-direction: column; gap: 1.5rem; }
-        .day-student-card { background: #fcf8fe; border-radius: 30px; padding: 1.5rem 2rem; border: 1px solid #decbe3; box-shadow: 0 6px 14px -6px rgba(130, 90, 145, 0.12); transition: 0.15s; }
-        .day-student-card:hover { border-color: #cbafd3; }
-        .day-student-header { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 1rem 0.5rem; margin-bottom: 0.8rem; }
-        .day-student-name { font-size: 1.5rem; font-weight: 450; color: #3b2740; display: flex; align-items: center; gap: 8px; }
-        .day-student-name i { color: #8f6f9a; font-size: 1.3rem; }
-        .day-lessons-table-wrap { overflow-x: auto; margin: 0.5rem 0 0.8rem; }
-        .day-lessons-table { width: 100%; border-collapse: collapse; font-size: 0.95rem; min-width: 500px; }
-        .day-lessons-table th { text-align: left; padding: 0.7rem 0.6rem 0.7rem 0; font-weight: 500; color: #5b4363; border-bottom: 1px solid #dcc7e2; }
-        .day-lessons-table td { padding: 0.8rem 0.6rem 0.8rem 0; border-bottom: 1px dashed #e8d9ed; vertical-align: middle; }
-        .day-lessons-table tr:last-child td { border-bottom: none; }
-        .status-paid { background: #d9ebd9; color: #1f5420; padding: 0.3rem 1.2rem; border-radius: 60px; font-size: 0.85rem; font-weight: 500; display: inline-block; border: 1px solid #b8d5b8; }
-        .status-unpaid { background: #f7e6e6; color: #8a4040; padding: 0.3rem 1.2rem; border-radius: 60px; font-size: 0.85rem; font-weight: 500; display: inline-block; border: 1px solid #eac8c8; }
-        .note-badge { background: #efe6f2; padding: 0.3rem 1rem; border-radius: 30px; font-size: 0.85rem; color: #3f2a44; max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: inline-block; border: 1px solid #dcc7e2; }
-        .no-lessons-msg { text-align: center; padding: 3rem 1rem; color: #9a82a2; background: #fcf8fe; border-radius: 40px; border: 1px dashed #dcc7e2; font-style: italic; }
-        .no-lessons-msg i { font-size: 2.4rem; opacity: 0.5; display: block; margin-bottom: 0.5rem; }
-
-        .week-grid, .month-grid { display: grid; gap: 0.8rem; margin-top: 1rem; }
-        .week-grid { grid-template-columns: repeat(7, 1fr); }
-        .month-grid { grid-template-columns: repeat(7, 1fr); }
-        .day-cell { background: #fcf8fe; border-radius: 20px; padding: 0.8rem; border: 1px solid #decbe3; min-height: 120px; transition: 0.15s; }
-        .day-cell:hover { border-color: #cbafd3; }
-        .day-cell.today { border-color: #b48dbd; background: #faf5fc; box-shadow: 0 0 0 2px rgba(180, 130, 190, 0.2); }
-        .day-cell.other-month { opacity: 0.5; }
-        .day-header { display: flex; justify-content: space-between; align-items: center; font-weight: 500; color: #4a2e4f; margin-bottom: 0.5rem; font-size: 0.9rem; }
-        .day-header .day-num { font-size: 1.1rem; }
-        .day-header .day-name { font-size: 0.75rem; color: #7f5f89; }
-        .day-lesson { background: #efe6f2; border-radius: 12px; padding: 0.3rem 0.6rem; margin-bottom: 0.3rem; font-size: 0.75rem; border-left: 3px solid #b48dbd; cursor: pointer; transition: 0.1s; }
-        .day-lesson:hover { background: #dcc7e2; }
-        .day-lesson .student-name { font-weight: 500; color: #3b2740; }
-        .day-lesson .time { color: #6a4e72; font-size: 0.7rem; }
-        .day-lesson .price { color: #5e4166; font-size: 0.7rem; }
-        .day-lesson .paid-badge { font-size: 0.6rem; padding: 0.1rem 0.4rem; border-radius: 20px; background: #d9ebd9; color: #1f5420; margin-left: 4px; }
-        .day-lesson .unpaid-badge { background: #f7e6e6; color: #8a4040; }
-        .add-mini { background: transparent; border: 1px dashed #d5bedb; border-radius: 12px; padding: 0.2rem; text-align: center; color: #9a82a2; font-size: 0.7rem; cursor: pointer; margin-top: 0.3rem; transition: 0.1s; }
-        .add-mini:hover { background: #efe6f2; border-color: #b48dbd; }
-
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(60, 40, 70, 0.5); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
-        .modal-content { background: #fcf8fe; border-radius: 40px; padding: 2rem 2.5rem; max-width: 500px; width: 100%; border: 1px solid #dcc7e2; box-shadow: 0 20px 40px rgba(0,0,0,0.2); max-height: 90vh; overflow-y: auto; }
-        .modal-content h3 { color: #4a2e4f; margin-bottom: 1rem; }
-        .modal-content .field-group { margin-bottom: 1rem; }
-        .modal-content label { display: block; font-weight: 500; color: #5e4166; margin-bottom: 0.3rem; font-size: 0.9rem; }
-        .modal-content input, .modal-content select { width: 100%; padding: 0.6rem 1rem; border-radius: 40px; border: 1px solid #dcc7e2; outline: none; }
-        .modal-actions { display: flex; gap: 0.8rem; margin-top: 1.5rem; justify-content: flex-end; flex-wrap: wrap; }
-        .modal-actions .btn-secondary { background: #efe6f2; border: 1px solid #d5bedb; border-radius: 40px; padding: 0.5rem 1.5rem; cursor: pointer; }
-        .modal-actions .btn-secondary:hover { background: #dcc7e2; }
+        .no-data { text-align: center; padding: 3rem; color: #9a82a2; background: #fcf8fe; border-radius: 40px; border: 1px dashed #dcc7e2; }
+        .no-data i { font-size: 2.4rem; opacity: 0.5; display: block; margin-bottom: 0.5rem; }
 
         @media (max-width: 768px) {
-            .week-grid, .month-grid { grid-template-columns: repeat(4, 1fr); }
-            .app-container { padding: 1rem; margin: 10px; }
-            .add-student-section { flex-direction: column; align-items: stretch; }
+            .app-container { padding: 1rem; }
+            .add-slot-form { flex-direction: column; align-items: stretch; }
             .calendar-nav { flex-direction: column; align-items: stretch; }
-            .calendar-nav .nav-group { justify-content: center; }
-            .login-card { padding: 2rem 1.5rem; margin: 10px; }
-            .header-botanical { flex-direction: column; align-items: stretch; text-align: center; }
-            .botanical-icon { margin-left: 0; justify-content: center; flex-wrap: wrap; }
-        }
-        @media (max-width: 500px) {
-            .week-grid, .month-grid { grid-template-columns: repeat(2, 1fr); }
+            .slots-grid { grid-template-columns: 1fr; }
+            .login-card { padding: 2rem 1.5rem; }
         }
     </style>
 </head>
@@ -243,11 +233,19 @@
     <div v-if="!isLoggedIn" class="login-overlay">
         <div class="login-card">
             <h2><i class="fas fa-leaf"></i> Ученический сад</h2>
-            <p class="subtitle">Войдите, чтобы синхронизировать данные</p>
+            <p class="subtitle">Войдите как репетитор или родитель</p>
             
             <div v-if="loginError" class="error">{{ loginError }}</div>
             
-            <!-- Форма входа -->
+            <div class="role-selector">
+                <button :class="{ active: selectedRole === 'tutor' }" @click="selectedRole = 'tutor'">
+                    <i class="fas fa-chalkboard-teacher"></i> Репетитор
+                </button>
+                <button :class="{ active: selectedRole === 'parent' }" @click="selectedRole = 'parent'">
+                    <i class="fas fa-user-friends"></i> Родитель
+                </button>
+            </div>
+            
             <div v-if="!showRegister">
                 <div class="field-group">
                     <label><i class="fas fa-envelope"></i> Email</label>
@@ -265,8 +263,7 @@
                 </div>
             </div>
             
-            <!-- Форма регистрации -->
-            <div v-else class="register-section">
+            <div v-else>
                 <div class="field-group">
                     <label><i class="fas fa-user"></i> Ваше имя</label>
                     <input type="text" v-model="registerName" placeholder="Анна" @keydown.enter="register">
@@ -288,7 +285,7 @@
             </div>
             
             <div class="hint">
-                <i class="fas fa-cloud-upload-alt"></i> Данные сохраняются в облаке и доступны на всех устройствах
+                <i class="fas fa-cloud-upload-alt"></i> Данные сохраняются в облаке
             </div>
         </div>
     </div>
@@ -296,14 +293,11 @@
     <!-- ОСНОВНОЙ ИНТЕРФЕЙС -->
     <template v-if="isLoggedIn">
         <div class="header-botanical">
-            <h1><i class="fas fa-leaf"></i><span>ученический сад</span></h1>
+            <h1><i class="fas fa-leaf"></i> ученический сад</h1>
             <span class="botanical-icon">
                 <i class="fas fa-user-circle"></i> {{ userEmail }}
-                <span class="save-status" :class="{ synced: syncStatus === 'synced' }">
-                    <i v-if="syncStatus === 'syncing'" class="fas fa-spinner fa-spin"></i>
-                    <i v-else-if="syncStatus === 'synced'" class="fas fa-check-circle"></i>
-                    <i v-else-if="syncStatus === 'error'" class="fas fa-exclamation-circle"></i>
-                    {{ syncLabel }}
+                <span class="role-badge" :class="{ parent: userRole === 'parent' }">
+                    {{ userRole === 'tutor' ? '👩‍🏫 Репетитор' : '👨‍👩‍👦 Родитель' }}
                 </span>
                 <button class="btn-circle" @click="logout" style="width:auto;padding:0 0.8rem;font-size:0.8rem;background:#e9d4ed;border-color:#d5b8dc;">
                     <i class="fas fa-sign-out-alt"></i> Выйти
@@ -311,118 +305,194 @@
             </span>
         </div>
 
-        <div class="tabs">
-            <button class="tab-btn" :class="{ active: viewMode === 'day' }" @click="viewMode = 'day'"><i class="fas fa-day"></i> День</button>
-            <button class="tab-btn" :class="{ active: viewMode === 'week' }" @click="viewMode = 'week'"><i class="fas fa-week"></i> Неделя</button>
-            <button class="tab-btn" :class="{ active: viewMode === 'month' }" @click="viewMode = 'month'"><i class="fas fa-month"></i> Месяц</button>
+        <!-- Вкладки для репетитора -->
+        <div v-if="userRole === 'tutor'" class="tabs">
+            <button class="tab-btn" :class="{ active: viewMode === 'slots' }" @click="viewMode = 'slots'">
+                <i class="fas fa-clock"></i> Мои слоты
+            </button>
+            <button class="tab-btn" :class="{ active: viewMode === 'students' }" @click="viewMode = 'students'">
+                <i class="fas fa-users"></i> Ученики
+            </button>
+            <button class="tab-btn" :class="{ active: viewMode === 'calendar' }" @click="viewMode = 'calendar'">
+                <i class="fas fa-calendar-alt"></i> Календарь
+            </button>
         </div>
 
-        <div class="calendar-nav">
-            <div class="nav-group">
-                <button class="btn-circle" @click="changePeriod(-1)"><i class="fas fa-chevron-left"></i></button>
-                <button class="btn-circle today-btn" @click="goToday"><i class="fas fa-calendar-day"></i> Сегодня</button>
-                <button class="btn-circle" @click="changePeriod(1)"><i class="fas fa-chevron-right"></i></button>
-            </div>
-            <div class="date-display"><i class="far fa-calendar-alt"></i> {{ periodLabel }}</div>
-            <div class="nav-group">
-                <button class="btn-circle copy-btn" @click="openCopyModal"><i class="fas fa-copy"></i> Копировать</button>
-                <button class="btn-circle cloud-btn" :class="{ synced: syncStatus === 'synced' }" @click="syncWithCloud">
-                    <i class="fas fa-cloud-upload-alt"></i> {{ syncStatus === 'synced' ? 'Синхронизировано' : 'Синхронизировать' }}
-                </button>
-            </div>
+        <!-- Вкладки для родителя -->
+        <div v-else class="tabs">
+            <button class="tab-btn" :class="{ active: viewMode === 'slots' }" @click="viewMode = 'slots'">
+                <i class="fas fa-clock"></i> Свободные слоты
+            </button>
+            <button class="tab-btn" :class="{ active: viewMode === 'mybookings' }" @click="viewMode = 'mybookings'">
+                <i class="fas fa-calendar-check"></i> Мои записи
+            </button>
         </div>
 
-        <div class="add-student-section">
-            <div class="field-group"><label><i class="fas fa-user-graduate"></i> Ученик</label><input v-model="newStudentName" placeholder="Имя"></div>
-            <div class="field-group"><label><i class="fas fa-calendar-day"></i> Дата</label><input type="date" v-model="newLessonDate"></div>
-            <div class="field-group"><label><i class="far fa-clock"></i> Время</label><input v-model="newLessonTime" placeholder="15:00–16:30"></div>
-            <div class="field-group"><label><i class="fas fa-coins"></i> Стоимость</label><input v-model="newLessonPrice" placeholder="1500 ₽"></div>
-            <div class="field-group" style="flex:0.6;"><label><i class="fas fa-check-circle"></i> Оплата</label>
-                <select v-model="newLessonPaid"><option value="paid">✅ Оплачено</option><option value="unpaid">❌ Не оплачено</option></select>
-            </div>
-            <div class="field-group" style="flex:1;"><label><i class="fas fa-pen-fancy"></i> Заметка</label><input v-model="newLessonNote" placeholder="Тема, долг..."></div>
-            <button class="btn-primary" @click="addLesson"><i class="fas fa-plus-circle"></i> Добавить</button>
-        </div>
-
-        <!-- ДЕНЬ -->
-        <div v-if="viewMode === 'day'">
-            <div class="day-students-grid">
-                <div v-if="filteredLessons.length === 0" class="no-lessons-msg">
-                    <i class="fas fa-seedling"></i>
-                    <p>Нет занятий на {{ formattedSelectedDate }}</p>
+        <!-- ===== РЕЖИМ РЕПЕТИТОРА ===== -->
+        <template v-if="userRole === 'tutor'">
+            <!-- Форма добавления слота -->
+            <div v-if="viewMode === 'slots'" class="add-slot-form">
+                <div class="field-group">
+                    <label><i class="fas fa-calendar-day"></i> Дата</label>
+                    <input type="date" v-model="newSlotDate">
                 </div>
-                <div v-for="(student, idx) in filteredStudents" :key="idx" class="day-student-card">
-                    <div class="day-student-header">
-                        <span class="day-student-name">
-                            <i class="fas fa-user-circle"></i> {{ student.name }}
-                            <span style="background:#ebdfef;padding:0.2rem 1rem;border-radius:60px;font-size:0.8rem;color:#46304b;">{{ student.lessons.length }} занятий</span>
+                <div class="field-group">
+                    <label><i class="far fa-clock"></i> Время</label>
+                    <input type="text" v-model="newSlotTime" placeholder="15:00–16:30">
+                </div>
+                <div class="field-group">
+                    <label><i class="fas fa-coins"></i> Стоимость</label>
+                    <input type="text" v-model="newSlotPrice" placeholder="1500 ₽">
+                </div>
+                <button class="btn-primary" @click="addSlot"><i class="fas fa-plus-circle"></i> Добавить слот</button>
+            </div>
+
+            <!-- Слоты репетитора -->
+            <div v-if="viewMode === 'slots'">
+                <div class="slots-grid" v-if="tutorSlots.length > 0">
+                    <div v-for="slot in tutorSlots" :key="slot.id" class="slot-card" :class="{ booked: slot.booked }">
+                        <div class="time">{{ slot.time }}</div>
+                        <div>{{ slot.date }}</div>
+                        <div style="font-weight:500;">{{ slot.price }}</div>
+                        <span class="status" :class="{ free: !slot.booked, booked: slot.booked }">
+                            {{ slot.booked ? '📕 Занято' : '📗 Свободно' }}
                         </span>
-                        <button class="btn-danger" @click="removeStudent(student.originalIndex)"><i class="fas fa-trash-alt"></i> удалить</button>
-                    </div>
-                    <div class="day-lessons-table-wrap">
-                        <table class="day-lessons-table">
-                            <thead><tr><th>Время</th><th>Стоимость</th><th>Статус</th><th>Заметка</th><th style="width:70px;"></th></tr></thead>
-                            <tbody>
-                                <tr v-for="(lesson, lIdx) in student.lessons" :key="lIdx">
-                                    <td>{{ lesson.time }}</td><td>{{ lesson.price }}</td>
-                                    <td><span v-if="lesson.paid === 'paid'" class="status-paid"><i class="fas fa-check-circle"></i> оплачено</span><span v-else class="status-unpaid"><i class="fas fa-exclamation-circle"></i> не оплачено</span></td>
-                                    <td><span class="note-badge" :title="lesson.note || '—'">{{ lesson.note || '—' }}</span></td>
-                                    <td>
-                                        <button class="btn-icon" @click="togglePaid(student.originalIndex, lesson.originalIndex)"><i class="fas fa-sync-alt"></i></button>
-                                        <button class="btn-icon" @click="removeLesson(student.originalIndex, lesson.originalIndex)"><i class="fas fa-times-circle" style="color:#a079aa;"></i></button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                        <div v-if="slot.booked && slot.student" class="student-info">
+                            <div><strong>👤 {{ slot.student.name }}</strong></div>
+                            <div>{{ slot.student.class || '' }}</div>
+                            <div>📞 {{ slot.student.phone || '' }}</div>
+                        </div>
+                        <div class="actions">
+                            <button v-if="!slot.booked" class="btn-delete" @click="deleteSlot(slot.id)">
+                                <i class="fas fa-trash"></i> Удалить
+                            </button>
+                            <button v-if="slot.booked" class="btn-cancel" @click="cancelBooking(slot.id)">
+                                <i class="fas fa-times"></i> Отменить запись
+                            </button>
+                        </div>
                     </div>
                 </div>
+                <div v-else class="no-data">
+                    <i class="fas fa-clock"></i>
+                    <p>Нет созданных слотов</p>
+                </div>
             </div>
-        </div>
 
-        <!-- НЕДЕЛЯ -->
-        <div v-if="viewMode === 'week'">
-            <div class="week-grid">
-                <div v-for="day in weekDays" :key="day.date" class="day-cell" :class="{ today: day.isToday }">
-                    <div class="day-header"><span class="day-name">{{ day.weekday }}</span><span class="day-num">{{ day.dayNum }}</span></div>
-                    <div v-for="lesson in day.lessons" :key="lesson.id" class="day-lesson">
-                        <div><span class="student-name">{{ lesson.student }}</span> <span class="time">{{ lesson.time }}</span></div>
-                        <div><span class="price">{{ lesson.price }}</span> <span class="paid-badge" :class="{'unpaid-badge': lesson.paid === 'unpaid'}">{{ lesson.paid === 'paid' ? '✅' : '❌' }}</span></div>
-                        <div style="font-size:0.65rem;color:#6a4e72;">{{ lesson.note || '' }}</div>
+            <!-- Ученики репетитора -->
+            <div v-if="viewMode === 'students'">
+                <div class="slots-grid" v-if="myStudents.length > 0">
+                    <div v-for="student in myStudents" :key="student.id" class="slot-card">
+                        <div style="font-size:1.2rem;font-weight:500;">
+                            <i class="fas fa-user-circle"></i> {{ student.name }}
+                        </div>
+                        <div>📞 {{ student.phone || '—' }}</div>
+                        <div>🏫 {{ student.class || '—' }}</div>
+                        <div style="margin-top:0.5rem;font-size:0.9rem;color:#6a4e72;">
+                            Всего занятий: {{ student.totalLessons || 0 }}
+                        </div>
                     </div>
-                    <div class="add-mini" @click="quickAdd(day.date)"><i class="fas fa-plus-circle"></i> добавить</div>
+                </div>
+                <div v-else class="no-data">
+                    <i class="fas fa-users"></i>
+                    <p>Пока нет учеников</p>
                 </div>
             </div>
-        </div>
 
-        <!-- МЕСЯЦ -->
-        <div v-if="viewMode === 'month'">
-            <div class="month-grid">
-                <div v-for="day in monthDays" :key="day.date" class="day-cell" :class="{ today: day.isToday, 'other-month': !day.isCurrentMonth }">
-                    <div class="day-header"><span class="day-name">{{ day.weekdayShort }}</span><span class="day-num">{{ day.dayNum }}</span></div>
-                    <div v-for="lesson in day.lessons" :key="lesson.id" class="day-lesson">
-                        <div><span class="student-name">{{ lesson.student }}</span> <span class="time">{{ lesson.time }}</span></div>
-                        <div><span class="price">{{ lesson.price }}</span> <span class="paid-badge" :class="{'unpaid-badge': lesson.paid === 'unpaid'}">{{ lesson.paid === 'paid' ? '✅' : '❌' }}</span></div>
+            <!-- Календарь репетитора -->
+            <div v-if="viewMode === 'calendar'">
+                <div class="calendar-nav">
+                    <div class="nav-group">
+                        <button class="btn-circle" @click="changeMonth(-1)"><i class="fas fa-chevron-left"></i></button>
+                        <span style="font-weight:500;">{{ currentMonth }} {{ currentYear }}</span>
+                        <button class="btn-circle" @click="changeMonth(1)"><i class="fas fa-chevron-right"></i></button>
                     </div>
-                    <div class="add-mini" @click="quickAdd(day.date)"><i class="fas fa-plus-circle"></i></div>
+                    <button class="btn-circle today-btn" @click="goToday">Сегодня</button>
+                </div>
+                <div class="slots-grid">
+                    <div v-for="day in monthDays" :key="day.date" class="slot-card" :style="{ opacity: day.isCurrentMonth ? 1 : 0.5 }">
+                        <div style="font-weight:500;">{{ day.dayNum }} {{ day.weekday }}</div>
+                        <div v-if="day.slots.length === 0" style="color:#9a82a2;font-size:0.9rem;">Нет слотов</div>
+                        <div v-for="slot in day.slots" :key="slot.id" style="font-size:0.9rem;margin-top:0.3rem;padding:0.3rem;background:#efe6f2;border-radius:12px;">
+                            {{ slot.time }} - {{ slot.booked ? '📕 занято' : '📗 свободно' }}
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
+        </template>
 
-        <!-- Модалка копирования -->
-        <div v-if="copyModalVisible" class="modal-overlay" @click.self="copyModalVisible = false">
-            <div class="modal-content">
-                <h3><i class="fas fa-copy"></i> Копировать день</h3>
-                <div class="field-group"><label>Исходная дата</label><input type="date" v-model="copySourceDate"></div>
-                <div class="field-group"><label>Целевая дата</label><input type="date" v-model="copyTargetDate"></div>
-                <div class="field-group"><label><i class="fas fa-check-circle"></i> Действие</label>
-                    <select v-model="copyAction"><option value="copy">Копировать все занятия</option><option value="move">Перенести (удалить исходные)</option></select>
+        <!-- ===== РЕЖИМ РОДИТЕЛЯ ===== -->
+        <template v-else>
+            <!-- Свободные слоты -->
+            <div v-if="viewMode === 'slots'">
+                <div style="margin-bottom:1rem;color:#6a4e72;">
+                    <i class="fas fa-info-circle"></i> Выберите свободный слот для записи
                 </div>
-                <div class="modal-actions">
-                    <button class="btn-secondary" @click="copyModalVisible = false">Отмена</button>
-                    <button class="btn-primary" @click="executeCopy"><i class="fas fa-check"></i> Выполнить</button>
+                <div class="slots-grid" v-if="freeSlots.length > 0">
+                    <div v-for="slot in freeSlots" :key="slot.id" class="slot-card">
+                        <div class="time">{{ slot.time }}</div>
+                        <div>{{ slot.date }}</div>
+                        <div style="font-weight:500;">{{ slot.price }}</div>
+                        <span class="status free">📗 Свободно</span>
+                        
+                        <!-- Форма записи -->
+                        <div v-if="slot.showBookingForm" style="margin-top:1rem;padding-top:1rem;border-top:1px dashed #dcc7e2;">
+                            <div class="field-group" style="margin-bottom:0.5rem;">
+                                <input type="text" v-model="slot.bookForm.name" placeholder="Имя ученика *" style="width:100%;padding:0.5rem;border-radius:40px;border:1px solid #dcc7e2;">
+                            </div>
+                            <div class="field-group" style="margin-bottom:0.5rem;">
+                                <input type="text" v-model="slot.bookForm.class" placeholder="Класс" style="width:100%;padding:0.5rem;border-radius:40px;border:1px solid #dcc7e2;">
+                            </div>
+                            <div class="field-group" style="margin-bottom:0.5rem;">
+                                <input type="text" v-model="slot.bookForm.phone" placeholder="Телефон *" style="width:100%;padding:0.5rem;border-radius:40px;border:1px solid #dcc7e2;">
+                            </div>
+                            <div style="display:flex;gap:0.5rem;">
+                                <button class="btn-primary" @click="bookSlot(slot)" style="flex:1;justify-content:center;padding:0.5rem;">
+                                    <i class="fas fa-check"></i> Записаться
+                                </button>
+                                <button class="btn-danger" @click="slot.showBookingForm = false" style="padding:0.5rem 1rem;">
+                                    Отмена
+                                </button>
+                            </div>
+                        </div>
+                        <div class="actions" v-else>
+                            <button class="btn-book" @click="slot.showBookingForm = true">
+                                <i class="fas fa-pen"></i> Записаться
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div v-else class="no-data">
+                    <i class="fas fa-clock"></i>
+                    <p>Свободных слотов нет</p>
                 </div>
             </div>
-        </div>
+
+            <!-- Мои записи -->
+            <div v-if="viewMode === 'mybookings'">
+                <div class="slots-grid" v-if="myBookings.length > 0">
+                    <div v-for="booking in myBookings" :key="booking.id" class="slot-card" :class="{ booked: true }">
+                        <div class="time">{{ booking.time }}</div>
+                        <div>{{ booking.date }}</div>
+                        <div>{{ booking.price }}</div>
+                        <span class="status booked">📕 Записано</span>
+                        <div class="student-info">
+                            <div><strong>👤 {{ booking.student_name }}</strong></div>
+                            <div>🏫 {{ booking.student_class || '—' }}</div>
+                            <div>📞 {{ booking.student_phone || '—' }}</div>
+                        </div>
+                        <div class="actions">
+                            <button class="btn-cancel" @click="cancelMyBooking(booking.id)">
+                                <i class="fas fa-times"></i> Отменить запись
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div v-else class="no-data">
+                    <i class="fas fa-calendar-check"></i>
+                    <p>У вас пока нет записей</p>
+                </div>
+            </div>
+        </template>
     </template>
 </div>
 
@@ -443,6 +513,8 @@
         data: {
             isLoggedIn: false,
             userEmail: '',
+            userRole: 'tutor',
+            selectedRole: 'tutor',
             loginEmail: '',
             loginPassword: '',
             loginError: '',
@@ -450,238 +522,38 @@
             registerName: '',
             registerEmail: '',
             registerPassword: '',
+            
+            // Данные
+            slots: [],
             students: [],
-            viewMode: 'day',
-            selectedDate: new Date(),
-            newStudentName: '', 
-            newLessonDate: '', 
-            newLessonTime: '', 
-            newLessonPrice: '', 
-            newLessonPaid: 'paid', 
-            newLessonNote: '',
-            copyModalVisible: false, 
-            copySourceDate: '', 
-            copyTargetDate: '', 
-            copyAction: 'copy',
-            syncStatus: 'idle',
-            syncLabel: 'Ожидание'
+            bookings: [],
+            
+            viewMode: 'slots',
+            currentDate: new Date(),
+            
+            newSlotDate: '',
+            newSlotTime: '',
+            newSlotPrice: '',
+            
+            myStudents: [],
+            freeSlots: [],
+            myBookings: [],
+            tutorSlots: [],
+            monthDays: []
         },
         computed: {
-            formattedSelectedDate() {
-                const d = this.selectedDate; 
-                return `${String(d.getDate()).padStart(2,'0')}.${String(d.getMonth()+1).padStart(2,'0')}.${d.getFullYear()}`;
+            currentMonth() {
+                return ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'][this.currentDate.getMonth()];
             },
-            selectedDateStr() {
-                const d = this.selectedDate; 
-                return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-            },
-            periodLabel() {
-                if (this.viewMode === 'day') return this.formattedSelectedDate;
-                if (this.viewMode === 'week') {
-                    const start = this.weekStart; 
-                    const end = new Date(start); 
-                    end.setDate(end.getDate()+6);
-                    return `${String(start.getDate()).padStart(2,'0')}.${String(start.getMonth()+1).padStart(2,'0')} – ${String(end.getDate()).padStart(2,'0')}.${String(end.getMonth()+1).padStart(2,'0')}`;
-                }
-                const d = this.selectedDate; 
-                return `${this.monthNames[d.getMonth()]} ${d.getFullYear()}`;
-            },
-            weekStart() {
-                const d = new Date(this.selectedDate); 
-                d.setDate(d.getDate() - d.getDay()); 
-                return d;
-            },
-            weekDays() {
-                const start = new Date(this.weekStart); 
-                const days = [];
-                for (let i = 0; i < 7; i++) {
-                    const d = new Date(start); 
-                    d.setDate(d.getDate() + i);
-                    const dateStr = this.formatDateStr(d);
-                    const today = new Date(); 
-                    const isToday = d.getDate() === today.getDate() && d.getMonth() === today.getMonth() && d.getFullYear() === today.getFullYear();
-                    const lessons = this.getLessonsForDate(dateStr);
-                    days.push({ 
-                        date: dateStr, 
-                        weekday: ['вс','пн','вт','ср','чт','пт','сб'][d.getDay()], 
-                        dayNum: d.getDate(), 
-                        isToday, 
-                        lessons 
-                    });
-                }
-                return days;
-            },
-            monthDays() {
-                const d = new Date(this.selectedDate); 
-                d.setDate(1);
-                const firstDay = d.getDay();
-                const monthStart = new Date(d); 
-                monthStart.setDate(1 - firstDay);
-                const days = [];
-                const today = new Date();
-                for (let i = 0; i < 42; i++) {
-                    const date = new Date(monthStart); 
-                    date.setDate(monthStart.getDate() + i);
-                    const dateStr = this.formatDateStr(date);
-                    const isCurrentMonth = date.getMonth() === d.getMonth();
-                    const isToday = date.getDate() === today.getDate() && date.getMonth() === today.getMonth() && date.getFullYear() === today.getFullYear();
-                    const lessons = this.getLessonsForDate(dateStr);
-                    days.push({ 
-                        date: dateStr, 
-                        weekdayShort: ['вс','пн','вт','ср','чт','пт','сб'][date.getDay()], 
-                        dayNum: date.getDate(), 
-                        isCurrentMonth, 
-                        isToday, 
-                        lessons 
-                    });
-                }
-                return days;
-            },
-            filteredLessons() {
-                const result = [];
-                this.students.forEach((s, i) => {
-                    const filtered = s.lessons.filter(l => l.date === this.selectedDateStr);
-                    if (filtered.length) result.push({ 
-                        name: s.name, 
-                        originalIndex: i, 
-                        lessons: filtered.map((l, idx) => ({ ...l, originalIndex: s.lessons.indexOf(l) })) 
-                    });
-                });
-                return result;
-            },
-            filteredStudents() { return this.filteredLessons; },
-            monthNames() { return ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь']; }
+            currentYear() {
+                return this.currentDate.getFullYear();
+            }
         },
         methods: {
-            formatDateStr(date) {
+            formatDate(date) {
                 return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;
             },
-            getLessonsForDate(dateStr) {
-                const result = [];
-                this.students.forEach(s => {
-                    s.lessons.forEach(l => {
-                        if (l.date === dateStr) result.push({ ...l, student: s.name, id: Date.now() + Math.random() });
-                    });
-                });
-                return result;
-            },
-            changePeriod(delta) {
-                if (this.viewMode === 'day') { 
-                    const d = new Date(this.selectedDate); 
-                    d.setDate(d.getDate()+delta); 
-                    this.selectedDate = d; 
-                } else if (this.viewMode === 'week') { 
-                    const d = new Date(this.selectedDate); 
-                    d.setDate(d.getDate()+delta*7); 
-                    this.selectedDate = d; 
-                } else { 
-                    const d = new Date(this.selectedDate); 
-                    d.setMonth(d.getMonth()+delta); 
-                    this.selectedDate = d; 
-                }
-            },
-            goToday() { 
-                this.selectedDate = new Date(); 
-            },
-            addLesson() {
-                const name = this.newStudentName.trim(), 
-                      date = this.newLessonDate.trim(), 
-                      time = this.newLessonTime.trim(), 
-                      price = this.newLessonPrice.trim(), 
-                      note = this.newLessonNote.trim();
-                if (!name || !date || !time || !price) { 
-                    alert('Заполните имя, дату, время и стоимость.'); 
-                    return; 
-                }
-                let student = this.students.find(s => s.name === name);
-                if (!student) { 
-                    student = { name, lessons: [] }; 
-                    this.students.push(student); 
-                }
-                student.lessons.push({ date, time, price, paid: this.newLessonPaid, note: note || '' });
-                this.newLessonDate = ''; 
-                this.newLessonTime = ''; 
-                this.newLessonPrice = ''; 
-                this.newLessonPaid = 'paid'; 
-                this.newLessonNote = '';
-                if (date) { 
-                    const parts = date.split('-'); 
-                    const d = new Date(parts[0], parts[1]-1, parts[2]); 
-                    if (!isNaN(d)) this.selectedDate = d; 
-                }
-                this.saveToCloud();
-            },
-            quickAdd(date) {
-                this.newLessonDate = date;
-                this.viewMode = 'day';
-                if (date) { 
-                    const parts = date.split('-'); 
-                    const d = new Date(parts[0], parts[1]-1, parts[2]); 
-                    if (!isNaN(d)) this.selectedDate = d; 
-                }
-            },
-            togglePaid(sIdx, lIdx) { 
-                const l = this.students[sIdx].lessons[lIdx]; 
-                if (l) {
-                    l.paid = l.paid === 'paid' ? 'unpaid' : 'paid';
-                    this.saveToCloud();
-                }
-            },
-            removeLesson(sIdx, lIdx) {
-                this.students[sIdx].lessons.splice(lIdx, 1);
-                if (this.students[sIdx].lessons.length === 0 && confirm(`Удалить ученика "${this.students[sIdx].name}"?`)) {
-                    this.students.splice(sIdx, 1);
-                }
-                this.saveToCloud();
-            },
-            removeStudent(sIdx) { 
-                if (confirm(`Удалить ученика "${this.students[sIdx].name}"?`)) {
-                    this.students.splice(sIdx, 1);
-                    this.saveToCloud();
-                }
-            },
-            openCopyModal() {
-                this.copySourceDate = this.selectedDateStr;
-                const d = new Date(this.selectedDate); 
-                d.setDate(d.getDate()+1);
-                this.copyTargetDate = this.formatDateStr(d);
-                this.copyModalVisible = true;
-            },
-            executeCopy() {
-                if (!this.copySourceDate || !this.copyTargetDate) { 
-                    alert('Выберите даты'); 
-                    return; 
-                }
-                const lessonsToCopy = [];
-                this.students.forEach(s => { 
-                    s.lessons.forEach(l => { 
-                        if (l.date === this.copySourceDate) lessonsToCopy.push({ student: s, lesson: l }); 
-                    }); 
-                });
-                if (lessonsToCopy.length === 0) { 
-                    alert('Нет занятий для копирования'); 
-                    return; 
-                }
-                if (this.copyAction === 'move') {
-                    lessonsToCopy.forEach(({ student, lesson }) => {
-                        const idx = student.lessons.indexOf(lesson);
-                        if (idx > -1) student.lessons.splice(idx, 1);
-                    });
-                }
-                lessonsToCopy.forEach(({ student, lesson }) => {
-                    student.lessons.push({ 
-                        date: this.copyTargetDate, 
-                        time: lesson.time, 
-                        price: lesson.price, 
-                        paid: lesson.paid, 
-                        note: lesson.note 
-                    });
-                });
-                this.copyModalVisible = false;
-                this.saveToCloud();
-                alert(`Скопировано ${lessonsToCopy.length} занятий на ${this.copyTargetDate}`);
-            },
-
+            
             // ===== АВТОРИЗАЦИЯ =====
             async login() {
                 this.loginError = '';
@@ -695,16 +567,27 @@
                         password: this.loginPassword
                     });
                     if (error) throw error;
+                    
+                    // Определяем роль пользователя
+                    const { data: userData } = await supabaseClient
+                        .from('users')
+                        .select('role')
+                        .eq('id', data.user.id)
+                        .maybeSingle();
+                    
+                    this.userRole = userData?.role || 'parent';
                     this.userEmail = data.user.email;
                     this.isLoggedIn = true;
                     this.loginEmail = '';
                     this.loginPassword = '';
                     this.loginError = '';
-                    await this.loadFromCloud();
+                    
+                    await this.loadData();
                 } catch (e) {
                     this.loginError = e.message || 'Ошибка входа. Проверьте email и пароль.';
                 }
             },
+            
             async register() {
                 this.loginError = '';
                 if (!this.registerEmail || !this.registerPassword || !this.registerName) {
@@ -720,131 +603,304 @@
                         email: this.registerEmail,
                         password: this.registerPassword,
                         options: {
-                            data: { name: this.registerName || 'Репетитор' }
+                            data: { name: this.registerName, role: this.selectedRole }
                         }
                     });
                     if (error) throw error;
-                    alert('Регистрация успешна! Проверьте почту для подтверждения (если не пришло - проверьте спам).');
+                    
+                    // Сохраняем роль в таблицу users
+                    if (data.user) {
+                        await supabaseClient
+                            .from('users')
+                            .insert({
+                                id: data.user.id,
+                                email: this.registerEmail,
+                                name: this.registerName,
+                                role: this.selectedRole
+                            });
+                    }
+                    
+                    alert('✅ Регистрация успешна! Проверьте почту для подтверждения.');
                     this.showRegister = false;
                     this.registerName = '';
                     this.registerEmail = '';
                     this.registerPassword = '';
                     this.loginEmail = this.registerEmail;
-                    this.loginError = 'Теперь войдите с вашим email и паролем';
+                    this.loginError = '✅ Теперь войдите с вашим email и паролем.';
                 } catch (e) {
-                    this.loginError = e.message || 'Ошибка регистрации. Возможно, email уже используется.';
+                    this.loginError = e.message || 'Ошибка регистрации.';
                 }
             },
+            
             async logout() {
                 await supabaseClient.auth.signOut();
                 this.isLoggedIn = false;
                 this.userEmail = '';
+                this.userRole = '';
+                this.slots = [];
                 this.students = [];
-                this.syncStatus = 'idle';
-                this.syncLabel = 'Ожидание';
+                this.bookings = [];
             },
-
-            // ===== ОБЛАЧНОЕ ХРАНИЛИЩЕ =====
-            async saveToCloud() {
-                if (!this.isLoggedIn) return;
-                this.syncStatus = 'syncing';
-                this.syncLabel = 'Сохранение...';
-                try {
-                    const user = await supabaseClient.auth.getUser();
-                    if (user.error) throw user.error;
-                    const { error } = await supabaseClient
-                        .from('tutor_data')
-                        .upsert({
-                            user_id: user.data.user.id,
-                            data: JSON.stringify(this.students),
-                            updated_at: new Date().toISOString()
-                        }, { onConflict: 'user_id' });
-                    if (error) throw error;
-                    this.syncStatus = 'synced';
-                    this.syncLabel = 'Сохранено';
-                    setTimeout(() => {
-                        if (this.syncStatus === 'synced') {
-                            this.syncLabel = 'Синхронизировано';
-                        }
-                    }, 3000);
-                } catch (e) {
-                    console.error('Ошибка сохранения:', e);
-                    this.syncStatus = 'error';
-                    this.syncLabel = 'Ошибка';
+            
+            // ===== ЗАГРУЗКА ДАННЫХ =====
+            async loadData() {
+                if (this.userRole === 'tutor') {
+                    await this.loadTutorSlots();
+                    await this.loadStudents();
+                    this.viewMode = 'slots';
+                } else {
+                    await this.loadFreeSlots();
+                    await this.loadMyBookings();
+                    this.viewMode = 'slots';
                 }
             },
-            async loadFromCloud() {
-                this.syncStatus = 'syncing';
-                this.syncLabel = 'Загрузка...';
-                try {
-                    const user = await supabaseClient.auth.getUser();
-                    if (user.error) throw user.error;
-                    const { data, error } = await supabaseClient
-                        .from('tutor_data')
-                        .select('data')
-                        .eq('user_id', user.data.user.id)
-                        .maybeSingle();
-                    if (error) throw error;
-                    if (data) {
-                        this.students = JSON.parse(data.data);
-                        this.syncStatus = 'synced';
-                        this.syncLabel = 'Загружено';
-                        setTimeout(() => {
-                            if (this.syncStatus === 'synced') {
-                                this.syncLabel = 'Синхронизировано';
-                            }
-                        }, 3000);
-                    } else {
-                        this.students = [];
-                        this.syncStatus = 'synced';
-                        this.syncLabel = 'Новые данные';
-                        await this.saveToCloud();
+            
+            async loadTutorSlots() {
+                const { data } = await supabaseClient
+                    .from('slots')
+                    .select('*')
+                    .eq('tutor_id', (await supabaseClient.auth.getUser()).data.user.id)
+                    .order('date', { ascending: true });
+                this.tutorSlots = data || [];
+            },
+            
+            async loadStudents() {
+                const { data } = await supabaseClient
+                    .from('bookings')
+                    .select('student_name, student_class, student_phone, slot:slots(*)')
+                    .eq('tutor_id', (await supabaseClient.auth.getUser()).data.user.id)
+                    .order('created_at', { ascending: false });
+                
+                // Группируем по ученикам
+                const studentsMap = new Map();
+                (data || []).forEach(b => {
+                    const key = b.student_name + b.student_phone;
+                    if (!studentsMap.has(key)) {
+                        studentsMap.set(key, {
+                            name: b.student_name,
+                            phone: b.student_phone,
+                            class: b.student_class || '—',
+                            totalLessons: 0
+                        });
                     }
-                } catch (e) {
-                    console.error('Ошибка загрузки:', e);
-                    this.syncStatus = 'error';
-                    this.syncLabel = 'Ошибка';
-                    // Пробуем загрузить из localStorage как резерв
-                    try {
-                        const saved = localStorage.getItem('tutorStudents');
-                        if (saved) {
-                            this.students = JSON.parse(saved);
-                            this.syncStatus = 'idle';
-                            this.syncLabel = 'Локальная копия';
-                        }
-                    } catch (e2) {}
+                    studentsMap.get(key).totalLessons++;
+                });
+                this.myStudents = Array.from(studentsMap.values());
+            },
+            
+            async loadFreeSlots() {
+                const today = this.formatDate(new Date());
+                const { data } = await supabaseClient
+                    .from('slots')
+                    .select('*')
+                    .eq('booked', false)
+                    .gte('date', today)
+                    .order('date', { ascending: true });
+                
+                this.freeSlots = (data || []).map(s => ({
+                    ...s,
+                    showBookingForm: false,
+                    bookForm: { name: '', class: '', phone: '' }
+                }));
+            },
+            
+            async loadMyBookings() {
+                const user = await supabaseClient.auth.getUser();
+                const { data } = await supabaseClient
+                    .from('bookings')
+                    .select('*, slot:slots(*)')
+                    .eq('parent_id', user.data.user.id)
+                    .order('created_at', { ascending: false });
+                this.myBookings = data || [];
+            },
+            
+            // ===== УПРАВЛЕНИЕ СЛОТАМИ (РЕПЕТИТОР) =====
+            async addSlot() {
+                if (!this.newSlotDate || !this.newSlotTime || !this.newSlotPrice) {
+                    alert('Заполните все поля');
+                    return;
+                }
+                const user = await supabaseClient.auth.getUser();
+                const { error } = await supabaseClient
+                    .from('slots')
+                    .insert({
+                        tutor_id: user.data.user.id,
+                        date: this.newSlotDate,
+                        time: this.newSlotTime,
+                        price: this.newSlotPrice,
+                        booked: false
+                    });
+                if (error) {
+                    alert('Ошибка: ' + error.message);
+                } else {
+                    this.newSlotDate = '';
+                    this.newSlotTime = '';
+                    this.newSlotPrice = '';
+                    await this.loadTutorSlots();
                 }
             },
-            async syncWithCloud() {
-                await this.saveToCloud();
-                await this.loadFromCloud();
+            
+            async deleteSlot(slotId) {
+                if (confirm('Удалить этот слот?')) {
+                    await supabaseClient
+                        .from('slots')
+                        .delete()
+                        .eq('id', slotId);
+                    await this.loadTutorSlots();
+                }
+            },
+            
+            async cancelBooking(slotId) {
+                if (confirm('Отменить запись на этот слот?')) {
+                    await supabaseClient
+                        .from('bookings')
+                        .delete()
+                        .eq('slot_id', slotId);
+                    
+                    await supabaseClient
+                        .from('slots')
+                        .update({ booked: false, student: null })
+                        .eq('id', slotId);
+                    
+                    await this.loadTutorSlots();
+                }
+            },
+            
+            // ===== ЗАПИСЬ РОДИТЕЛЯ =====
+            async bookSlot(slot) {
+                const form = slot.bookForm;
+                if (!form.name || !form.phone) {
+                    alert('Заполните имя и телефон');
+                    return;
+                }
+                const user = await supabaseClient.auth.getUser();
+                
+                const { error } = await supabaseClient
+                    .from('bookings')
+                    .insert({
+                        slot_id: slot.id,
+                        parent_id: user.data.user.id,
+                        tutor_id: slot.tutor_id,
+                        student_name: form.name,
+                        student_class: form.class || '',
+                        student_phone: form.phone
+                    });
+                
+                if (error) {
+                    alert('Ошибка записи: ' + error.message);
+                    return;
+                }
+                
+                await supabaseClient
+                    .from('slots')
+                    .update({ 
+                        booked: true, 
+                        student: { 
+                            name: form.name, 
+                            class: form.class || '', 
+                            phone: form.phone 
+                        } 
+                    })
+                    .eq('id', slot.id);
+                
+                await this.loadFreeSlots();
+                await this.loadMyBookings();
+                alert('✅ Вы успешно записались!');
+            },
+            
+            async cancelMyBooking(bookingId) {
+                if (confirm('Отменить запись?')) {
+                    const booking = this.myBookings.find(b => b.id === bookingId);
+                    if (booking) {
+                        await supabaseClient
+                            .from('slots')
+                            .update({ booked: false, student: null })
+                            .eq('id', booking.slot_id);
+                    }
+                    
+                    await supabaseClient
+                        .from('bookings')
+                        .delete()
+                        .eq('id', bookingId);
+                    
+                    await this.loadMyBookings();
+                    await this.loadFreeSlots();
+                }
+            },
+            
+            // ===== КАЛЕНДАРЬ =====
+            changeMonth(delta) {
+                const newDate = new Date(this.currentDate);
+                newDate.setMonth(newDate.getMonth() + delta);
+                this.currentDate = newDate;
+                this.buildCalendar();
+            },
+            
+            goToday() {
+                this.currentDate = new Date();
+                this.buildCalendar();
+            },
+            
+            async buildCalendar() {
+                const year = this.currentDate.getFullYear();
+                const month = this.currentDate.getMonth();
+                const firstDay = new Date(year, month, 1);
+                const lastDay = new Date(year, month + 1, 0);
+                
+                const days = [];
+                for (let d = 1; d <= lastDay.getDate(); d++) {
+                    const date = new Date(year, month, d);
+                    const dateStr = this.formatDate(date);
+                    const slots = this.tutorSlots.filter(s => s.date === dateStr);
+                    days.push({
+                        date: dateStr,
+                        dayNum: d,
+                        weekday: ['Вс','Пн','Вт','Ср','Чт','Пт','Сб'][date.getDay()],
+                        isCurrentMonth: true,
+                        slots: slots
+                    });
+                }
+                this.monthDays = days;
             }
         },
+        
         mounted() {
-            supabaseClient.auth.getSession().then(({ data }) => {
+            // Проверяем сессию
+            supabaseClient.auth.getSession().then(async ({ data }) => {
                 if (data.session) {
+                    const { data: userData } = await supabaseClient
+                        .from('users')
+                        .select('role')
+                        .eq('id', data.session.user.id)
+                        .maybeSingle();
+                    
+                    this.userRole = userData?.role || 'parent';
                     this.userEmail = data.session.user.email;
                     this.isLoggedIn = true;
-                    this.loadFromCloud();
+                    await this.loadData();
+                    if (this.userRole === 'tutor') {
+                        this.buildCalendar();
+                    }
                 }
             });
-
+            
+            // Слушаем изменения сессии
             supabaseClient.auth.onAuthStateChange((event, session) => {
                 if (event === 'SIGNED_IN' && session) {
                     this.userEmail = session.user.email;
                     this.isLoggedIn = true;
-                    this.loadFromCloud();
+                    this.loadData();
                 }
                 if (event === 'SIGNED_OUT') {
                     this.isLoggedIn = false;
                     this.userEmail = '';
-                    this.students = [];
+                    this.userRole = '';
                 }
             });
-
-            const today = new Date(); 
-            this.selectedDate = today;
-            this.newLessonDate = this.formatDateStr(today);
+            
+            // Устанавливаем сегодняшнюю дату для формы
+            const today = new Date();
+            this.newSlotDate = this.formatDate(today);
         }
     });
 </script>
