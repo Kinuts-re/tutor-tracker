@@ -231,7 +231,7 @@
         .day-student-name { font-size: 1.5rem; font-weight: 450; color: #3b2740; display: flex; align-items: center; gap: 8px; }
         .day-student-name i { color: #8f6f9a; font-size: 1.3rem; }
         .day-lessons-table-wrap { overflow-x: auto; margin: 0.5rem 0 0.8rem; }
-        .day-lessons-table { width: 100%; border-collapse: collapse; font-size: 0.95rem; min-width: 500px; }
+        .day-lessons-table { width: 100%; border-collapse: collapse; font-size: 0.95rem; min-width: 600px; }
         .day-lessons-table th { text-align: left; padding: 0.7rem 0.6rem 0.7rem 0; font-weight: 500; color: #5b4363; border-bottom: 1px solid #dcc7e2; }
         .day-lessons-table td { padding: 0.8rem 0.6rem 0.8rem 0; border-bottom: 1px dashed #e8d9ed; vertical-align: middle; }
         .day-lessons-table tr:last-child td { border-bottom: none; }
@@ -265,13 +265,45 @@
         .day-header { display: flex; justify-content: space-between; align-items: center; font-weight: 500; color: #4a2e4f; margin-bottom: 0.5rem; font-size: 0.9rem; }
         .day-header .day-num { font-size: 1.1rem; }
         .day-header .day-name { font-size: 0.75rem; color: #7f5f89; }
-        .day-lesson { background: #efe6f2; border-radius: 12px; padding: 0.3rem 0.6rem; margin-bottom: 0.3rem; font-size: 0.75rem; border-left: 3px solid #b48dbd; cursor: pointer; transition: 0.1s; }
-        .day-lesson:hover { background: #dcc7e2; }
+        .day-lesson { background: #efe6f2; border-radius: 12px; padding: 0.3rem 0.6rem; margin-bottom: 0.3rem; font-size: 0.75rem; border-left: 3px solid #b48dbd; }
         .day-lesson .student-name { font-weight: 500; color: #3b2740; }
         .day-lesson .time { color: #6a4e72; font-size: 0.7rem; }
         .day-lesson .price { color: #5e4166; font-size: 0.7rem; }
         .day-lesson .paid-badge { font-size: 0.6rem; padding: 0.1rem 0.4rem; border-radius: 20px; background: #d9ebd9; color: #1f5420; margin-left: 4px; }
         .day-lesson .unpaid-badge { background: #f7e6e6; color: #8a4040; }
+        .day-lesson-actions { 
+            margin-top: 0.3rem; 
+            display: flex; 
+            gap: 0.3rem; 
+            flex-wrap: wrap; 
+        }
+        .day-lesson-actions button { 
+            padding: 0.1rem 0.5rem; 
+            border-radius: 30px; 
+            border: none; 
+            font-size: 0.6rem; 
+            cursor: pointer; 
+            font-weight: 500;
+            transition: 0.15s;
+        }
+        .day-lesson-actions .btn-toggle-paid { 
+            background: #d9ebd9; 
+            color: #1f5420; 
+        }
+        .day-lesson-actions .btn-toggle-paid.unpaid { 
+            background: #f7e6e6; 
+            color: #8a4040; 
+        }
+        .day-lesson-actions .btn-delete-lesson { 
+            background: #f7e6e6; 
+            color: #8a4040; 
+        }
+        .day-lesson-actions .btn-delete-lesson:hover { 
+            background: #eac8c8; 
+        }
+        .day-lesson-actions .btn-toggle-paid:hover { 
+            opacity: 0.8; 
+        }
         .add-mini { background: transparent; border: 1px dashed #d5bedb; border-radius: 12px; padding: 0.2rem; text-align: center; color: #9a82a2; font-size: 0.7rem; cursor: pointer; margin-top: 0.3rem; transition: 0.1s; }
         .add-mini:hover { background: #efe6f2; border-color: #b48dbd; }
 
@@ -314,6 +346,21 @@
         .booking-controls .paid-status.paid { background: #d9ebd9; color: #1f5420; }
         .booking-controls .paid-status.unpaid { background: #f7e6e6; color: #8a4040; }
 
+        .student-card-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+        .student-card-actions button { 
+            padding: 0.2rem 0.8rem; 
+            border-radius: 60px; 
+            border: none; 
+            font-size: 0.7rem; 
+            cursor: pointer; 
+            font-weight: 500;
+            transition: 0.15s;
+        }
+        .student-card-actions .btn-edit { background: #c9d4e8; color: #2e3f5a; }
+        .student-card-actions .btn-edit:hover { background: #b5c4dc; }
+        .student-card-actions .btn-delete-student { background: #f7e6e6; color: #8a4040; }
+        .student-card-actions .btn-delete-student:hover { background: #eac8c8; }
+
         @media (max-width: 768px) {
             .app-container { padding: 1rem; }
             .add-slot-form, .add-student-section { flex-direction: column; align-items: stretch; }
@@ -322,6 +369,7 @@
             .login-card { padding: 2rem 1.5rem; }
             .week-grid { grid-template-columns: repeat(4, 1fr); }
             .month-grid { grid-template-columns: repeat(4, 1fr); }
+            .day-lessons-table { min-width: 400px; }
         }
         @media (max-width: 500px) {
             .week-grid, .month-grid { grid-template-columns: repeat(2, 1fr); }
@@ -495,9 +543,8 @@
                 </div>
             </div>
 
-            <!-- 2. ДНЕВНИК (ПОЛНОЕ УПРАВЛЕНИЕ) -->
+            <!-- 2. ДНЕВНИК -->
             <div v-if="viewMode === 'diary'">
-                <!-- Форма добавления -->
                 <div class="add-student-section">
                     <div class="field-group"><label><i class="fas fa-user-graduate"></i> Ученик</label><input v-model="newStudentName" placeholder="Имя"></div>
                     <div class="field-group"><label><i class="fas fa-calendar-day"></i> Дата</label><input type="date" v-model="newLessonDate"></div>
@@ -510,7 +557,6 @@
                     <button class="btn-primary" @click="addDiaryLesson"><i class="fas fa-plus-circle"></i> Добавить</button>
                 </div>
 
-                <!-- Список занятий -->
                 <div class="day-students-grid">
                     <div v-if="diaryStudents.length === 0" class="no-data">
                         <i class="fas fa-book"></i>
@@ -562,17 +608,33 @@
                 </div>
             </div>
 
-            <!-- 3. УЧЕНИКИ -->
+            <!-- 3. УЧЕНИКИ (ЕДИНАЯ БАЗА) -->
             <div v-if="viewMode === 'students'">
-                <div class="slots-grid" v-if="myStudents.length > 0">
-                    <div v-for="student in myStudents" :key="student.name + student.phone" class="slot-card">
+                <!-- Форма добавления ученика -->
+                <div class="add-student-section" style="background:#fcf8fe;border-radius:40px;padding:1.5rem 2rem;margin:1.5rem 0;border:1px solid #dcc7e2;">
+                    <div class="field-group"><label><i class="fas fa-user-graduate"></i> Имя ученика *</label><input v-model="newStudentForm.name" placeholder="Имя"></div>
+                    <div class="field-group"><label><i class="fas fa-user-tag"></i> Класс</label><input v-model="newStudentForm.class" placeholder="7А"></div>
+                    <div class="field-group"><label><i class="fas fa-phone"></i> Телефон родителя</label><input v-model="newStudentForm.phone" placeholder="+7 999 123-45-67"></div>
+                    <div class="field-group"><label><i class="fas fa-user"></i> Имя родителя</label><input v-model="newStudentForm.parent_name" placeholder="Анна"></div>
+                    <button class="btn-primary" @click="addStudent"><i class="fas fa-plus-circle"></i> Добавить ученика</button>
+                </div>
+
+                <!-- Список учеников -->
+                <div class="slots-grid" v-if="allStudents.length > 0">
+                    <div v-for="student in allStudents" :key="student.id || student.name + student.phone" class="slot-card">
                         <div style="font-size:1.2rem;font-weight:500;">
                             <i class="fas fa-user-circle"></i> {{ student.name }}
                         </div>
                         <div>📞 {{ student.parent_phone || student.phone || '—' }}</div>
                         <div>🏫 {{ student.class || '—' }}</div>
+                        <div style="font-size:0.8rem;color:#6a4e72;">👤 {{ student.parent_name || '—' }}</div>
                         <div style="margin-top:0.5rem;font-size:0.9rem;color:#6a4e72;">
                             Всего занятий: {{ student.totalLessons || 0 }}
+                        </div>
+                        <div class="student-card-actions" style="margin-top:0.5rem;padding-top:0.5rem;border-top:1px dashed #e8d9ed;">
+                            <button class="btn-delete-student" @click="deleteStudent(student.id || student.name)" title="Удалить ученика">
+                                <i class="fas fa-trash"></i> Удалить
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -582,7 +644,7 @@
                 </div>
             </div>
 
-            <!-- 4. РАСПИСАНИЕ -->
+            <!-- 4. РАСПИСАНИЕ (С УПРАВЛЕНИЕМ) -->
             <div v-if="viewMode === 'schedule'">
                 <div class="tabs" style="margin-bottom:1rem;">
                     <button class="tab-btn" :class="{ active: scheduleView === 'day' }" @click="scheduleView = 'day'">
@@ -624,12 +686,34 @@
                             </div>
                             <div class="day-lessons-table-wrap">
                                 <table class="day-lessons-table">
-                                    <thead><tr><th>Время</th><th>Стоимость</th><th>Статус</th><th>Заметка</th></tr></thead>
+                                    <thead>
+                                        <tr>
+                                            <th>Время</th>
+                                            <th>Стоимость</th>
+                                            <th>Статус</th>
+                                            <th>Заметка</th>
+                                            <th style="width:150px;">Действия</th>
+                                        </tr>
+                                    </thead>
                                     <tbody>
                                         <tr v-for="(lesson, lIdx) in student.lessons" :key="lIdx">
-                                            <td>{{ lesson.time }}</td><td>{{ lesson.price }}</td>
-                                            <td><span v-if="lesson.paid === 'paid'" class="status-paid"><i class="fas fa-check-circle"></i> оплачено</span><span v-else class="status-unpaid"><i class="fas fa-exclamation-circle"></i> не оплачено</span></td>
+                                            <td>{{ lesson.time }}</td>
+                                            <td>{{ lesson.price }}</td>
+                                            <td>
+                                                <span v-if="lesson.paid === 'paid'" class="status-paid"><i class="fas fa-check-circle"></i> оплачено</span>
+                                                <span v-else class="status-unpaid"><i class="fas fa-exclamation-circle"></i> не оплачено</span>
+                                            </td>
                                             <td><span class="note-badge" :title="lesson.note || '—'">{{ lesson.note || '—' }}</span></td>
+                                            <td>
+                                                <div style="display:flex;gap:0.3rem;flex-wrap:wrap;">
+                                                    <button class="btn-icon" @click="toggleSchedulePaid(lesson.id)" title="Сменить оплату">
+                                                        <i class="fas fa-sync-alt"></i>
+                                                    </button>
+                                                    <button class="btn-icon" @click="deleteScheduleLesson(lesson.id)" title="Удалить занятие">
+                                                        <i class="fas fa-trash" style="color:#a079aa;"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -648,8 +732,21 @@
                             </div>
                             <div v-for="lesson in day.lessons" :key="lesson.id" class="day-lesson">
                                 <div><span class="student-name">{{ lesson.student }}</span> <span class="time">{{ lesson.time }}</span></div>
-                                <div><span class="price">{{ lesson.price }}</span> <span class="paid-badge" :class="{'unpaid-badge': lesson.paid === 'unpaid'}">{{ lesson.paid === 'paid' ? '✅' : '❌' }}</span></div>
+                                <div><span class="price">{{ lesson.price }}</span> 
+                                    <span class="paid-badge" :class="{'unpaid-badge': lesson.paid === 'unpaid'}">
+                                        {{ lesson.paid === 'paid' ? '✅' : '❌' }}
+                                    </span>
+                                </div>
                                 <div style="font-size:0.65rem;color:#6a4e72;">{{ lesson.note || '' }}</div>
+                                <div class="day-lesson-actions">
+                                    <button class="btn-toggle-paid" :class="lesson.paid === 'paid' ? '' : 'unpaid'" 
+                                            @click="toggleSchedulePaid(lesson.id)">
+                                        {{ lesson.paid === 'paid' ? '✅' : '❌' }}
+                                    </button>
+                                    <button class="btn-delete-lesson" @click="deleteScheduleLesson(lesson.id)">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
                             </div>
                             <div class="add-mini" @click="quickAddToDiary(day.date)"><i class="fas fa-plus-circle"></i> добавить</div>
                         </div>
@@ -666,7 +763,20 @@
                             </div>
                             <div v-for="lesson in day.lessons" :key="lesson.id" class="day-lesson">
                                 <div><span class="student-name">{{ lesson.student }}</span> <span class="time">{{ lesson.time }}</span></div>
-                                <div><span class="price">{{ lesson.price }}</span> <span class="paid-badge" :class="{'unpaid-badge': lesson.paid === 'unpaid'}">{{ lesson.paid === 'paid' ? '✅' : '❌' }}</span></div>
+                                <div><span class="price">{{ lesson.price }}</span> 
+                                    <span class="paid-badge" :class="{'unpaid-badge': lesson.paid === 'unpaid'}">
+                                        {{ lesson.paid === 'paid' ? '✅' : '❌' }}
+                                    </span>
+                                </div>
+                                <div class="day-lesson-actions">
+                                    <button class="btn-toggle-paid" :class="lesson.paid === 'paid' ? '' : 'unpaid'" 
+                                            @click="toggleSchedulePaid(lesson.id)">
+                                        {{ lesson.paid === 'paid' ? '✅' : '❌' }}
+                                    </button>
+                                    <button class="btn-delete-lesson" @click="deleteScheduleLesson(lesson.id)">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
                             </div>
                             <div class="add-mini" @click="quickAddToDiary(day.date)"><i class="fas fa-plus-circle"></i></div>
                         </div>
@@ -674,7 +784,7 @@
                 </div>
             </div>
 
-            <!-- 5. ЗАПИСИ РОДИТЕЛЕЙ С УПРАВЛЕНИЕМ -->
+            <!-- 5. ЗАПИСИ РОДИТЕЛЕЙ -->
             <div v-if="viewMode === 'bookings'">
                 <div style="margin-bottom:1rem;color:#6a4e72;">
                     <i class="fas fa-info-circle"></i> Управление записями родителей и добавление занятий
@@ -692,7 +802,6 @@
                             <div style="font-size:0.8rem;color:#6a4e72;">Родитель: {{ booking.parent_name || '' }}</div>
                         </div>
                         
-                        <!-- Управление занятием -->
                         <div class="booking-controls">
                             <button class="btn-add-lesson" @click="openAddLessonModal(booking)">
                                 <i class="fas fa-plus"></i> Добавить занятие
@@ -858,6 +967,8 @@
 <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
 <script>
     // ==========================================
+    // ⭐ ВСТАВЬТЕ ВАШИ ДАННЫЕ СЮДА ⭐
+    // ==========================================
     const SUPABASE_URL = 'https://nmvsdljxxwghwpmjnoxh.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_TexxaSVrxSpUXBh0tIR7Tw_6-Sdlsm_';
     // ==========================================
@@ -887,6 +998,7 @@
             myBookings: [],
             allBookings: [],
             myStudents: [],
+            allStudents: [],
             
             // Дневник
             diaryStudents: [],
@@ -910,6 +1022,14 @@
             newLessonPrice: '',
             newLessonPaid: 'paid',
             newLessonNote: '',
+            
+            // Форма добавления ученика
+            newStudentForm: {
+                name: '',
+                class: '',
+                phone: '',
+                parent_name: ''
+            },
             
             // Форма добавления занятия для родителей
             addLessonModalVisible: false,
@@ -1142,6 +1262,7 @@
                 this.myBookings = [];
                 this.allBookings = [];
                 this.myStudents = [];
+                this.allStudents = [];
                 this.diaryStudents = [];
                 this.diaryLessons = [];
             },
@@ -1151,7 +1272,7 @@
                 console.log('Загрузка данных для роли:', this.userRole);
                 if (this.userRole === 'tutor') {
                     await this.loadTutorSlots();
-                    await this.loadStudents();
+                    await this.loadAllStudents();
                     await this.loadDiary();
                     await this.loadAllBookings();
                     this.viewMode = 'slots';
@@ -1178,31 +1299,65 @@
                 }
             },
             
-            async loadStudents() {
+            async loadAllStudents() {
                 try {
                     const user = await supabaseClient.auth.getUser();
-                    const { data, error } = await supabaseClient
+                    
+                    // Загружаем учеников из bookings (родители)
+                    const { data: bookingsData, error: bookingsError } = await supabaseClient
                         .from('bookings')
-                        .select('student_name, student_class, parent_phone, created_at')
+                        .select('student_name, student_class, parent_phone, parent_name, created_at')
                         .eq('tutor_id', user.data.user.id)
                         .order('created_at', { ascending: false });
                     
-                    if (error) throw error;
+                    if (bookingsError) throw bookingsError;
                     
+                    // Загружаем учеников из diary_lessons
+                    const { data: diaryData, error: diaryError } = await supabaseClient
+                        .from('diary_lessons')
+                        .select('student_name, note, created_at')
+                        .eq('tutor_id', user.data.user.id)
+                        .order('created_at', { ascending: false });
+                    
+                    if (diaryError) throw diaryError;
+                    
+                    // Объединяем в единую базу
                     const studentsMap = new Map();
-                    (data || []).forEach(b => {
-                        const key = b.student_name + b.parent_phone;
+                    
+                    // Добавляем из bookings
+                    (bookingsData || []).forEach(b => {
+                        const key = b.student_name + (b.parent_phone || '');
                         if (!studentsMap.has(key)) {
                             studentsMap.set(key, {
                                 name: b.student_name,
-                                phone: b.parent_phone || '—',
                                 class: b.student_class || '—',
-                                totalLessons: 0
+                                phone: b.parent_phone || '—',
+                                parent_name: b.parent_name || '—',
+                                totalLessons: 0,
+                                source: 'booking'
                             });
                         }
                         studentsMap.get(key).totalLessons++;
                     });
-                    this.myStudents = Array.from(studentsMap.values());
+                    
+                    // Добавляем из diary_lessons
+                    (diaryData || []).forEach(d => {
+                        const key = d.student_name + 'diary';
+                        if (!studentsMap.has(key)) {
+                            studentsMap.set(key, {
+                                name: d.student_name,
+                                class: '—',
+                                phone: '—',
+                                parent_name: '—',
+                                totalLessons: 0,
+                                source: 'diary'
+                            });
+                        }
+                        studentsMap.get(key).totalLessons++;
+                    });
+                    
+                    this.allStudents = Array.from(studentsMap.values());
+                    console.log('Загружено учеников:', this.allStudents.length);
                 } catch (e) {
                     console.error('Ошибка загрузки учеников:', e);
                 }
@@ -1256,9 +1411,7 @@
                     
                     if (error) throw error;
                     
-                    // Добавляем статус оплаты для каждой записи
                     this.allBookings = (data || []).map(b => {
-                        // Ищем соответствующее занятие в дневнике
                         const diaryLesson = this.diaryLessons.find(
                             l => l.student_name === b.student_name && 
                                  l.date === b.slot?.date && 
@@ -1282,7 +1435,7 @@
                         result.push({ 
                             ...l, 
                             student: l.student_name,
-                            id: l.id + Math.random()
+                            id: l.id
                         });
                     }
                 });
@@ -1370,13 +1523,11 @@
             
             async cancelSlotBooking(slotId) {
                 if (confirm('Отменить запись на этот слот?')) {
-                    // Удаляем запись из bookings
                     await supabaseClient
                         .from('bookings')
                         .delete()
                         .eq('slot_id', slotId);
                     
-                    // Обновляем слот
                     await supabaseClient
                         .from('slots')
                         .update({ booked: false, student: null })
@@ -1384,6 +1535,7 @@
                     
                     await this.loadTutorSlots();
                     await this.loadAllBookings();
+                    await this.loadAllStudents();
                 }
             },
             
@@ -1429,6 +1581,7 @@
                 await this.loadFreeSlots();
                 await this.loadMyBookings();
                 await this.loadAllBookings();
+                await this.loadAllStudents();
                 alert('✅ Вы успешно записались!');
             },
             
@@ -1450,6 +1603,7 @@
                     await this.loadMyBookings();
                     await this.loadFreeSlots();
                     await this.loadAllBookings();
+                    await this.loadAllStudents();
                 }
             },
             
@@ -1476,6 +1630,57 @@
                     console.error('Ошибка проверки времени:', e);
                     return false;
                 }
+            },
+            
+            // ===== УПРАВЛЕНИЕ УЧЕНИКАМИ =====
+            async addStudent() {
+                const name = this.newStudentForm.name.trim();
+                if (!name) {
+                    alert('Введите имя ученика');
+                    return;
+                }
+                
+                // Сохраняем в diary_lessons как информацию об ученике
+                // Добавляем запись-заглушку, чтобы ученик появился в списке
+                const user = await supabaseClient.auth.getUser();
+                const { error } = await supabaseClient
+                    .from('diary_lessons')
+                    .insert({
+                        tutor_id: user.data.user.id,
+                        student_name: name,
+                        date: new Date().toISOString().split('T')[0],
+                        time: '—',
+                        price: '—',
+                        paid: 'unpaid',
+                        note: `Ученик добавлен репетитором. Класс: ${this.newStudentForm.class || '—'}, Телефон: ${this.newStudentForm.phone || '—'}, Родитель: ${this.newStudentForm.parent_name || '—'}`
+                    });
+                
+                if (error) {
+                    alert('Ошибка: ' + error.message);
+                    return;
+                }
+                
+                this.newStudentForm = { name: '', class: '', phone: '', parent_name: '' };
+                await this.loadAllStudents();
+                await this.loadDiary();
+                alert('✅ Ученик добавлен!');
+            },
+            
+            async deleteStudent(studentKey) {
+                if (!confirm('Удалить этого ученика и все его занятия?')) return;
+                
+                // Находим все занятия ученика
+                const lessons = this.diaryLessons.filter(l => l.student_name === studentKey);
+                for (const lesson of lessons) {
+                    await supabaseClient
+                        .from('diary_lessons')
+                        .delete()
+                        .eq('id', lesson.id);
+                }
+                
+                await this.loadAllStudents();
+                await this.loadDiary();
+                await this.loadAllBookings();
             },
             
             // ===== УПРАВЛЕНИЕ ЗАПИСЯМИ РОДИТЕЛЕЙ (РЕПЕТИТОР) =====
@@ -1520,6 +1725,7 @@
                 
                 await this.loadDiary();
                 await this.loadAllBookings();
+                await this.loadAllStudents();
                 alert('✅ Занятие добавлено в расписание!');
             },
             
@@ -1527,7 +1733,6 @@
                 const booking = this.allBookings.find(b => b.id === bookingId);
                 if (!booking) return;
                 
-                // Ищем соответствующее занятие в дневнике
                 const diaryLesson = this.diaryLessons.find(
                     l => l.student_name === booking.student_name && 
                          l.date === booking.slot?.date && 
@@ -1553,13 +1758,11 @@
                 if (confirm('Удалить эту запись? Это действие нельзя отменить.')) {
                     const booking = this.allBookings.find(b => b.id === bookingId);
                     if (booking) {
-                        // Удаляем запись
                         await supabaseClient
                             .from('bookings')
                             .delete()
                             .eq('id', bookingId);
                         
-                        // Обновляем слот
                         await supabaseClient
                             .from('slots')
                             .update({ booked: false, student: null })
@@ -1568,6 +1771,7 @@
                     
                     await this.loadAllBookings();
                     await this.loadTutorSlots();
+                    await this.loadAllStudents();
                 }
             },
             
@@ -1610,6 +1814,7 @@
                 
                 await this.loadDiary();
                 await this.loadTutorSlots();
+                await this.loadAllStudents();
             },
             
             async removeDiaryLesson(studentIdx, lessonIdx) {
@@ -1627,6 +1832,7 @@
                     await this.loadDiary();
                     await this.loadTutorSlots();
                     await this.loadAllBookings();
+                    await this.loadAllStudents();
                 }
             },
             
@@ -1661,6 +1867,7 @@
                     await this.loadDiary();
                     await this.loadTutorSlots();
                     await this.loadAllBookings();
+                    await this.loadAllStudents();
                 }
             },
             
@@ -1669,6 +1876,36 @@
                 this.newLessonDate = date;
                 const d = new Date(date);
                 if (!isNaN(d)) this.scheduleDate = d;
+            },
+            
+            // ===== УПРАВЛЕНИЕ В РАСПИСАНИИ =====
+            async toggleSchedulePaid(lessonId) {
+                const lesson = this.diaryLessons.find(l => l.id === lessonId);
+                if (!lesson) return;
+                
+                const newStatus = lesson.paid === 'paid' ? 'unpaid' : 'paid';
+                await supabaseClient
+                    .from('diary_lessons')
+                    .update({ paid: newStatus })
+                    .eq('id', lessonId);
+                
+                await this.loadDiary();
+                await this.loadTutorSlots();
+                await this.loadAllBookings();
+            },
+            
+            async deleteScheduleLesson(lessonId) {
+                if (!confirm('Удалить это занятие?')) return;
+                
+                await supabaseClient
+                    .from('diary_lessons')
+                    .delete()
+                    .eq('id', lessonId);
+                
+                await this.loadDiary();
+                await this.loadTutorSlots();
+                await this.loadAllBookings();
+                await this.loadAllStudents();
             },
             
             // ===== РАСПИСАНИЕ =====
@@ -1743,6 +1980,7 @@
                 await this.loadDiary();
                 await this.loadTutorSlots();
                 await this.loadAllBookings();
+                await this.loadAllStudents();
                 alert(`Скопировано ${lessonsToCopy.length} занятий на ${this.copyTargetDate}`);
             }
         },
@@ -1789,6 +2027,7 @@
                     this.freeSlots = [];
                     this.myBookings = [];
                     this.allBookings = [];
+                    this.allStudents = [];
                     this.diaryStudents = [];
                     this.diaryLessons = [];
                 }
