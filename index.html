@@ -1362,7 +1362,6 @@
                 const result = [];
                 const studentsMap = new Map();
                 
-                // Берем все занятия из diaryLessons для выбранной даты
                 this.diaryLessons.filter(l => l.date === dateStr).forEach(l => {
                     if (!studentsMap.has(l.student_name)) {
                         studentsMap.set(l.student_name, {
@@ -1752,7 +1751,6 @@
                     this.diaryLessons = data || [];
                     console.log('Загружено занятий в дневнике:', this.diaryLessons.length);
                     
-                    // Группируем по ученикам для отображения на выбранную дату
                     const filtered = this.diaryLessons.filter(l => l.date === this.selectedDateStr);
                     const result = [];
                     const studentsMap = new Map();
@@ -1906,7 +1904,7 @@
                 }
             },
             
-            // ===== ЗАПИСЬ РОДИТЕЛЯ (ГЛАВНАЯ ЛОГИКА) =====
+            // ===== ГЛАВНАЯ ЛОГИКА: ЗАПИСЬ РОДИТЕЛЯ =====
             async bookSlot(slot) {
                 const form = slot.bookForm;
                 if (!form.parent_name || !form.parent_phone || !form.student_name) {
@@ -1933,13 +1931,35 @@
                     return;
                 }
                 
-                // 2. Создаем запись в bookings
+                // 2. СОЗДАЕМ ЗАНЯТИЕ В ДНЕВНИКЕ (ГЛАВНОЕ ХРАНИЛИЩЕ!)
+                const { data: diaryData, error: diaryError } = await supabaseClient
+                    .from('diary_lessons')
+                    .insert({
+                        tutor_id: slot.tutor_id,
+                        student_name: form.student_name,
+                        student_class: form.student_class || '',
+                        date: slot.date,
+                        time: slot.time,
+                        price: slot.price,
+                        paid: 'unpaid',
+                        source: 'parent',
+                        note: `${form.note || ''} (Запись от родителя ${form.parent_name}, тел: ${form.parent_phone})`
+                    })
+                    .select();
+                
+                if (diaryError) {
+                    alert('Ошибка создания занятия: ' + diaryError.message);
+                    return;
+                }
+                
+                // 3. СОЗДАЕМ ЗАПИСЬ В BOOKINGS (СВЯЗЬ С РОДИТЕЛЕМ)
                 const { error: bookingError } = await supabaseClient
                     .from('bookings')
                     .insert({
                         slot_id: slot.id,
                         parent_id: user.data.user.id,
                         tutor_id: slot.tutor_id,
+                        diary_lesson_id: diaryData[0].id,
                         parent_name: form.parent_name,
                         parent_phone: form.parent_phone,
                         student_name: form.student_name,
@@ -1949,11 +1969,16 @@
                     });
                 
                 if (bookingError) {
+                    // Откатываем созданное занятие
+                    await supabaseClient
+                        .from('diary_lessons')
+                        .delete()
+                        .eq('id', diaryData[0].id);
                     alert('Ошибка записи: ' + bookingError.message);
                     return;
                 }
                 
-                // 3. Обновляем слот - помечаем как занятый
+                // 4. ОБНОВЛЯЕМ СЛОТ - ПОМЕЧАЕМ КАК ЗАНЯТЫЙ
                 await supabaseClient
                     .from('slots')
                     .update({ 
@@ -1968,7 +1993,7 @@
                     })
                     .eq('id', slot.id);
                 
-                // 4. Сохраняем данные родителя
+                // 5. Сохраняем данные родителя
                 this.saveParentData({
                     parent_name: form.parent_name,
                     parent_phone: form.parent_phone,
@@ -1977,32 +2002,13 @@
                     note: form.note || ''
                 });
                 
-                // 5. ДОБАВЛЯЕМ В ДНЕВНИК (единое расписание)
-                const { error: diaryError } = await supabaseClient
-                    .from('diary_lessons')
-                    .insert({
-                        tutor_id: slot.tutor_id,
-                        student_name: form.student_name,
-                        student_class: form.student_class || '',
-                        date: slot.date,
-                        time: slot.time,
-                        price: slot.price,
-                        paid: 'unpaid',
-                        source: 'parent',
-                        note: `${form.note || ''} (Запись от родителя ${form.parent_name}, тел: ${form.parent_phone})`
-                    });
-                
-                if (diaryError) {
-                    console.error('Ошибка добавления в дневник:', diaryError);
-                }
-                
-                // 6. Обновляем ВСЕ списки
-                await this.loadFreeSlots();      // Свободные слоты (родитель)
-                await this.loadMyBookings();     // Мои записи (родитель)
-                await this.loadAllBookings();    // Все записи (репетитор)
-                await this.loadAllStudents();    // Все ученики
-                await this.loadDiary();          // Дневник (репетитор)
-                await this.loadTutorSlots();     // Слоты (репетитор)
+                // 6. ОБНОВЛЯЕМ ВСЕ СПИСКИ
+                await this.loadFreeSlots();      
+                await this.loadMyBookings();     
+                await this.loadAllBookings();    
+                await this.loadAllStudents();    
+                await this.loadDiary();          
+                await this.loadTutorSlots();     
                 
                 alert('✅ Вы успешно записались! Занятие добавлено в расписание репетитора.');
             },
@@ -2012,28 +2018,25 @@
                 if (confirm('Отменить запись?')) {
                     const booking = this.myBookings.find(b => b.id === bookingId);
                     if (booking) {
-                        // 1. Освобождаем слот
+                        // Удаляем из дневника
+                        await supabaseClient
+                            .from('diary_lessons')
+                            .delete()
+                            .eq('id', booking.diary_lesson_id);
+                        
+                        // Освобождаем слот
                         await supabaseClient
                             .from('slots')
                             .update({ booked: false, student: null })
                             .eq('id', booking.slot_id);
-                        
-                        // 2. Удаляем из дневника
-                        await supabaseClient
-                            .from('diary_lessons')
-                            .delete()
-                            .eq('student_name', booking.student_name)
-                            .eq('date', booking.slot?.date)
-                            .eq('time', booking.slot?.time);
                     }
                     
-                    // 3. Удаляем запись
+                    // Удаляем запись
                     await supabaseClient
                         .from('bookings')
                         .delete()
                         .eq('id', bookingId);
                     
-                    // 4. Обновляем все списки
                     await this.loadMyBookings();
                     await this.loadFreeSlots();
                     await this.loadAllBookings();
@@ -2046,32 +2049,28 @@
             // ===== ОТМЕНА ЗАПИСИ РЕПЕТИТОРОМ =====
             async cancelSlotBooking(slotId) {
                 if (confirm('Отменить запись на этот слот?')) {
-                    // 1. Находим запись в bookings
                     const booking = this.allBookings.find(b => b.slot_id === slotId);
                     
-                    // 2. Освобождаем слот
-                    await supabaseClient
-                        .from('slots')
-                        .update({ booked: false, student: null })
-                        .eq('id', slotId);
-                    
                     if (booking) {
-                        // 3. Удаляем из дневника
+                        // Удаляем из дневника
                         await supabaseClient
                             .from('diary_lessons')
                             .delete()
-                            .eq('student_name', booking.student_name)
-                            .eq('date', booking.slot?.date)
-                            .eq('time', booking.slot?.time);
+                            .eq('id', booking.diary_lesson_id);
                         
-                        // 4. Удаляем запись
+                        // Удаляем запись
                         await supabaseClient
                             .from('bookings')
                             .delete()
                             .eq('id', booking.id);
                     }
                     
-                    // 5. Обновляем все списки
+                    // Освобождаем слот
+                    await supabaseClient
+                        .from('slots')
+                        .update({ booked: false, student: null })
+                        .eq('id', slotId);
+                    
                     await this.loadTutorSlots();
                     await this.loadAllBookings();
                     await this.loadAllStudents();
@@ -2306,13 +2305,11 @@
                 if (!booking) return;
                 
                 const diaryLesson = this.diaryLessons.find(
-                    l => l.student_name === booking.student_name && 
-                         l.date === booking.slot?.date && 
-                         l.time === booking.slot?.time
+                    l => l.id === booking.diary_lesson_id
                 );
                 
                 if (!diaryLesson) {
-                    alert('Занятие не найдено в дневнике. Создайте его сначала.');
+                    alert('Занятие не найдено в дневнике.');
                     return;
                 }
                 
@@ -2343,9 +2340,7 @@
                         await supabaseClient
                             .from('diary_lessons')
                             .delete()
-                            .eq('student_name', booking.student_name)
-                            .eq('date', booking.slot?.date)
-                            .eq('time', booking.slot?.time);
+                            .eq('id', booking.diary_lesson_id);
                     }
                     
                     await this.loadAllBookings();
