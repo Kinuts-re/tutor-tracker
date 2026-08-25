@@ -1185,23 +1185,46 @@
                 </div>
             </div>
         </div>
+                <!-- ===== МОДАЛКА КОПИРОВАНИЯ ===== -->
+        <div v-if="copyModalVisible" class="modal-overlay" @click.self="copyModalVisible = false">
+            <div class="modal-content">
+                <h3><i class="fas fa-copy"></i> Копировать день</h3>
+                <div class="field-group"><label>Исходная дата</label><input type="date" v-model="copySourceDate"></div>
+                <div class="field-group"><label>Целевая дата</label><input type="date" v-model="copyTargetDate"></div>
+                <div class="field-group"><label><i class="fas fa-check-circle"></i> Действие</label>
+                    <select v-model="copyAction"><option value="copy">Копировать все занятия</option><option value="move">Перенести (удалить исходные)</option></select>
+                </div>
+                <div class="modal-actions">
+                    <button class="btn-secondary" @click="copyModalVisible = false">Отмена</button>
+                    <button class="btn-primary" @click="executeCopy"><i class="fas fa-check"></i> Выполнить</button>
+                </div>
+            </div>
+        </div>
+        <div style="
+            text-align: center; 
+            padding: 2rem 0 0.5rem; 
+            margin-top: 2rem; 
+            border-top: 2px solid #e8d9ed; 
+            width: 100%;
+        ">
+            <p style="color: #9a82a2; font-size: 0.75rem; margin-bottom: 0.3rem;">
+                <i class="fas fa-leaf" style="color: #7d5f86;"></i> Ученический сад © 2026
+            </p>
+            <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; font-size: 0.8rem;">
+                <a href="privacy.html" style="color: #7d5f86; text-decoration: none;">
+                    <i class="fas fa-shield-alt"></i> Политика конфиденциальности
+                </a>
+                <span style="color: #dcc7e2;">|</span>
+                <a href="mailto:ваш-email@example.com" style="color: #9a82a2; text-decoration: none;">
+                    <i class="fas fa-envelope"></i> natlumail@mail.ru
+                </a>
+            </div>
+            <p style="font-size: 0.65rem; color: #b5a5ba; margin-top: 0.3rem;">
+                Данные хранятся в Supabase и доступны только авторизованным пользователям
+            </p>
+        </div>
     </template>
 </div>
-        </div>
-<!-- ФУТЕР -->
-<table width="100%" style="max-width:1400px;margin:0 auto;border-top:1px solid #e8d9ed;padding-top:1rem;">
-    <tr>
-        <td align="center" style="padding:1rem 0;font-size:0.75rem;color:#9a82a2;">
-            <i class="fas fa-leaf" style="color:#7d5f86;"></i> Ученический сад © 2026
-            <span style="margin:0 10px;">|</span>
-            <a href="privacy.html" style="color:#7d5f86;text-decoration:none;">Политика конфиденциальности</a>
-            <span style="margin:0 10px;">|</span>
-            <a href="mailto:ваш-email@example.com" style="color:#9a82a2;text-decoration:none;">ваш-email</a>
-            <br>
-            <span style="font-size:0.65rem;color:#b5a5ba;">Данные хранятся в Supabase</span>
-        </td>
-    </tr>
-</table>
 <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
 <script>
     // ==========================================
