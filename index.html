@@ -197,6 +197,8 @@
         .slot-card .actions .btn-delete:hover { background: #eac8c8; }
         .slot-card .actions .btn-add-lesson { background: #c9d4e8; color: #2e3f5a; }
         .slot-card .actions .btn-add-lesson:hover { background: #b5c4dc; }
+        .slot-card .actions .btn-edit-note { background: #d9ebd9; color: #1f5420; }
+        .slot-card .actions .btn-edit-note:hover { background: #c5e0c5; }
 
         .add-slot-form { 
             background: #fcf8fe; 
@@ -231,13 +233,28 @@
         .day-student-name { font-size: 1.5rem; font-weight: 450; color: #3b2740; display: flex; align-items: center; gap: 8px; }
         .day-student-name i { color: #8f6f9a; font-size: 1.3rem; }
         .day-lessons-table-wrap { overflow-x: auto; margin: 0.5rem 0 0.8rem; }
-        .day-lessons-table { width: 100%; border-collapse: collapse; font-size: 0.95rem; min-width: 650px; }
+        .day-lessons-table { width: 100%; border-collapse: collapse; font-size: 0.95rem; min-width: 700px; }
         .day-lessons-table th { text-align: left; padding: 0.7rem 0.6rem 0.7rem 0; font-weight: 500; color: #5b4363; border-bottom: 1px solid #dcc7e2; }
         .day-lessons-table td { padding: 0.8rem 0.6rem 0.8rem 0; border-bottom: 1px dashed #e8d9ed; vertical-align: middle; }
         .day-lessons-table tr:last-child td { border-bottom: none; }
         .status-paid { background: #d9ebd9; color: #1f5420; padding: 0.3rem 1.2rem; border-radius: 60px; font-size: 0.85rem; font-weight: 500; display: inline-block; border: 1px solid #b8d5b8; }
         .status-unpaid { background: #f7e6e6; color: #8a4040; padding: 0.3rem 1.2rem; border-radius: 60px; font-size: 0.85rem; font-weight: 500; display: inline-block; border: 1px solid #eac8c8; }
-        .note-badge { background: #efe6f2; padding: 0.3rem 1rem; border-radius: 30px; font-size: 0.85rem; color: #3f2a44; max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: inline-block; border: 1px solid #dcc7e2; }
+        .note-badge { 
+            background: #efe6f2; 
+            padding: 0.3rem 0.8rem; 
+            border-radius: 30px; 
+            font-size: 0.85rem; 
+            color: #3f2a44; 
+            max-width: 180px; 
+            white-space: nowrap; 
+            overflow: hidden; 
+            text-overflow: ellipsis; 
+            display: inline-block; 
+            border: 1px solid #dcc7e2; 
+            cursor: pointer; 
+            transition: 0.15s;
+        }
+        .note-badge:hover { background: #dcc7e2; }
         .source-badge { 
             font-size: 0.65rem; 
             padding: 0.15rem 0.6rem; 
@@ -291,17 +308,31 @@
             margin-left: 4px;
         }
         .day-lesson .source-badge-small.parent { background: #d9ebd9; color: #1f5420; }
+        .day-lesson .note-text { 
+            font-size: 0.6rem; 
+            color: #6a4e72; 
+            cursor: pointer; 
+            background: #f5f0f7; 
+            padding: 0.05rem 0.3rem; 
+            border-radius: 10px; 
+            display: inline-block;
+            max-width: 80px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .day-lesson .note-text:hover { background: #e8d9ed; }
         .day-lesson-actions { 
-            margin-top: 0.3rem; 
+            margin-top: 0.2rem; 
             display: flex; 
-            gap: 0.3rem; 
+            gap: 0.2rem; 
             flex-wrap: wrap; 
         }
         .day-lesson-actions button { 
-            padding: 0.1rem 0.5rem; 
+            padding: 0.1rem 0.4rem; 
             border-radius: 30px; 
             border: none; 
-            font-size: 0.6rem; 
+            font-size: 0.55rem; 
             cursor: pointer; 
             font-weight: 500;
             transition: 0.15s;
@@ -323,6 +354,13 @@
         }
         .day-lesson-actions .btn-toggle-paid:hover { 
             opacity: 0.8; 
+        }
+        .day-lesson-actions .btn-edit-note-small { 
+            background: #c9d4e8; 
+            color: #2e3f5a; 
+        }
+        .day-lesson-actions .btn-edit-note-small:hover { 
+            background: #b5c4dc; 
         }
         .add-mini { background: transparent; border: 1px dashed #d5bedb; border-radius: 12px; padding: 0.2rem; text-align: center; color: #9a82a2; font-size: 0.7rem; cursor: pointer; margin-top: 0.3rem; transition: 0.1s; }
         .add-mini:hover { background: #efe6f2; border-color: #b48dbd; }
@@ -538,7 +576,8 @@
                     <i class="fas fa-chalkboard-teacher"></i> Репетитор
                 </button>
                 <button :class="{ active: selectedRole === 'parent' }" @click="selectedRole = 'parent'">
-                    <i class="fas fa-user-friends"></i> Родитель                </button>
+                    <i class="fas fa-user-friends"></i> Родитель
+                </button>
             </div>
             
             <div v-if="!showRegister">
@@ -687,7 +726,7 @@
                 </div>
             </div>
 
-            <!-- 2. ДНЕВНИК -->
+            <!-- 2. ДНЕВНИК (С РЕДАКТИРОВАНИЕМ ЗАМЕТКИ) -->
             <div v-if="viewMode === 'diary'">
                 <div class="add-student-section">
                     <div class="field-group">
@@ -756,7 +795,12 @@
                                                 {{ lesson.paid === 'paid' ? '✅ Оплачено' : '❌ Не оплачено' }}
                                             </button>
                                         </td>
-                                        <td><span class="note-badge" :title="lesson.note || '—'">{{ lesson.note || '—' }}</span></td>
+                                        <td>
+                                            <span class="note-badge" :title="lesson.note || '—'" @click="openEditNoteModal(lesson.id, lesson.note || '')">
+                                                {{ lesson.note || '—' }}
+                                                <i class="fas fa-pen" style="font-size:0.6rem;margin-left:4px;opacity:0.6;"></i>
+                                            </span>
+                                        </td>
                                         <td>
                                             <span class="source-badge" :class="lesson.source || 'tutor'">
                                                 {{ lesson.source === 'parent' ? '👨‍👩‍👦 Родитель' : '📝 Репетитор' }}
@@ -841,7 +885,7 @@
                 </div>
             </div>
 
-            <!-- 4. РАСПИСАНИЕ -->
+            <!-- 4. РАСПИСАНИЕ (С РЕДАКТИРОВАНИЕМ ЗАМЕТКИ) -->
             <div v-if="viewMode === 'schedule'">
                 <div class="tabs" style="margin-bottom:1rem;">
                     <button class="tab-btn" :class="{ active: scheduleView === 'day' }" @click="scheduleView = 'day'">
@@ -891,7 +935,7 @@
                                             <th>Статус</th>
                                             <th>Заметка</th>
                                             <th>Источник</th>
-                                            <th style="width:130px;">Действия</th>
+                                            <th style="width:160px;">Действия</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -903,7 +947,12 @@
                                                 <span v-if="lesson.paid === 'paid'" class="status-paid"><i class="fas fa-check-circle"></i> оплачено</span>
                                                 <span v-else class="status-unpaid"><i class="fas fa-exclamation-circle"></i> не оплачено</span>
                                             </td>
-                                            <td><span class="note-badge" :title="lesson.note || '—'">{{ lesson.note || '—' }}</span></td>
+                                            <td>
+                                                <span class="note-badge" :title="lesson.note || '—'" @click="openEditNoteModal(lesson.id, lesson.note || '')">
+                                                    {{ lesson.note || '—' }}
+                                                    <i class="fas fa-pen" style="font-size:0.6rem;margin-left:4px;opacity:0.6;"></i>
+                                                </span>
+                                            </td>
                                             <td>
                                                 <span class="source-badge" :class="lesson.source || 'tutor'">
                                                     {{ lesson.source === 'parent' ? '👨‍👩‍👦 Родитель' : '📝 Репетитор' }}
@@ -913,6 +962,9 @@
                                                 <div style="display:flex;gap:0.3rem;flex-wrap:wrap;">
                                                     <button class="btn-icon" @click="toggleSchedulePaid(lesson.id)" title="Сменить оплату">
                                                         <i class="fas fa-sync-alt"></i>
+                                                    </button>
+                                                    <button class="btn-icon" @click="openEditNoteModal(lesson.id, lesson.note || '')" title="Редактировать заметку">
+                                                        <i class="fas fa-edit" style="color:#4a7d8c;"></i>
                                                     </button>
                                                     <button class="btn-icon" @click="deleteScheduleLesson(lesson.id)" title="Удалить занятие">
                                                         <i class="fas fa-trash" style="color:#a079aa;"></i>
@@ -927,7 +979,7 @@
                     </div>
                 </div>
 
-                <!-- НЕДЕЛЯ -->
+                <!-- НЕДЕЛЯ (С РЕДАКТИРОВАНИЕМ ЗАМЕТКИ) -->
                 <div v-if="scheduleView === 'week'">
                     <div class="week-grid">
                         <div v-for="day in weekDays" :key="day.date" class="day-cell" :class="{ today: day.isToday }">
@@ -950,11 +1002,18 @@
                                     </span>
                                     <span style="font-size:0.6rem;color:#7f5f89;">{{ lesson.student_class || '' }}</span>
                                 </div>
-                                <div style="font-size:0.65rem;color:#6a4e72;">{{ lesson.note || '' }}</div>
+                                <div>
+                                    <span class="note-text" @click="openEditNoteModal(lesson.id, lesson.note || '')" :title="lesson.note || 'Нажмите для редактирования'">
+                                        {{ lesson.note || '📝' }}
+                                    </span>
+                                </div>
                                 <div class="day-lesson-actions">
                                     <button class="btn-toggle-paid" :class="lesson.paid === 'paid' ? '' : 'unpaid'" 
                                             @click="toggleSchedulePaid(lesson.id)">
                                         {{ lesson.paid === 'paid' ? '✅' : '❌' }}
+                                    </button>
+                                    <button class="btn-edit-note-small" @click="openEditNoteModal(lesson.id, lesson.note || '')">
+                                        <i class="fas fa-edit"></i>
                                     </button>
                                     <button class="btn-delete-lesson" @click="deleteScheduleLesson(lesson.id)">
                                         <i class="fas fa-trash"></i>
@@ -966,7 +1025,7 @@
                     </div>
                 </div>
 
-                <!-- МЕСЯЦ -->
+                <!-- МЕСЯЦ (С РЕДАКТИРОВАНИЕМ ЗАМЕТКИ) -->
                 <div v-if="scheduleView === 'month'">
                     <div class="month-grid">
                         <div v-for="day in monthDays" :key="day.date" class="day-cell" :class="{ today: day.isToday, 'other-month': !day.isCurrentMonth }">
@@ -993,6 +1052,9 @@
                                             @click="toggleSchedulePaid(lesson.id)">
                                         {{ lesson.paid === 'paid' ? '✅' : '❌' }}
                                     </button>
+                                    <button class="btn-edit-note-small" @click="openEditNoteModal(lesson.id, lesson.note || '')">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
                                     <button class="btn-delete-lesson" @click="deleteScheduleLesson(lesson.id)">
                                         <i class="fas fa-trash"></i>
                                     </button>
@@ -1004,7 +1066,7 @@
                 </div>
             </div>
 
-            <!-- 5. ЗАПИСИ РОДИТЕЛЕЙ (БЕЗ КНОПКИ ДОБАВИТЬ ЗАНЯТИЕ) -->
+            <!-- 5. ЗАПИСИ РОДИТЕЛЕЙ (С РЕДАКТИРОВАНИЕМ ЗАМЕТКИ) -->
             <div v-if="viewMode === 'bookings'">
                 <div style="margin-bottom:1rem;color:#6a4e72;">
                     <i class="fas fa-info-circle"></i> Управление записями родителей
@@ -1020,7 +1082,12 @@
                             <div>🏫 {{ booking.student_class || '—' }}</div>
                             <div>📞 {{ booking.parent_phone || '—' }}</div>
                             <div style="font-size:0.8rem;color:#6a4e72;">Родитель: {{ booking.parent_name || '' }}</div>
-                            <div style="font-size:0.8rem;color:#6a4e72;">📝 {{ booking.note || '—' }}</div>
+                            <div style="font-size:0.8rem;color:#6a4e72;">
+                                📝 <span class="note-badge" :title="booking.note || '—'" @click="openEditNoteModal(booking.id, booking.note || '', 'booking')">
+                                    {{ booking.note || '—' }}
+                                    <i class="fas fa-pen" style="font-size:0.6rem;margin-left:4px;opacity:0.6;"></i>
+                                </span>
+                            </div>
                         </div>
                         
                         <div class="booking-controls">
@@ -1030,6 +1097,9 @@
                             <button class="paid-status" :class="booking.paid_status === 'paid' ? 'paid' : 'unpaid'" 
                                     @click="toggleBookingPaid(booking.id)">
                                 {{ booking.paid_status === 'paid' ? '✅ Оплачено' : '❌ Не оплачено' }}
+                            </button>
+                            <button class="btn-edit-note" @click="openEditNoteModal(booking.id, booking.note || '', 'booking')">
+                                <i class="fas fa-edit"></i> Заметка
                             </button>
                             <button class="btn-delete" @click="deleteBooking(booking.id)" title="Удалить запись">
                                 <i class="fas fa-trash"></i>
@@ -1154,7 +1224,22 @@
             </div>
         </template>
 
-        <!-- МОДАЛКИ -->
+        <!-- МОДАЛКА РЕДАКТИРОВАНИЯ ЗАМЕТКИ -->
+        <div v-if="editNoteModalVisible" class="modal-overlay" @click.self="editNoteModalVisible = false">
+            <div class="modal-content">
+                <h3><i class="fas fa-pen-fancy"></i> Редактировать заметку</h3>
+                <div class="field-group">
+                    <label>Заметка</label>
+                    <textarea v-model="editNoteText" rows="3" style="width:100%;padding:0.8rem;border-radius:20px;border:1px solid #dcc7e2;font-size:0.95rem;font-family:inherit;resize:vertical;" placeholder="Введите заметку..."></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button class="btn-secondary" @click="editNoteModalVisible = false">Отмена</button>
+                    <button class="btn-primary" @click="saveNoteEdit"><i class="fas fa-check"></i> Сохранить</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- МОДАЛКА КОПИРОВАНИЯ -->
         <div v-if="copyModalVisible" class="modal-overlay" @click.self="copyModalVisible = false">
             <div class="modal-content">
                 <h3><i class="fas fa-copy"></i> Копировать день</h3>
@@ -1240,6 +1325,12 @@
             editingStudentIndex: -1,
             
             savedParentData: null,
+            
+            // Редактирование заметки
+            editNoteModalVisible: false,
+            editNoteId: null,
+            editNoteText: '',
+            editNoteType: 'diary', // 'diary' или 'booking'
             
             copyModalVisible: false,
             copySourceDate: '',
@@ -1911,7 +2002,6 @@
                     return;
                 }
                 
-                // 1. Создаем запись в bookings
                 const { error } = await supabaseClient
                     .from('bookings')
                     .insert({
@@ -1931,7 +2021,6 @@
                     return;
                 }
                 
-                // 2. Обновляем слот
                 await supabaseClient
                     .from('slots')
                     .update({ 
@@ -1946,7 +2035,6 @@
                     })
                     .eq('id', slot.id);
                 
-                // 3. Сохраняем данные родителя
                 this.saveParentData({
                     parent_name: form.parent_name,
                     parent_phone: form.parent_phone,
@@ -1955,7 +2043,6 @@
                     note: form.note || ''
                 });
                 
-                // 4. Добавляем в дневник репетитора
                 const { error: diaryError } = await supabaseClient
                     .from('diary_lessons')
                     .insert({
@@ -1974,7 +2061,6 @@
                     console.error('Ошибка добавления в дневник:', diaryError);
                 }
                 
-                // 5. Обновляем все списки
                 await this.loadFreeSlots();
                 await this.loadMyBookings();
                 await this.loadAllBookings();
@@ -2235,7 +2321,65 @@
                 await this.loadAllStudents();
             },
             
-            // ===== УПРАВЛЕНИЕ ЗАПИСЯМИ РОДИТЕЛЕЙ (РЕПЕТИТОР) =====
+            // ===== РЕДАКТИРОВАНИЕ ЗАМЕТКИ =====
+            openEditNoteModal(id, currentNote, type = 'diary') {
+                this.editNoteId = id;
+                this.editNoteText = currentNote || '';
+                this.editNoteType = type || 'diary';
+                this.editNoteModalVisible = true;
+            },
+            
+            async saveNoteEdit() {
+                if (!this.editNoteId) return;
+                
+                try {
+                    if (this.editNoteType === 'booking') {
+                        // Обновляем заметку в bookings
+                        await supabaseClient
+                            .from('bookings')
+                            .update({ note: this.editNoteText })
+                            .eq('id', this.editNoteId);
+                        
+                        // Также обновляем в diary_lessons если есть
+                        const booking = this.allBookings.find(b => b.id === this.editNoteId);
+                        if (booking) {
+                            const diaryLesson = this.diaryLessons.find(
+                                l => l.student_name === booking.student_name && 
+                                     l.date === booking.slot?.date && 
+                                     l.time === booking.slot?.time
+                            );
+                            if (diaryLesson) {
+                                await supabaseClient
+                                    .from('diary_lessons')
+                                    .update({ note: this.editNoteText })
+                                    .eq('id', diaryLesson.id);
+                            }
+                        }
+                    } else {
+                        // Обновляем заметку в diary_lessons
+                        await supabaseClient
+                            .from('diary_lessons')
+                            .update({ note: this.editNoteText })
+                            .eq('id', this.editNoteId);
+                    }
+                    
+                    this.editNoteModalVisible = false;
+                    this.editNoteId = null;
+                    this.editNoteText = '';
+                    
+                    // Обновляем все данные
+                    await this.loadDiary();
+                    await this.loadAllBookings();
+                    await this.loadTutorSlots();
+                    
+                    alert('✅ Заметка обновлена!');
+                } catch (e) {
+                    console.error('Ошибка сохранения заметки:', e);
+                    alert('Ошибка сохранения заметки');
+                }
+            },
+            
+            // ===== УПРАВЛЕНИЕ ЗАПИСЯМИ РОДИТЕЛЕЙ =====
             async toggleBookingPaid(bookingId) {
                 const booking = this.allBookings.find(b => b.id === bookingId);
                 if (!booking) return;
@@ -2247,7 +2391,6 @@
                 );
                 
                 if (!diaryLesson) {
-                    // Если нет занятия в дневнике, создаем его
                     const user = await supabaseClient.auth.getUser();
                     const { error } = await supabaseClient
                         .from('diary_lessons')
