@@ -195,6 +195,8 @@
         .slot-card .actions .btn-cancel:hover { background: #dcbfe2; }
         .slot-card .actions .btn-delete { background: #f7e6e6; color: #8a4040; }
         .slot-card .actions .btn-delete:hover { background: #eac8c8; }
+        .slot-card .actions .btn-add-lesson { background: #c9d4e8; color: #2e3f5a; }
+        .slot-card .actions .btn-add-lesson:hover { background: #b5c4dc; }
 
         .add-slot-form { 
             background: #fcf8fe; 
@@ -216,11 +218,12 @@
         .btn-primary:hover { background: #a47bae; transform: scale(0.98); }
         .btn-danger { background: #e9d4ed; border: 1px solid #d5b8dc; color: #55335e; padding: 0.3rem 0.8rem; border-radius: 40px; font-size: 0.75rem; font-weight: 500; cursor: pointer; transition: 0.15s; display: inline-flex; align-items: center; gap: 4px; }
         .btn-danger:hover { background: #dcbfe2; }
+        .btn-icon { background: transparent; border: none; color: #7f5f89; font-size: 0.9rem; cursor: pointer; padding: 0 4px; }
+        .btn-icon:hover { color: #4a2e4f; }
 
         .no-data { text-align: center; padding: 3rem; color: #9a82a2; background: #fcf8fe; border-radius: 40px; border: 1px dashed #dcc7e2; }
         .no-data i { font-size: 2.4rem; opacity: 0.5; display: block; margin-bottom: 0.5rem; }
 
-        /* Стили для дневника учеников */
         .day-students-grid { display: flex; flex-direction: column; gap: 1.5rem; }
         .day-student-card { background: #fcf8fe; border-radius: 30px; padding: 1.5rem 2rem; border: 1px solid #decbe3; box-shadow: 0 6px 14px -6px rgba(130, 90, 145, 0.12); transition: 0.15s; }
         .day-student-card:hover { border-color: #cbafd3; }
@@ -252,7 +255,6 @@
         .add-student-section input, .add-student-section select { background: white; border: 1px solid #dcc7e2; border-radius: 40px; padding: 0.6rem 1rem; font-size: 0.9rem; color: #2e1f32; outline: none; width: 100%; }
         .add-student-section input:focus, .add-student-section select:focus { border-color: #b48dbd; box-shadow: 0 0 0 3px rgba(180, 130, 190, 0.2); }
 
-        /* Стили для недели и месяца */
         .week-grid, .month-grid { display: grid; gap: 0.8rem; margin-top: 1rem; }
         .week-grid { grid-template-columns: repeat(7, 1fr); }
         .month-grid { grid-template-columns: repeat(7, 1fr); }
@@ -282,6 +284,16 @@
         .modal-actions { display: flex; gap: 0.8rem; margin-top: 1.5rem; justify-content: flex-end; flex-wrap: wrap; }
         .modal-actions .btn-secondary { background: #efe6f2; border: 1px solid #d5bedb; border-radius: 40px; padding: 0.5rem 1.5rem; cursor: pointer; }
         .modal-actions .btn-secondary:hover { background: #dcc7e2; }
+
+        .cancel-error { 
+            background: #f7e6e6; 
+            color: #8a4040; 
+            padding: 0.5rem 1rem; 
+            border-radius: 30px; 
+            font-size: 0.85rem; 
+            margin-top: 0.5rem;
+            border: 1px solid #eac8c8;
+        }
 
         @media (max-width: 768px) {
             .app-container { padding: 1rem; }
@@ -350,7 +362,7 @@
                     <label><i class="fas fa-user-tag"></i> Кто вы?</label>
                     <select v-model="selectedRole" style="width:100%;padding:0.8rem 1.2rem;border-radius:60px;border:1px solid #dcc7e2;font-size:1rem;outline:none;background:white;">
                         <option value="tutor">👩‍🏫 Репетитор</option>
-                        <option value="parent">👨‍👩‍👦 Родитель</option>
+                        <option value="parent" selected>👨‍👩‍👦 Родитель</option>
                     </select>
                 </div>
                 <button class="btn-primary" @click="register" style="background:#a47bae;"><i class="fas fa-user-plus"></i> Зарегистрироваться</button>
@@ -382,7 +394,7 @@
             </span>
         </div>
 
-        <!-- ===== ВКЛАДКИ ДЛЯ РЕПЕТИТОРА ===== -->
+        <!-- Вкладки для репетитора -->
         <div v-if="userRole === 'tutor'" class="tabs">
             <button class="tab-btn" :class="{ active: viewMode === 'slots' }" @click="viewMode = 'slots'">
                 <i class="fas fa-clock"></i> Слоты
@@ -396,9 +408,12 @@
             <button class="tab-btn" :class="{ active: viewMode === 'schedule' }" @click="viewMode = 'schedule'">
                 <i class="fas fa-calendar-alt"></i> Расписание
             </button>
+            <button class="tab-btn" :class="{ active: viewMode === 'bookings' }" @click="viewMode = 'bookings'">
+                <i class="fas fa-calendar-check"></i> Записи родителей
+            </button>
         </div>
 
-        <!-- ===== ВКЛАДКИ ДЛЯ РОДИТЕЛЯ ===== -->
+        <!-- Вкладки для родителя -->
         <div v-else class="tabs">
             <button class="tab-btn" :class="{ active: viewMode === 'slots' }" @click="viewMode = 'slots'">
                 <i class="fas fa-clock"></i> Свободные слоты
@@ -408,12 +423,9 @@
             </button>
         </div>
 
-        <!-- ============================================ -->
         <!-- ===== РЕЖИМ РЕПЕТИТОРА ===== -->
-        <!-- ============================================ -->
         <template v-if="userRole === 'tutor'">
-            
-            <!-- 1. СЛОТЫ ДЛЯ РОДИТЕЛЕЙ -->
+            <!-- 1. СЛОТЫ -->
             <div v-if="viewMode === 'slots'">
                 <div class="add-slot-form">
                     <div class="field-group">
@@ -441,8 +453,9 @@
                         </span>
                         <div v-if="slot.booked && slot.student" class="student-info">
                             <div><strong>👤 {{ slot.student.name }}</strong></div>
-                            <div>{{ slot.student.class || '' }}</div>
-                            <div>📞 {{ slot.student.phone || '' }}</div>
+                            <div>📞 {{ slot.student.parent_phone || slot.student.phone || '' }}</div>
+                            <div>🏫 {{ slot.student.class || '' }}</div>
+                            <div style="font-size:0.8rem;color:#6a4e72;">Родитель: {{ slot.student.parent_name || '' }}</div>
                         </div>
                         <div class="actions">
                             <button v-if="!slot.booked" class="btn-delete" @click="deleteSlot(slot.id)">
@@ -460,7 +473,7 @@
                 </div>
             </div>
 
-            <!-- 2. ДНЕВНИК ЗАНЯТИЙ -->
+            <!-- 2. ДНЕВНИК -->
             <div v-if="viewMode === 'diary'">
                 <div class="add-student-section">
                     <div class="field-group"><label><i class="fas fa-user-graduate"></i> Ученик</label><input v-model="newStudentName" placeholder="Имя"></div>
@@ -514,7 +527,7 @@
                         <div style="font-size:1.2rem;font-weight:500;">
                             <i class="fas fa-user-circle"></i> {{ student.name }}
                         </div>
-                        <div>📞 {{ student.phone || '—' }}</div>
+                        <div>📞 {{ student.parent_phone || student.phone || '—' }}</div>
                         <div>🏫 {{ student.class || '—' }}</div>
                         <div style="margin-top:0.5rem;font-size:0.9rem;color:#6a4e72;">
                             Всего занятий: {{ student.totalLessons || 0 }}
@@ -527,9 +540,8 @@
                 </div>
             </div>
 
-            <!-- 4. РАСПИСАНИЕ (ДЕНЬ/НЕДЕЛЯ/МЕСЯЦ) -->
+            <!-- 4. РАСПИСАНИЕ -->
             <div v-if="viewMode === 'schedule'">
-                <!-- Переключатель вида -->
                 <div class="tabs" style="margin-bottom:1rem;">
                     <button class="tab-btn" :class="{ active: scheduleView === 'day' }" @click="scheduleView = 'day'">
                         <i class="fas fa-day"></i> День
@@ -545,7 +557,6 @@
                     </button>
                 </div>
 
-                <!-- Навигация -->
                 <div class="calendar-nav">
                     <div class="nav-group">
                         <button class="btn-circle" @click="changeSchedulePeriod(-1)"><i class="fas fa-chevron-left"></i></button>
@@ -620,11 +631,42 @@
                     </div>
                 </div>
             </div>
+
+            <!-- 5. ЗАПИСИ РОДИТЕЛЕЙ (НОВАЯ ВКЛАДКА) -->
+            <div v-if="viewMode === 'bookings'">
+                <div style="margin-bottom:1rem;color:#6a4e72;">
+                    <i class="fas fa-info-circle"></i> Здесь вы можете добавлять занятия для зарегистрированных родителей, чтобы заполнить расписание на будущее
+                </div>
+                <div class="slots-grid" v-if="allBookings.length > 0">
+                    <div v-for="booking in allBookings" :key="booking.id" class="slot-card" :class="{ booked: true }">
+                        <div class="time">{{ booking.slot?.time || '—' }}</div>
+                        <div>{{ booking.slot?.date || '—' }}</div>
+                        <div style="font-weight:500;">{{ booking.slot?.price || '—' }}</div>
+                        <span class="status booked">📕 Записано</span>
+                        <div class="student-info">
+                            <div><strong>👤 {{ booking.student_name }}</strong></div>
+                            <div>🏫 {{ booking.student_class || '—' }}</div>
+                            <div>📞 {{ booking.parent_phone || '—' }}</div>
+                            <div style="font-size:0.8rem;color:#6a4e72;">Родитель: {{ booking.parent_name || '' }}</div>
+                        </div>
+                        <div class="actions">
+                            <button class="btn-add-lesson" @click="openAddLessonModal(booking)">
+                                <i class="fas fa-plus"></i> Добавить занятие
+                            </button>
+                            <button class="btn-cancel" @click="cancelBooking(booking.slot_id)">
+                                <i class="fas fa-times"></i> Отменить запись
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div v-else class="no-data">
+                    <i class="fas fa-calendar-check"></i>
+                    <p>Нет записей от родителей</p>
+                </div>
+            </div>
         </template>
 
-        <!-- ============================================ -->
         <!-- ===== РЕЖИМ РОДИТЕЛЯ ===== -->
-        <!-- ============================================ -->
         <template v-else>
             <!-- Свободные слоты -->
             <div v-if="viewMode === 'slots'">
@@ -639,14 +681,27 @@
                         <span class="status free">📗 Свободно</span>
                         
                         <div v-if="slot.showBookingForm" style="margin-top:1rem;padding-top:1rem;border-top:1px dashed #dcc7e2;">
-                            <div class="field-group" style="margin-bottom:0.5rem;">
-                                <input type="text" v-model="slot.bookForm.name" placeholder="Имя ученика *" style="width:100%;padding:0.5rem;border-radius:40px;border:1px solid #dcc7e2;">
+                            <div style="margin-bottom:0.8rem;font-size:0.9rem;color:#5e4166;">
+                                <i class="fas fa-info-circle"></i> Данные родителя
                             </div>
                             <div class="field-group" style="margin-bottom:0.5rem;">
-                                <input type="text" v-model="slot.bookForm.class" placeholder="Класс" style="width:100%;padding:0.5rem;border-radius:40px;border:1px solid #dcc7e2;">
+                                <label style="font-size:0.8rem;color:#5e4166;">Имя родителя *</label>
+                                <input type="text" v-model="slot.bookForm.parent_name" placeholder="Например: Анна" style="width:100%;padding:0.5rem;border-radius:40px;border:1px solid #dcc7e2;">
                             </div>
                             <div class="field-group" style="margin-bottom:0.5rem;">
-                                <input type="text" v-model="slot.bookForm.phone" placeholder="Телефон *" style="width:100%;padding:0.5rem;border-radius:40px;border:1px solid #dcc7e2;">
+                                <label style="font-size:0.8rem;color:#5e4166;">Телефон родителя *</label>
+                                <input type="text" v-model="slot.bookForm.parent_phone" placeholder="+7 999 123-45-67" style="width:100%;padding:0.5rem;border-radius:40px;border:1px solid #dcc7e2;">
+                            </div>
+                            <div style="margin-bottom:0.8rem;font-size:0.9rem;color:#5e4166;border-top:1px dashed #e8d9ed;padding-top:0.8rem;">
+                                <i class="fas fa-user-graduate"></i> Данные ученика
+                            </div>
+                            <div class="field-group" style="margin-bottom:0.5rem;">
+                                <label style="font-size:0.8rem;color:#5e4166;">Имя ученика *</label>
+                                <input type="text" v-model="slot.bookForm.student_name" placeholder="Например: Мария" style="width:100%;padding:0.5rem;border-radius:40px;border:1px solid #dcc7e2;">
+                            </div>
+                            <div class="field-group" style="margin-bottom:0.5rem;">
+                                <label style="font-size:0.8rem;color:#5e4166;">Класс ученика</label>
+                                <input type="text" v-model="slot.bookForm.student_class" placeholder="Например: 7А" style="width:100%;padding:0.5rem;border-radius:40px;border:1px solid #dcc7e2;">
                             </div>
                             <div style="display:flex;gap:0.5rem;">
                                 <button class="btn-primary" @click="bookSlot(slot)" style="flex:1;justify-content:center;padding:0.5rem;">
@@ -681,12 +736,22 @@
                         <div class="student-info">
                             <div><strong>👤 {{ booking.student_name }}</strong></div>
                             <div>🏫 {{ booking.student_class || '—' }}</div>
-                            <div>📞 {{ booking.student_phone || '—' }}</div>
+                            <div>📞 {{ booking.parent_phone || '—' }}</div>
                         </div>
                         <div class="actions">
-                            <button class="btn-cancel" @click="cancelMyBooking(booking.id)">
-                                <i class="fas fa-times"></i> Отменить запись
-                            </button>
+                            <!-- Проверяем, можно ли отменить занятие -->
+                            <div v-if="canCancelBooking(booking)">
+                                <button class="btn-cancel" @click="cancelMyBooking(booking.id)">
+                                    <i class="fas fa-times"></i> Отменить запись
+                                </button>
+                            </div>
+                            <div v-else>
+                                <div class="cancel-error">
+                                    <i class="fas fa-exclamation-circle"></i> 
+                                    Занятия уже нельзя отменить, свяжитесь со мной по телефону 
+                                    <strong>+7 999 123-45-67</strong>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -696,6 +761,29 @@
                 </div>
             </div>
         </template>
+
+        <!-- МОДАЛКА ДОБАВЛЕНИЯ ЗАНЯТИЯ ДЛЯ РОДИТЕЛЯ -->
+        <div v-if="addLessonModalVisible" class="modal-overlay" @click.self="addLessonModalVisible = false">
+            <div class="modal-content">
+                <h3><i class="fas fa-plus-circle"></i> Добавить занятие для {{ selectedBooking?.student_name }}</h3>
+                <div class="field-group">
+                    <label><i class="fas fa-calendar-day"></i> Дата занятия</label>
+                    <input type="date" v-model="newBookingLessonDate">
+                </div>
+                <div class="field-group">
+                    <label><i class="far fa-clock"></i> Время</label>
+                    <input type="text" v-model="newBookingLessonTime" placeholder="15:00–16:30">
+                </div>
+                <div class="field-group">
+                    <label><i class="fas fa-coins"></i> Стоимость</label>
+                    <input type="text" v-model="newBookingLessonPrice" placeholder="1500 ₽">
+                </div>
+                <div class="modal-actions">
+                    <button class="btn-secondary" @click="addLessonModalVisible = false">Отмена</button>
+                    <button class="btn-primary" @click="addLessonForParent"><i class="fas fa-check"></i> Добавить</button>
+                </div>
+            </div>
+        </div>
 
         <!-- МОДАЛКА КОПИРОВАНИЯ -->
         <div v-if="copyModalVisible" class="modal-overlay" @click.self="copyModalVisible = false">
@@ -733,7 +821,7 @@
             isLoggedIn: false,
             userEmail: '',
             userRole: 'parent',
-            selectedRole: 'tutor',
+            selectedRole: 'parent',
             loginEmail: '',
             loginPassword: '',
             loginError: '',
@@ -747,6 +835,7 @@
             tutorSlots: [],
             freeSlots: [],
             myBookings: [],
+            allBookings: [],
             myStudents: [],
             
             // Дневник
@@ -772,14 +861,23 @@
             newLessonPaid: 'paid',
             newLessonNote: '',
             
+            // Форма добавления занятия для родителей
+            addLessonModalVisible: false,
+            selectedBooking: null,
+            newBookingLessonDate: '',
+            newBookingLessonTime: '',
+            newBookingLessonPrice: '',
+            
             // Копирование
             copyModalVisible: false,
             copySourceDate: '',
             copyTargetDate: '',
-            copyAction: 'copy'
+            copyAction: 'copy',
+            
+            // Телефон репетитора для сообщения
+            tutorPhone: '+7 952 246-81-85'
         },
         computed: {
-            // Для дневника
             formattedSelectedDate() {
                 const d = this.scheduleDate; 
                 return `${String(d.getDate()).padStart(2,'0')}.${String(d.getMonth()+1).padStart(2,'0')}.${d.getFullYear()}`;
@@ -788,8 +886,6 @@
                 const d = this.scheduleDate; 
                 return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
             },
-            
-            // Для расписания
             formattedScheduleDate() {
                 const d = this.scheduleDate; 
                 return `${String(d.getDate()).padStart(2,'0')}.${String(d.getMonth()+1).padStart(2,'0')}.${d.getFullYear()}`;
@@ -995,6 +1091,7 @@
                 this.tutorSlots = [];
                 this.freeSlots = [];
                 this.myBookings = [];
+                this.allBookings = [];
                 this.myStudents = [];
                 this.diaryStudents = [];
                 this.diaryLessons = [];
@@ -1007,6 +1104,7 @@
                     await this.loadTutorSlots();
                     await this.loadStudents();
                     await this.loadDiary();
+                    await this.loadAllBookings();
                     this.viewMode = 'slots';
                 } else {
                     await this.loadFreeSlots();
@@ -1036,7 +1134,7 @@
                     const user = await supabaseClient.auth.getUser();
                     const { data, error } = await supabaseClient
                         .from('bookings')
-                        .select('student_name, student_class, student_phone, created_at')
+                        .select('student_name, student_class, parent_phone, created_at')
                         .eq('tutor_id', user.data.user.id)
                         .order('created_at', { ascending: false });
                     
@@ -1044,11 +1142,11 @@
                     
                     const studentsMap = new Map();
                     (data || []).forEach(b => {
-                        const key = b.student_name + b.student_phone;
+                        const key = b.student_name + b.parent_phone;
                         if (!studentsMap.has(key)) {
                             studentsMap.set(key, {
                                 name: b.student_name,
-                                phone: b.student_phone || '—',
+                                phone: b.parent_phone || '—',
                                 class: b.student_class || '—',
                                 totalLessons: 0
                             });
@@ -1074,7 +1172,6 @@
                     
                     this.diaryLessons = data || [];
                     
-                    // Фильтруем для отображения на выбранную дату
                     const filtered = this.diaryLessons.filter(l => l.date === this.selectedDateStr);
                     const result = [];
                     const studentsMap = new Map();
@@ -1096,6 +1193,22 @@
                     
                 } catch (e) {
                     console.error('Ошибка загрузки дневника:', e);
+                }
+            },
+            
+            async loadAllBookings() {
+                try {
+                    const user = await supabaseClient.auth.getUser();
+                    const { data, error } = await supabaseClient
+                        .from('bookings')
+                        .select('*, slot:slots(*)')
+                        .eq('tutor_id', user.data.user.id)
+                        .order('created_at', { ascending: false });
+                    
+                    if (error) throw error;
+                    this.allBookings = data || [];
+                } catch (e) {
+                    console.error('Ошибка загрузки записей:', e);
                 }
             },
             
@@ -1128,7 +1241,12 @@
                     this.freeSlots = (data || []).map(s => ({
                         ...s,
                         showBookingForm: false,
-                        bookForm: { name: '', class: '', phone: '' }
+                        bookForm: { 
+                            parent_name: '',
+                            parent_phone: '',
+                            student_name: '',
+                            student_class: ''
+                        }
                     }));
                 } catch (e) {
                     console.error('Ошибка загрузки свободных слотов:', e);
@@ -1200,14 +1318,15 @@
                         .eq('id', slotId);
                     
                     await this.loadTutorSlots();
+                    await this.loadAllBookings();
                 }
             },
             
             // ===== ЗАПИСЬ РОДИТЕЛЯ =====
             async bookSlot(slot) {
                 const form = slot.bookForm;
-                if (!form.name || !form.phone) {
-                    alert('Заполните имя и телефон');
+                if (!form.parent_name || !form.parent_phone || !form.student_name) {
+                    alert('Заполните имя и телефон родителя, а также имя ученика');
                     return;
                 }
                 const user = await supabaseClient.auth.getUser();
@@ -1218,9 +1337,10 @@
                         slot_id: slot.id,
                         parent_id: user.data.user.id,
                         tutor_id: slot.tutor_id,
-                        student_name: form.name,
-                        student_class: form.class || '',
-                        student_phone: form.phone
+                        parent_name: form.parent_name,
+                        parent_phone: form.parent_phone,
+                        student_name: form.student_name,
+                        student_class: form.student_class || ''
                     });
                 
                 if (error) {
@@ -1233,15 +1353,17 @@
                     .update({ 
                         booked: true, 
                         student: { 
-                            name: form.name, 
-                            class: form.class || '', 
-                            phone: form.phone 
+                            name: form.student_name,
+                            class: form.student_class || '',
+                            parent_name: form.parent_name,
+                            parent_phone: form.parent_phone
                         } 
                     })
                     .eq('id', slot.id);
                 
                 await this.loadFreeSlots();
                 await this.loadMyBookings();
+                await this.loadAllBookings();
                 alert('✅ Вы успешно записались!');
             },
             
@@ -1262,7 +1384,80 @@
                     
                     await this.loadMyBookings();
                     await this.loadFreeSlots();
+                    await this.loadAllBookings();
                 }
+            },
+            
+            // ===== ПРОВЕРКА ОТМЕНЫ ДЛЯ РОДИТЕЛЕЙ =====
+            canCancelBooking(booking) {
+                if (!booking.slot) return false;
+                try {
+                    // Парсим дату и время из слота
+                    const dateParts = booking.slot.date.split('-');
+                    const timeParts = booking.slot.time.split('–')[0].trim().split(':');
+                    
+                    const lessonDateTime = new Date(
+                        parseInt(dateParts[0]),
+                        parseInt(dateParts[1]) - 1,
+                        parseInt(dateParts[2]),
+                        parseInt(timeParts[0]),
+                        parseInt(timeParts[1] || 0)
+                    );
+                    
+                    const now = new Date();
+                    const diffHours = (lessonDateTime - now) / (1000 * 60 * 60);
+                    
+                    // Можно отменить если больше 1 часа до начала
+                    return diffHours > 1;
+                } catch (e) {
+                    console.error('Ошибка проверки времени:', e);
+                    return false;
+                }
+            },
+            
+            // ===== ДОБАВЛЕНИЕ ЗАНЯТИЯ ДЛЯ РОДИТЕЛЯ =====
+            openAddLessonModal(booking) {
+                this.selectedBooking = booking;
+                this.newBookingLessonDate = booking.slot?.date || '';
+                this.newBookingLessonTime = booking.slot?.time || '';
+                this.newBookingLessonPrice = booking.slot?.price || '';
+                this.addLessonModalVisible = true;
+            },
+            
+            async addLessonForParent() {
+                if (!this.selectedBooking) return;
+                if (!this.newBookingLessonDate || !this.newBookingLessonTime || !this.newBookingLessonPrice) {
+                    alert('Заполните все поля');
+                    return;
+                }
+                
+                const user = await supabaseClient.auth.getUser();
+                const { error } = await supabaseClient
+                    .from('diary_lessons')
+                    .insert({
+                        tutor_id: user.data.user.id,
+                        student_name: this.selectedBooking.student_name,
+                        date: this.newBookingLessonDate,
+                        time: this.newBookingLessonTime,
+                        price: this.newBookingLessonPrice,
+                        paid: 'unpaid',
+                        note: `Занятие для ${this.selectedBooking.parent_name || ''} (родитель)`
+                    });
+                
+                if (error) {
+                    alert('Ошибка: ' + error.message);
+                    return;
+                }
+                
+                this.addLessonModalVisible = false;
+                this.selectedBooking = null;
+                this.newBookingLessonDate = '';
+                this.newBookingLessonTime = '';
+                this.newBookingLessonPrice = '';
+                
+                await this.loadDiary();
+                await this.loadAllBookings();
+                alert('✅ Занятие добавлено в расписание!');
             },
             
             // ===== ДНЕВНИК =====
@@ -1408,7 +1603,6 @@
                 const user = await supabaseClient.auth.getUser();
                 
                 if (this.copyAction === 'move') {
-                    // Удаляем исходные
                     for (const lesson of lessonsToCopy) {
                         await supabaseClient
                             .from('diary_lessons')
@@ -1417,7 +1611,6 @@
                     }
                 }
                 
-                // Копируем в целевую дату
                 for (const lesson of lessonsToCopy) {
                     await supabaseClient
                         .from('diary_lessons')
@@ -1440,7 +1633,6 @@
         },
         
         async mounted() {
-            // Проверяем сессию
             const { data } = await supabaseClient.auth.getSession();
             if (data.session) {
                 const { data: userData, error } = await supabaseClient
@@ -1460,7 +1652,6 @@
                 console.log('🔄 Загружена роль при монтировании:', this.userRole);
             }
             
-            // Слушаем изменения сессии
             supabaseClient.auth.onAuthStateChange(async (event, session) => {
                 if (event === 'SIGNED_IN' && session) {
                     this.userEmail = session.user.email;
@@ -1482,12 +1673,12 @@
                     this.tutorSlots = [];
                     this.freeSlots = [];
                     this.myBookings = [];
+                    this.allBookings = [];
                     this.diaryStudents = [];
                     this.diaryLessons = [];
                 }
             });
             
-            // Устанавливаем сегодняшние даты
             const today = new Date();
             this.newSlotDate = this.formatDate(today);
             this.newLessonDate = this.formatDate(today);
