@@ -26,7 +26,6 @@
             background-position: 0 0, 30px 40px, 0 20px;
         }
         
-        /* ===== ОСНОВНОЙ КОНТЕЙНЕР - УБРАЛИ ЛИШНИЕ ОТСТУПЫ ===== */
         .app-container { 
             max-width: 1400px; 
             width: 100%; 
@@ -38,9 +37,9 @@
             border: 1px solid #e5d5e9; 
             position: relative;
             overflow: hidden;
+            min-height: 80vh;
         }
         
-        /* Декоративные листочки */
         .app-container::before {
             content: '🌿';
             position: absolute;
@@ -113,7 +112,7 @@
             flex-wrap: wrap; 
         }
         
-        /* ===== ЭКРАН ВХОДА - ПОЛНОСТЬЮ НЕЗАВИСИМЫЙ ===== */
+        /* ===== ЭКРАН ВХОДА ===== */
         .login-overlay { 
             position: fixed; 
             top: 0; 
@@ -202,6 +201,7 @@
             cursor: pointer;
             transition: 0.2s;
             border: 1px solid #c9a8d3;
+            margin-top: 0.3rem;
         }
         .login-card .btn-primary:hover { 
             background: #a47bae; 
@@ -245,6 +245,7 @@
             transition: 0.2s;
             background: transparent;
             color: #5e4166;
+            font-size: 0.85rem;
         }
         .login-card .role-selector button.active { 
             background: #b48dbd; 
@@ -258,33 +259,22 @@
             padding-top: 1rem;
         }
         
-        /* ===== ОСТАЛЬНЫЕ СТИЛИ ===== */
-        .role-badge { 
-            background: #b48dbd; 
-            color: white; 
-            padding: 0.2rem 1rem; 
-            border-radius: 60px; 
-            font-size: 0.8rem; 
-            font-weight: 500;
-        }
+        /* ===== ОСТАЛЬНЫЕ СТИЛИ (сокращены) ===== */
+        .role-badge { background: #b48dbd; color: white; padding: 0.2rem 1rem; border-radius: 60px; font-size: 0.8rem; font-weight: 500; }
         .role-badge.parent { background: #7d9b9b; }
-
         .btn-circle { background: #efe6f2; border: 1px solid #d5bedb; border-radius: 60px; width: 38px; height: 38px; display: inline-flex; align-items: center; justify-content: center; color: #553a5c; font-size: 1rem; cursor: pointer; transition: 0.15s; }
         .btn-circle:hover { background: #dcc7e2; border-color: #b48dbd; }
         .btn-circle.today-btn { background: #b48dbd; color: white; border-color: #b48dbd; width: auto; padding: 0 1.2rem; font-weight: 500; font-size: 0.85rem; }
         .btn-circle.today-btn:hover { background: #a47bae; }
         .btn-circle.copy-btn { background: #d9ebd9; border-color: #b8d5b8; color: #1f5420; width: auto; padding: 0 1.2rem; font-weight: 500; font-size: 0.85rem; }
         .btn-circle.copy-btn:hover { background: #c5e0c5; }
-
         .tabs { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
         .tab-btn { background: #efe6f2; border: 1px solid #d5bedb; border-radius: 60px; padding: 0.5rem 1.5rem; font-weight: 500; color: #553a5c; cursor: pointer; transition: 0.15s; font-size: 0.95rem; }
         .tab-btn:hover { background: #dcc7e2; }
         .tab-btn.active { background: #b48dbd; color: white; border-color: #b48dbd; }
-
         .calendar-nav { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; background: #fcf8fe; border-radius: 60px; padding: 0.6rem 1.5rem; margin-bottom: 1.5rem; border: 1px solid #dcc7e2; }
         .calendar-nav .nav-group { display: flex; align-items: center; gap: 0.8rem; flex-wrap: wrap; }
         .calendar-nav .date-display { font-size: 1.1rem; font-weight: 450; color: #3b2740; min-width: 160px; text-align: center; }
-
         .slots-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; margin: 1rem 0; }
         .slot-card { background: #fcf8fe; border-radius: 30px; padding: 1.5rem; border: 1px solid #decbe3; transition: 0.15s; position: relative; }
         .slot-card:hover { border-color: #cbafd3; box-shadow: 0 4px 12px rgba(140, 100, 160, 0.1); }
@@ -302,23 +292,19 @@
         .slot-card .actions .btn-cancel:hover { background: #dcbfe2; }
         .slot-card .actions .btn-delete { background: #f7e6e6; color: #8a4040; }
         .slot-card .actions .btn-delete:hover { background: #eac8c8; }
-
         .add-slot-form { background: #fcf8fe; border-radius: 40px; padding: 1.5rem 2rem; margin: 1.5rem 0; border: 1px solid #dcc7e2; display: flex; flex-wrap: wrap; align-items: flex-end; gap: 1rem 1.5rem; }
         .add-slot-form .field-group { display: flex; flex-direction: column; gap: 0.3rem; flex: 1 0 120px; }
         .add-slot-form label { font-size: 0.8rem; font-weight: 500; color: #5e4166; }
         .add-slot-form input { background: white; border: 1px solid #dcc7e2; border-radius: 40px; padding: 0.6rem 1rem; font-size: 0.9rem; outline: none; width: 100%; }
         .add-slot-form input:focus { border-color: #b48dbd; }
-
         .btn-primary { background: #b48dbd; border: none; border-radius: 60px; padding: 0.6rem 1.5rem; font-weight: 500; color: white; font-size: 0.95rem; display: inline-flex; align-items: center; gap: 8px; cursor: pointer; transition: 0.2s; border: 1px solid #c9a8d3; }
         .btn-primary:hover { background: #a47bae; transform: scale(0.98); }
         .btn-danger { background: #e9d4ed; border: 1px solid #d5b8dc; color: #55335e; padding: 0.3rem 0.8rem; border-radius: 40px; font-size: 0.75rem; font-weight: 500; cursor: pointer; transition: 0.15s; display: inline-flex; align-items: center; gap: 4px; }
         .btn-danger:hover { background: #dcbfe2; }
         .btn-icon { background: transparent; border: none; color: #7f5f89; font-size: 0.9rem; cursor: pointer; padding: 0 4px; }
         .btn-icon:hover { color: #4a2e4f; }
-
         .no-data { text-align: center; padding: 3rem; color: #9a82a2; background: #fcf8fe; border-radius: 40px; border: 1px dashed #dcc7e2; }
         .no-data i { font-size: 2.4rem; opacity: 0.5; display: block; margin-bottom: 0.5rem; }
-
         .day-students-grid { display: flex; flex-direction: column; gap: 1.5rem; }
         .day-student-card { background: #fcf8fe; border-radius: 30px; padding: 1.5rem 2rem; border: 1px solid #decbe3; box-shadow: 0 6px 14px -6px rgba(130, 90, 145, 0.12); transition: 0.15s; }
         .day-student-card:hover { border-color: #cbafd3; }
@@ -336,13 +322,11 @@
         .source-badge { font-size: 0.65rem; padding: 0.15rem 0.6rem; border-radius: 30px; background: #c9d4e8; color: #2e3f5a; display: inline-block; margin-left: 0.3rem; }
         .source-badge.parent { background: #d9ebd9; color: #1f5420; }
         .source-badge.tutor { background: #c9d4e8; color: #2e3f5a; }
-
         .add-student-section { background: #fcf8fe; border-radius: 40px; padding: 1.5rem 2rem; margin: 1.5rem 0; border: 1px solid #dcc7e2; display: flex; flex-wrap: wrap; align-items: flex-end; gap: 1rem 1.5rem; }
         .add-student-section .field-group { display: flex; flex-direction: column; gap: 0.3rem; flex: 1 0 100px; }
         .add-student-section label { font-size: 0.8rem; font-weight: 500; color: #5e4166; display: flex; align-items: center; gap: 6px; }
         .add-student-section input, .add-student-section select { background: white; border: 1px solid #dcc7e2; border-radius: 40px; padding: 0.6rem 1rem; font-size: 0.9rem; color: #2e1f32; outline: none; width: 100%; }
         .add-student-section input:focus, .add-student-section select:focus { border-color: #b48dbd; box-shadow: 0 0 0 3px rgba(180, 130, 190, 0.2); }
-
         .week-grid, .month-grid { display: grid; gap: 0.8rem; margin-top: 1rem; }
         .week-grid { grid-template-columns: repeat(7, 1fr); }
         .month-grid { grid-template-columns: repeat(7, 1fr); }
@@ -370,7 +354,6 @@
         .day-lesson-actions .btn-toggle-paid:hover { opacity: 0.8; }
         .add-mini { background: transparent; border: 1px dashed #d5bedb; border-radius: 12px; padding: 0.2rem; text-align: center; color: #9a82a2; font-size: 0.7rem; cursor: pointer; margin-top: 0.3rem; transition: 0.1s; }
         .add-mini:hover { background: #efe6f2; border-color: #b48dbd; }
-
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(60, 40, 70, 0.5); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
         .modal-content { background: #fcf8fe; border-radius: 40px; padding: 2rem 2.5rem; max-width: 500px; width: 100%; border: 1px solid #dcc7e2; box-shadow: 0 20px 40px rgba(0,0,0,0.2); max-height: 90vh; overflow-y: auto; }
         .modal-content h3 { color: #4a2e4f; margin-bottom: 1rem; }
@@ -380,20 +363,17 @@
         .modal-actions { display: flex; gap: 0.8rem; margin-top: 1.5rem; justify-content: flex-end; flex-wrap: wrap; }
         .modal-actions .btn-secondary { background: #efe6f2; border: 1px solid #d5bedb; border-radius: 40px; padding: 0.5rem 1.5rem; cursor: pointer; }
         .modal-actions .btn-secondary:hover { background: #dcc7e2; }
-
         .cancel-error { background: #f7e6e6; color: #8a4040; padding: 0.5rem 1rem; border-radius: 30px; font-size: 0.85rem; margin-top: 0.5rem; border: 1px solid #eac8c8; }
         .booking-controls { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px dashed #e8d9ed; }
         .booking-controls .paid-status { padding: 0.2rem 0.8rem; border-radius: 60px; font-size: 0.75rem; font-weight: 500; cursor: pointer; border: none; }
         .booking-controls .paid-status.paid { background: #d9ebd9; color: #1f5420; }
         .booking-controls .paid-status.unpaid { background: #f7e6e6; color: #8a4040; }
-
         .student-card-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
         .student-card-actions button { padding: 0.2rem 0.8rem; border-radius: 60px; border: none; font-size: 0.7rem; cursor: pointer; font-weight: 500; transition: 0.15s; }
         .student-card-actions .btn-edit { background: #c9d4e8; color: #2e3f5a; }
         .student-card-actions .btn-edit:hover { background: #b5c4dc; }
         .student-card-actions .btn-delete-student { background: #f7e6e6; color: #8a4040; }
         .student-card-actions .btn-delete-student:hover { background: #eac8c8; }
-
         .autocomplete-container { position: relative; width: 100%; }
         .autocomplete-list { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #dcc7e2; border-radius: 20px; max-height: 200px; overflow-y: auto; z-index: 100; box-shadow: 0 8px 20px rgba(0,0,0,0.1); margin-top: 4px; }
         .autocomplete-item { padding: 0.6rem 1rem; cursor: pointer; border-bottom: 1px solid #f0ebf2; transition: 0.1s; font-size: 0.9rem; display: flex; justify-content: space-between; align-items: center; }
@@ -401,7 +381,6 @@
         .autocomplete-item:last-child { border-bottom: none; }
         .autocomplete-item .student-info { font-size: 0.75rem; color: #7f5f89; }
         .autocomplete-item .student-name { font-weight: 500; color: #3b2740; }
-
         .edit-student-form { margin-top: 0.5rem; padding: 0.5rem; background: #f5f0f7; border-radius: 20px; }
         .edit-student-form .field-group { margin-bottom: 0.3rem; }
         .edit-student-form label { font-size: 0.7rem; color: #5e4166; }
@@ -413,12 +392,10 @@
         .edit-student-form .edit-actions .btn-save:hover { background: #a47bae; }
         .edit-student-form .edit-actions .btn-cancel-edit { background: #e9d4ed; color: #55335e; }
         .edit-student-form .edit-actions .btn-cancel-edit:hover { background: #dcbfe2; }
-
         .saved-data-badge { background: #efe6f2; border: 1px solid #dcc7e2; border-radius: 30px; padding: 0.3rem 1rem; font-size: 0.8rem; color: #5e4166; display: inline-flex; align-items: center; gap: 6px; margin-bottom: 0.5rem; }
         .saved-data-badge i { color: #7d5f86; }
         .btn-change-child { background: transparent; border: 1px solid #d5bedb; border-radius: 30px; padding: 0.2rem 0.8rem; font-size: 0.7rem; color: #553a5c; cursor: pointer; transition: 0.15s; margin-left: 0.5rem; }
         .btn-change-child:hover { background: #efe6f2; border-color: #b48dbd; }
-
         @media (max-width: 768px) {
             .app-container { padding: 1rem; }
             .add-slot-form, .add-student-section { flex-direction: column; align-items: stretch; }
@@ -440,7 +417,9 @@
 </head>
 <body>
 <div class="app-container" id="app">
+    <!-- ========================================== -->
     <!-- ===== ЭКРАН ВХОДА ===== -->
+    <!-- ========================================== -->
     <div v-if="!isLoggedIn" class="login-overlay">
         <div class="login-card">
             <h2><i class="fas fa-leaf"></i> Ученический сад</h2>
@@ -508,20 +487,9 @@
         </div>
     </div>
 
-    <!-- ===== ОСТАЛЬНОЙ КОД (ВСЕ ВКЛАДКИ И ФУНКЦИИ) ===== -->
-    <!-- ... (весь остальной код без изменений) ... -->
-    
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
-<script>
-    // ВЕСЬ JAVASCRIPT КОД БЕЗ ИЗМЕНЕНИЙ
-    // ...
-</script>
-</body>
-</html>
-
+    <!-- ========================================== -->
     <!-- ===== ОСНОВНОЙ ИНТЕРФЕЙС ===== -->
+    <!-- ========================================== -->
     <template v-if="isLoggedIn">
         <!-- ШАПКА -->
         <div class="header-botanical">
